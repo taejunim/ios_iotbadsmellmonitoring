@@ -37,11 +37,11 @@
 		BF673FDF2668B8C900B4D91B /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		BF673FE12668C6D100B4D91B /* SignUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpView.swift; sourceTree = "<group>"; };
 		BF673FE32668C75100B4D91B /* SignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInView.swift; sourceTree = "<group>"; };
-		BF673FE52668C7B500B4D91B /* SignInViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SignInViewModel.swift; path = IoTBadSmellMonitoring/Sources/View/SignInViewModel.swift; sourceTree = SOURCE_ROOT; };
+		BF673FE52668C7B500B4D91B /* SignInViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SignInViewModel.swift; path = IoTBadSmellMonitoring/Sources/ViewModel/SignInViewModel.swift; sourceTree = SOURCE_ROOT; };
 		BF673FE92668CA6A00B4D91B /* CustomControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomControlView.swift; sourceTree = "<group>"; };
-		BF673FEB2668CCDC00B4D91B /* SignUpViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SignUpViewModel.swift; path = IoTBadSmellMonitoring/Sources/View/Common/SignUpViewModel.swift; sourceTree = SOURCE_ROOT; };
-		BF673FED2668EC6C00B4D91B /* UserModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = UserModel.swift; path = IoTBadSmellMonitoring/Sources/View/Common/UserModel.swift; sourceTree = SOURCE_ROOT; };
-		BF673FEF2668EEDF00B4D91B /* WeatherModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = WeatherModel.swift; path = IoTBadSmellMonitoring/Sources/View/Common/WeatherModel.swift; sourceTree = SOURCE_ROOT; };
+		BF673FEB2668CCDC00B4D91B /* SignUpViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SignUpViewModel.swift; path = IoTBadSmellMonitoring/Sources/ViewModel/SignUpViewModel.swift; sourceTree = SOURCE_ROOT; };
+		BF673FED2668EC6C00B4D91B /* UserModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = UserModel.swift; path = IoTBadSmellMonitoring/Sources/Model/UserModel.swift; sourceTree = SOURCE_ROOT; };
+		BF673FEF2668EEDF00B4D91B /* WeatherModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = WeatherModel.swift; path = IoTBadSmellMonitoring/Sources/Model/WeatherModel.swift; sourceTree = SOURCE_ROOT; };
 		BFC8A41B266774770053995B /* LaunchScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchScreen.swift; sourceTree = "<group>"; };
 		BFE2C6D3266D9EE300F03C90 /* ApiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiService.swift; sourceTree = "<group>"; };
 		BFE2C6D5266DA44400F03C90 /* ApiManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiManager.swift; sourceTree = "<group>"; };
@@ -120,21 +120,12 @@
 		BF031BCF265F548A008AB3F5 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				BFE2C6DB266F618D00F03C90 /* Model */,
 				BF673FF12668EF0600B4D91B /* APIService */,
-				BF031BD2265F54AB008AB3F5 /* Model */,
 				BF031BD1265F54A6008AB3F5 /* View */,
-				BF031BD0265F549D008AB3F5 /* ViewModel */,
+				BFE2C6DC266F61CA00F03C90 /* ViewModel */,
 			);
 			path = Sources;
-			sourceTree = "<group>";
-		};
-		BF031BD0265F549D008AB3F5 /* ViewModel */ = {
-			isa = PBXGroup;
-			children = (
-				BF673FE52668C7B500B4D91B /* SignInViewModel.swift */,
-				BF673FEB2668CCDC00B4D91B /* SignUpViewModel.swift */,
-			);
-			path = ViewModel;
 			sourceTree = "<group>";
 		};
 		BF031BD1265F54A6008AB3F5 /* View */ = {
@@ -148,15 +139,6 @@
 				BF673FDF2668B8C900B4D91B /* MainView.swift */,
 			);
 			path = View;
-			sourceTree = "<group>";
-		};
-		BF031BD2265F54AB008AB3F5 /* Model */ = {
-			isa = PBXGroup;
-			children = (
-				BF673FED2668EC6C00B4D91B /* UserModel.swift */,
-				BF673FEF2668EEDF00B4D91B /* WeatherModel.swift */,
-			);
-			path = Model;
 			sourceTree = "<group>";
 		};
 		BF673FE82668C86400B4D91B /* Common */ = {
@@ -183,6 +165,24 @@
 				E60288365D4CBD273C7D1636 /* Pods_IoTBadSmellMonitoring.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		BFE2C6DB266F618D00F03C90 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				BF673FED2668EC6C00B4D91B /* UserModel.swift */,
+				BF673FEF2668EEDF00B4D91B /* WeatherModel.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		BFE2C6DC266F61CA00F03C90 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				BF673FE52668C7B500B4D91B /* SignInViewModel.swift */,
+				BF673FEB2668CCDC00B4D91B /* SignUpViewModel.swift */,
+			);
+			path = ViewModel;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
