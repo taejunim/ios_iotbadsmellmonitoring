@@ -12,7 +12,7 @@ struct IoTBadSmellMonitoringApp: App {
     var body: some Scene {
         WindowGroup {
             LaunchScreen()
-            //ContentView()
+            //SmellReceptionView()
         }
     }
 }

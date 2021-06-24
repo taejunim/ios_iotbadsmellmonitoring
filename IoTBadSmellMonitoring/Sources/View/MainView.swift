@@ -23,31 +23,32 @@ struct MainView: View {
     @State private var half = false
     @State private var dim = false
     @State private var blurRadius = false
-    
+    @State private var selectTest: String = "000"
+    @State var isShowing = false
     var body: some View {
         ZStack {
-            Rectangle().fill(gradient)
-
-            Image("LaunchImage")
-                .resizable()
-                .scaleEffect(half ? 1.0 : 0.5)
-                .opacity(dim ? 1.0 : 0.2)
-                
-            Title2()
-                .blur(radius: blurRadius ? 0 : 90)
+            
         }
-        .edgesIgnoringSafeArea(.all)
-        .onAppear {
-            self.half = true
-
-            withAnimation(.easeInOut(duration: 2.0)) {
-                
-                self.dim = true
-                self.blurRadius = true
-            }
-        }
+        
+//        ZStack {
+//            Image("CircleCheck")
+//                .renderingMode(.template)
+//                .foregroundColor(Color("Color_E4513D"))
+//
+//        }
+//        .edgesIgnoringSafeArea(.all)
+//        .onAppear {
+//            self.half = true
+//
+//            withAnimation(.easeInOut(duration: 2.0)) {
+//
+//                self.dim = true
+//                self.blurRadius = true
+//            }
+//        }
     }
 }
+
 
 struct Title2: View {
     

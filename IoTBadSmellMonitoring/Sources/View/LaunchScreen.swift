@@ -7,96 +7,78 @@
 
 import SwiftUI
 
+//MARK: - Launch Screen
 struct LaunchScreen: View {
+    @State private var showLaunchScreen = true  //App 실행화면 노출 여부
     
-    @State private var showLaunchScreen = true
+    @State private var half = false //스케일 효과
+    @State private var dim = false  //불투명 효과
+    @State private var degree = false //흐림 효과
     
+    //전체 화면 - 그라데이션 효과 설정
     var gradient: LinearGradient {
         LinearGradient(
             gradient: Gradient(
-                colors: [Color.black.opacity(0.6), Color.black.opacity(0)]
+                colors: [
+                    Color.black.opacity(0.6),
+                    Color.black.opacity(0)
+                ]
             ),
             startPoint: .bottom,
             endPoint: .top
         )
     }
     
-    @State private var half = false
-    @State private var dim = false
-    @State private var blurRadius = false
-    
     var body: some View {
-//        ZStack {
-//            Rectangle().fill(gradient)
-//
-//            Image("LaunchImage")
-//                .resizable()
-//                .scaleEffect(half ? 1.0 : 0.5)
-//                .opacity(dim ? 1.0 : 0.2)
-//
-//            Title()
-//                .blur(radius: blurRadius ? 0 : 90)
-//        }
-//        .edgesIgnoringSafeArea(.all)
-//        .onAppear {
-//            self.half = true
-//
-//            withAnimation(.easeInOut(duration: 2.0)) {
-//                self.dim = true
-//                self.blurRadius = true
-//            }
-//        }
-        
         Group {
             if showLaunchScreen {
                 ZStack {
-                    Rectangle().fill(gradient)
+                    Rectangle().fill(gradient)  //화면 Gradation 처리
 
+                    //화면 이미지
                     Image("LaunchImage")
                         .resizable()
-                        .scaleEffect(half ? 1.0 : 0.5)
-                        .opacity(dim ? 1.0 : 0.2)
+                        .scaleEffect(half ? 1.0 : 0.5)  //스케일 효과
+                        .opacity(dim ? 1.0 : 0.2)   //불투명 효과
 
+                    //타이틀
                     Title()
-                        .blur(radius: blurRadius ? 0 : 90)
+                        .blur(radius: degree ? 0 : 90)  //타이틀 흐림 효과 처리
                 }
-                .edgesIgnoringSafeArea(.all)
+                .edgesIgnoringSafeArea(.all)    //Safe Area 전체 적용
             }
             else {
-                SignInView()
+                SignInView()    //로그인 화면 이동
             }
         }
         .onAppear {
             self.half = true
 
+            //시작 화면 Animation 효과 처리
             withAnimation(.easeInOut(duration: 2.0)) {
                 self.dim = true
-                self.blurRadius = true
+                self.degree = true //흐림 효과 처리 해제
             }
-
-            withAnimation(Animation.linear.delay(2)) {
-                showLaunchScreen = false
+            //시작 화면 노출 시간 지연 설정
+            withAnimation(Animation.linear.delay(2.5)) {
+                showLaunchScreen = false    //시작 화면 노출 여부 변경
             }
         }
     }
 }
 
+//MARK: - 타이틀 영역
 struct Title: View {
+    @ObservedObject var viewUtil = ViewUtil()
     
-    var gradient: LinearGradient {
-        LinearGradient(
-            gradient: Gradient(
-                colors: [Color.black.opacity(0.6), Color.black.opacity(0)]
-            ),
-            startPoint: .bottom,
-            endPoint: .top
-        )
-    }
-    
+    //타이틀 Background - 그라데이션 효과 설정
     var titleGradient: LinearGradient {
         LinearGradient(
             gradient: Gradient(
-                colors: [Color.black.opacity(0.5), Color.black.opacity(0.5)]
+                colors: [
+                    Color.black.opacity(0.5),
+                    Color.black.opacity(0.5)
+                ]
             ),
             startPoint: .top,
             endPoint: .bottom
@@ -122,8 +104,8 @@ struct Title: View {
             }
         }
         .padding()
-        .foregroundColor(.white)
-        .background(titleGradient)
+        .foregroundColor(.white)    //타이틀 색상
+        .background(titleGradient)  //타이틀 영역 배경 설정
     }
 }
 

@@ -1,5 +1,5 @@
 //
-//  CustomControlView.swift
+//  CustomView.swift
 //  IoTBadSmellMonitoring
 //
 //  Created by KJ on 2021/06/03.
@@ -7,27 +7,58 @@
 
 import SwiftUI
 
-//Text Field 밑줄
+//MARK: - 구분선
+struct DividerLine: View {
+    var body: some View {
+        Divider()
+            .frame(height: 1)
+            .background(Color("Color_EFEFEF"))
+            .padding(.all, 10)
+    }
+}
+
+//MARK: - Text Field 밑줄
 struct TextFiledUnderLine: View {
     var body: some View {
         Divider()
             .frame(height: 1)
-            .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color("Color_E0E0E0")/*@END_MENU_TOKEN@*/)
+            .background(Color("Color_EFEFEF"))
             .padding(.bottom, 10)
     }
 }
 
-//필수입력(*) Label
+//MARK: - 필수입력(*) Label
 struct RequiredInputLabel: View {
     var body: some View {
         Text("*")
-            .foregroundColor(.red)
+            .foregroundColor(Color("Color_E4513D"))
     }
 }
 
-//Image Picker - 이미지 선택창
+//MARK: - Back 버튼
+struct BackButton: View {
+    @Environment(\.presentationMode) var presentationMode
+    
+    var body: some View {
+        Button(
+            action: {
+                self.presentationMode.wrappedValue.dismiss()
+            },
+            label: {
+                HStack {
+                    Image(systemName: "chevron.left")
+                        .foregroundColor(.black)
+                }
+                .padding(.trailing)
+            }
+        )
+    }
+}
+
+//MARK: - Image Picker - 이미지 선택창
 struct ImagePicker: UIViewControllerRepresentable {
     @Environment(\.presentationMode) private var presentationMode
+    
     let sourceType: UIImagePickerController.SourceType
     let onPickedImage: (UIImage) -> ()
     

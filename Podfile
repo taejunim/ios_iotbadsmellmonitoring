@@ -6,6 +6,8 @@ target 'IoTBadSmellMonitoring' do
   use_frameworks!
 
   pod 'Alamofire', '~> 5.4.3'
+  pod 'PromisedFuture'
+  pod 'ExytePopupView'
 
   post_install do |installer|
     installer.pods_project.targets.each do |target|

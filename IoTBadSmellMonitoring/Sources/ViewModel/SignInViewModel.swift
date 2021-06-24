@@ -6,43 +6,100 @@
 //
 
 import Foundation
+import Alamofire
 
 class SignInViewModel: ObservableObject {
+    private let userAPI = UserAPIService()  //사용자 API Service
     
-    let userApi = UserApiService()
-    let api = ApiService()
+    @Published var result: String = ""   //결과 상태
+    @Published var message: String = "" //결과 메시지
+    @Published var validMessage: String = ""    //유효성 검사 메시지
     
-    @Published var signInModel: SignIn?
-    
-    @Published var id: String = ""   //이메일
+    @Published var id: String = ""   //ID
     @Published var password: String = ""    //비밀번호
-    @Published var status: Bool = false   //로그인 결과
-    @Published var message: String = "" //로그인 결과 메시지
     
-    //로그인 실행
-    func signIn() {
-        print("ID = \(id)")
-        print("Password = \(password)")
+    //MARK: - 로그인 실행(로그인 API 호출)
+    /// 로그인 API 호출을 통한 로그인 실행
+    /// - Parameter completion: 로그인 결과
+    func signIn(completion: @escaping (String) -> Void) {
         
-        let body = ["userId": id, "userPassword": password]
+        //API 호출 - Request Body
+        let parameters = [
+            "userId": id,
+            "userPassword": password
+        ]
         
-//        userApi.requestSignIn(body) { (results) in
-//            let jsonObject = try JSONSerialization.data(withJSONObject: results, options: .prettyPrinted)
-//            let jsonData = try JSONDecoder.decode(signInModel.self, from: jsonObject)
-//        }
-        
-//        api.request("base", "/api/userLogin", "GET", body) { (response) in
-//            let jsonObject = try JSONSerialization.data(withJSONObject: response, options: .prettyPrinted)
-//            let jsonData = try JSONDecoder.decode(signInModel.self, from: jsonObject)
-//        }
-        api.request("base", "/api/userLogin", "GET", body) { (response) in
-            switch response.result {
-            case .success:
-                print("Value : \(response.value!)")
-                print("Data : \(response.data!)")
-            case .failure(let error):
+        //로그인 API 호출
+        let request = userAPI.requestSignIn(parameters: parameters)
+        request.execute(
+            //API 호출 성공
+            onSuccess: { (signIn) in
+                //로그인 성공
+                if signIn.result == "success" {
+                    self.result = signIn.result
+                }
+                //로그인 실패
+                else {
+                    self.result = signIn.result
+                    self.message = "아이디 또는 비밀번호가 일치하지 않습니다."
+                }
+                
+                completion(self.result)
+            },
+            //API 호출 실패
+            onFailure: { (error) in
+                self.result = "server error"
+                self.message = "서버와의 통신이 원활하지 않습니다."
+                
+                completion(self.result)
+                
                 print(error.localizedDescription)
             }
+        )
+    }
+    
+    //MARK: - 유효성 검사
+    func validate() -> Bool {
+        //ID 입력 여부 확인
+        if id.isEmpty {
+            self.validMessage = "아이디를 입력하세요."
+            return false
         }
+        else {
+            guard isIdValid() else {
+                self.validMessage = "올바른 아이디를 입력하세요."
+                return false
+            }
+        }
+        
+        //비밀번호 입력 여부 확인
+        if password.isEmpty {
+            self.validMessage = "비밀번호를 입력하세요."
+            return false
+        }
+        else {
+            guard isPasswordValid() else {
+                self.validMessage = "올바른 비밀번호를 입력하세요."
+                return false
+            }
+        }
+        
+        return true
+    }
+    
+    //MARK: - ID 유효성 검사
+    func isIdValid() -> Bool {
+        let regExp = "^[a-zA-Z0-9]{5,20}$"
+        let idPredicate = NSPredicate(format: "SELF MATCHES %@", regExp)
+        
+        return idPredicate.evaluate(with: id)
+    }
+    
+    //MARK: - 비밀번호 유효성 검사
+    func isPasswordValid() -> Bool {
+        let regExp = "^[a-zA-Z0-9]{5,15}$"
+        let passwordPredicate = NSPredicate(format: "SELF MATCHES %@", regExp)
+        
+        return passwordPredicate.evaluate(with: password)
     }
 }

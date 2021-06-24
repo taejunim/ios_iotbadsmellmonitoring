@@ -1,16 +1,24 @@
 PODS:
   - Alamofire (5.4.3)
+  - ExytePopupView (1.0.0)
+  - PromisedFuture (1.0.2)
 
 DEPENDENCIES:
   - Alamofire (~> 5.4.3)
+  - ExytePopupView
+  - PromisedFuture
 
 SPEC REPOS:
   trunk:
     - Alamofire
+    - ExytePopupView
+    - PromisedFuture
 
 SPEC CHECKSUMS:
   Alamofire: e447a2774a40c996748296fa2c55112fdbbc42f9
+  ExytePopupView: f28c73501939ed484018850a4f42099fac402d40
+  PromisedFuture: 15ab3542f9d9c9d62886e2228c606a3e0fd16ccd
 
-PODFILE CHECKSUM: 74ca0fc75fd5f7fb3e6341f1ac9d93b7bd73e05e
+PODFILE CHECKSUM: 0d86bb5653519a1237847010952a758886036d70
 
 COCOAPODS: 1.10.1
