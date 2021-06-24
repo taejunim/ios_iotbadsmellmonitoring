@@ -31,7 +31,7 @@ struct SmellReceptionView: View {
                 
                 VStack {
                     ScrollView {
-                        CurrentWeatherView(viewUtil: viewUtil, smellViewModel: smellViewModel)
+                        CurrentWeatherView(viewUtil: viewUtil, weatherViewModel: weatherViewModel, smellViewModel: smellViewModel)
                         DividerLine()
                         ReceptionStatusView()
                         DividerLine()
