@@ -14,7 +14,7 @@ struct SmellReceptionView: View {
     @ObservedObject var viewUtil = ViewUtil()
     @ObservedObject var codeViewModel = CodeViewModel() 
     @ObservedObject var weatherViewModel = WeatherViewModel() //Weather View Model
-    @ObservedObject var smellViewModel = SmellReceptionViewModel() //Code View Model
+    @ObservedObject var smellViewModel = SmellReceptionViewModel() //Smell Reception View Model
     
     init() {
         viewOptionSet.navigationBarOption() //Navigation Bar 옵션
@@ -31,7 +31,7 @@ struct SmellReceptionView: View {
                 
                 VStack {
                     ScrollView {
-                        CurrentWeatherView(viewUtil: viewUtil, weatherViewModel: weatherViewModel)
+                        CurrentWeatherView(viewUtil: viewUtil, smellViewModel: smellViewModel)
                         DividerLine()
                         ReceptionStatusView()
                         DividerLine()
@@ -48,7 +48,7 @@ struct SmellReceptionView: View {
         .onAppear {
             viewUtil.isLoading = true
             
-            weatherViewModel.backgroundColor = weatherViewModel.setWeatherBackground()
+            smellViewModel.weatherBackground = smellViewModel.setWeatherBackground()
             
             smellViewModel.getSmellCode()   //악취 강도 코드
             
@@ -83,6 +83,7 @@ struct MenuButton: View {
 struct CurrentWeatherView: View {
     @ObservedObject var viewUtil: ViewUtil
     @ObservedObject var weatherViewModel: WeatherViewModel //Weather View Model
+    @ObservedObject var smellViewModel: SmellReceptionViewModel //Smell Reception View Model
 
     var body: some View {
         VStack {
@@ -136,7 +137,7 @@ struct CurrentWeatherView: View {
             .foregroundColor(.white)
         }
         .padding(.vertical, 10)
-        .background(viewUtil.gradient(weatherViewModel.backgroundColor.0, weatherViewModel.backgroundColor.1, .top, .bottom))
+        .background(viewUtil.gradient(smellViewModel.weatherBackground.0, smellViewModel.weatherBackground.1, .top, .bottom))
     }
 }
 

@@ -56,6 +56,7 @@ class SignUpViewModel: ObservableObject {
         guard isIdValid() else {
             self.result = "valid error"
             self.validMessage = "형식에 맞지 않는 아이디입니다."
+            
             completion(self.result)
             
             return
@@ -116,7 +117,6 @@ class SignUpViewModel: ObservableObject {
         request.execute(
             //API 호출 성공
             onSuccess: { (signUp) in
-                print(signUp)
                 //회원가입 성공
                 if signUp.result == "success" {
                     self.result = signUp.result
@@ -136,7 +136,6 @@ class SignUpViewModel: ObservableObject {
                 self.message = "서버와의 통신이 원활하지 않습니다."
 
                 completion(self.result)
-
                 print(error.localizedDescription)
             }
         )
