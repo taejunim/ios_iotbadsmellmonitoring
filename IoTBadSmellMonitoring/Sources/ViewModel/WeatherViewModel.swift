@@ -30,8 +30,9 @@ class WeatherViewModel: ObservableObject {
     }
     
     //MARK: - 현재 날씨 API 호출
+    /// 기상청 날씨 API 호출
+    /// - Parameter completion: 가공된 현재 날씨 정보 - createCurrentWeather() 함수 참고
     func getCurrentWeather(completion: @escaping ([String: String]) -> Void) {
-    //func getCurrentWeather() {
         
         let baseDate: String = "yyyyMMdd".dateFormatter(formatDate: Date()) //발표일자 - yyyyMMdd
         
@@ -62,6 +63,7 @@ class WeatherViewModel: ObservableObject {
                 
                 let resultCode: String = weather.response.header.resultCode //날씨 API 조회 결과 코드
                 
+                //결과 코드 - 정상(00)
                 if resultCode == "00" {
                     self.result = "success"
                     let items = weather.response.body?.items.item   //Response Items 데이터 추출
@@ -69,23 +71,36 @@ class WeatherViewModel: ObservableObject {
                     for index in 0..<items!.count {
                         let item = items![index]
                         
+                        //현재 시간과 가장 가까운 날씨 예보 데이터 추출
                         if item.fcstTime == nearestTime {
-                            let category = item.category
+                            let category = item.category    //자료구분 코드
                             
+                            /*
+                             * - 자료구분 코드 정보
+                             *    T1H - 기온 (단위: ℃)
+                             *    SKY - 하늘상태 (맑음, 구름많음, 흐림)
+                             *    REH - 습도 (단위: %)
+                             *    PTY - 강수형태 (없음, 비, 비/눈, 눈, 소나기, 빗방울, 빗방울/눈날림, 눈날림)
+                             *    VEC - 풍향 (단위: deg)
+                             *    WSD - 풍속 (단위: m/s)
+                             */
+                            //필요없는 코드정보 제외 - RN1(1시간 강수량), UUU(동서바람성분), VVV(남북바람성분), LGT(낙뢰)
                             if category != "RN1" && category != "UUU" && category != "VVV" && category != "LGT" {
                                 weatherDictionary.updateValue(item.fcstValue, forKey: item.category)
                             }
                         }
                     }
-                    print(weatherDictionary)
                     
+                    //풍향 코드 호출 및 날씨 데이터 가공
                     self.getWindDirectionCode() { code in
                         self.windDirectionCode = code
-                        completion(self.createCurrentWeather(weatherDictionary))
+                        completion(self.createCurrentWeather(weatherDictionary))    //가공된 현재 날씨 데이터
                     }
                 }
                 else {
                     self.result = "fail"
+                    self.message = "날씨 정보를 불러오지 못하였습니다."
+                    completion([:])
                 }
             },
             //API 호출 실패
@@ -93,23 +108,28 @@ class WeatherViewModel: ObservableObject {
                 self.result = "server error"
                 self.message = "서버와의 통신이 원활하지 않습니다."
                 
+                completion([:])
                 print(error.localizedDescription)
             }
         )
     }
     
+    //MARK: - 현재 날씨 정보 생성
+    /// 날씨 API를 통해 추출한 날씨 데이터를 현재 날씨 화면에 출력할  데이터로 가공
+    /// - Parameter weatherValues: 추출한 날씨 API 데이터 정보
+    /// - Returns: 가공된 날씨 데이터 정보 - 기상상태 , 날씨 아이콘, 기온, 습도, 풍향, 풍속
     func createCurrentWeather(_ weatherValues: [String: String]) -> [String: String] {
 
         let currentTime: Int = Int("HH".dateFormatter(formatDate: Date()))!    //현재 시간
         
-        let skyState: String = weatherValues["SKY"]!
-        let precip: String = weatherValues["PTY"]!
-        let temp: String = weatherValues["T1H"]!
-        let humidity: String = weatherValues["REH"]!
-        let windVector: Int = Int(weatherValues["VEC"]!)!
-        let windSpeed: String = weatherValues["WSD"]!
+        let skyState: String = weatherValues["SKY"]!    //하늘상태
+        let precip: String = weatherValues["PTY"]!  //강수형태
+        let temp: String = weatherValues["T1H"]!    //기온
+        let humidity: String = weatherValues["REH"]!    //습도
+        let windVector: Int = Int(weatherValues["VEC"]!)!   //풍향
+        let windSpeed: String = weatherValues["WSD"]!   //풍속
 
-        var weatherStateCode: String = "001"
+        var weatherStateCode: String = "011"    //기상 상태 코드 (011: 기타)
         
         //날씨 아이콘
         var weatherIcon: String {
@@ -137,6 +157,7 @@ class WeatherViewModel: ObservableObject {
                     weatherStateCode = "003"
                     return"cloud.fill"
                 default:
+                    weatherStateCode = "011"
                     return "sun.max.fill"
                 }
             }
@@ -168,24 +189,27 @@ class WeatherViewModel: ObservableObject {
                     weatherStateCode = "010"
                     return "cloud.snow.fill"
                 default:
+                    weatherStateCode = "011"
                     return "cloud.rain.fill"
                 }
             }
         }
         
+        //풍향 값 계산 후 16방위로 변환
         var windDirection: String {
             let convertValue: Int = Int(floor((Double(windVector) + 22.5 * 0.5) / 22.5))    //풍향 변환 값
 
             return windDirectionCode[convertValue]["codeName"]!
         }
         
+        //가공된 현재 날씨 정보
         let currentWeather = [
-            "weatherState": weatherStateCode,
-            "weatherIcon": weatherIcon,
-            "temp": temp,
-            "humidity": humidity,
-            "windDirection": windDirection,
-            "windSpeed": windSpeed
+            "weatherState": weatherStateCode,   //기상상태 코드
+            "weatherIcon": weatherIcon, //날씨 아이콘
+            "temp": temp,   //기온
+            "humidity": humidity,   //습도
+            "windDirection": windDirection, //풍향
+            "windSpeed": windSpeed  //풍속
         ]
         
         print(currentWeather)

@@ -11,15 +11,14 @@ import SwiftUI
 struct SignUpView: View {
     @Environment(\.presentationMode) var presentationMode   //Back 버튼 기능 추가에 필요
     @State private var viewOptionSet = ViewOptionSet() //화면 Option Set
-    
     @ObservedObject var viewUtil = ViewUtil()
+    
     @ObservedObject var signUpViewModel = SignUpViewModel() //회원가입 View Model
-
+    
     init() {
-        viewOptionSet.navigationBarOption() //Navigation Bar 옵션
         viewOptionSet.pickerOption()    //Picker 옵션
     }
-
+    
     var body: some View {
         ZStack {
             //로딩 표시 여부에 따라 표출
@@ -255,6 +254,12 @@ struct AccountRegistButton: View {
 }
 
 struct SignUpView_Previews: PreviewProvider {
+    @State private var viewOptionSet = ViewOptionSet() //화면 Option Set
+    
+    init() {
+        viewOptionSet.navigationBarOption() //Navigation Bar 옵션
+    }
+    
     static var previews: some View {
         SignUpView()
     }

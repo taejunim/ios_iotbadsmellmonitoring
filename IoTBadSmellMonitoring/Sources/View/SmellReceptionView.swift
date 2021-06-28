@@ -7,18 +7,13 @@
 
 import SwiftUI
 
-//MARK: - 냄새 접수 화면
+//MARK: - 악취 접수 화면
 struct SmellReceptionView: View {
-    @State private var viewOptionSet = ViewOptionSet() //화면 Option Set
-    
     @ObservedObject var viewUtil = ViewUtil()
-    @ObservedObject var codeViewModel = CodeViewModel() 
+    
+    @ObservedObject var codeViewModel = CodeViewModel() //Code View Model
     @ObservedObject var weatherViewModel = WeatherViewModel() //Weather View Model
     @ObservedObject var smellViewModel = SmellReceptionViewModel() //Smell Reception View Model
-    
-    init() {
-        viewOptionSet.navigationBarOption() //Navigation Bar 옵션
-    }
     
     var body: some View {
         NavigationView {
@@ -31,30 +26,37 @@ struct SmellReceptionView: View {
                 
                 VStack {
                     ScrollView {
-                        CurrentWeatherView(viewUtil: viewUtil, weatherViewModel: weatherViewModel, smellViewModel: smellViewModel)
-                        DividerLine()
-                        ReceptionStatusView()
-                        DividerLine()
-                        SmellLevelView(smellViewModel: smellViewModel)
-                        DividerLine()
+                        CurrentWeatherView(viewUtil: viewUtil, weatherViewModel: weatherViewModel, smellViewModel: smellViewModel)  //현재 날씨 화면
+                        
+                        DividerLine()   //구분선
+                        
+                        ReceptionStatusView(smellViewModel: smellViewModel) //금일 접수 현황 화면
+                        
+                        DividerLine()   //구분선
+                        
+                        SmellLevelView(smellViewModel: smellViewModel)  //악취 강도 선택 화면
+                        
+                        DividerLine()   //구분선
                     }
                 }
                 .disabled(viewUtil.isLoading)   //로딩 중 화면 클릭 방지
             }
-            .navigationBarTitle(Text("냄새 접수"), displayMode: .inline) //Navigation Bar 타이틀
+            .navigationBarTitle(Text("악취 접수"), displayMode: .inline) //Navigation Bar 타이틀
             .navigationBarBackButtonHidden(true)    //기본 Back 버튼 숨김
             .navigationBarItems(leading: MenuButton())  //커스텀 Back 버튼 추가
         }
         .onAppear {
-            viewUtil.isLoading = true
+            viewUtil.isLoading = true   //로딩 시작
             
-            smellViewModel.weatherBackground = smellViewModel.setWeatherBackground()
-            
+            smellViewModel.weatherBackground = smellViewModel.setWeatherBackground()    //시간에 따른 날씨 배경 설정
             smellViewModel.getSmellCode()   //악취 강도 코드
             
+            smellViewModel.getReceptionStatus() //금일 냄새 접수 현황
+            
+            //현재 날씨 호출
             weatherViewModel.getCurrentWeather() { (weather) in
-                weatherViewModel.currentWeather = weather
-                viewUtil.isLoading = false
+                weatherViewModel.currentWeather = weather   //현재 날씨 정보
+                viewUtil.isLoading = false  //로딩 종료
             }
         }
     }
@@ -125,11 +127,11 @@ struct CurrentWeatherView: View {
                 //날씨 API 호출 실패 시
                 else {
                     VStack(alignment: .center) {
-                        Text("날씨 정보를 불러오지 못하였습니다.")
+                        //Text("날씨 정보를 불러오지 못하였습니다.")
+                        Text(weatherViewModel.message)
                             .fontWeight(/*@START_MENU_TOKEN@*/.bold/*@END_MENU_TOKEN@*/)
                     }
                     .padding(.vertical, 30)
-                    
                 }
                 
                 Spacer()
@@ -137,59 +139,58 @@ struct CurrentWeatherView: View {
             .foregroundColor(.white)
         }
         .padding(.vertical, 10)
-        .background(viewUtil.gradient(smellViewModel.weatherBackground.0, smellViewModel.weatherBackground.1, .top, .bottom))
+        .background(viewUtil.gradient(smellViewModel.weatherBackground.0, smellViewModel.weatherBackground.1, .top, .bottom))   //현재 날씨 화면 배경 설정
     }
 }
 
 //MARK: - 금일 접수 현황 화면
 struct ReceptionStatusView: View {
-    @State var count: Int = 2
+    @ObservedObject var smellViewModel: SmellReceptionViewModel
     
     var body: some View {
-        VStack(alignment: .leading) {
+        VStack {
             HStack {
-                Text("금일 냄새 접수 현황(\(count)/4)")
+                Text("금일 냄새 접수 현황(\(smellViewModel.completeCount)/\(smellViewModel.receptionStatus.count))")
                     .font(/*@START_MENU_TOKEN@*/.subheadline/*@END_MENU_TOKEN@*/)
+                
                 Spacer()
             }
             
             HStack {
-                VStack {
-                    Image("Check.Circle")
-                        .resizable().scaledToFill().frame(width: 60, height: 60).clipped()
+                //금일 냄새 접수 현황
+                ForEach(smellViewModel.receptionStatus, id: \.self) { status in
+                    //let timeZoneCode: String = status["timeZoneCode"] ?? ""   //접수 시간대 코드
+                    let timeZone: String = status["timeZone"] ?? "" //접수 시간대
+                    let statusCode: String = status["statusCode"] ?? "" //접수상태 코드
                     
-                    Text("07:00 ~ 09:00")
-                        .font(.caption)
-                }
-                
-                Spacer()
-                
-                VStack {
-                    Image("Xmark.Circle")
-                        .resizable().scaledToFill().frame(width: 60, height: 60).clipped()
+                    //접수상태에 따른 이미지 명
+                    let statusImage: String = {
+                        //접수 완료
+                        if statusCode == "001" {
+                            return "Check.Circle"
+                        }
+                        //접수 미완료
+                        else if statusCode == "002" {
+                            return "Xmark.Circle"
+                        }
+                        //접수 예정
+                        else {
+                            return "Minus.Circle"
+                        }
+                    }()
                     
-                    Text("12:00 ~ 14:00")
-                        .font(.caption)
-                }
-                
-                Spacer()
-                
-                VStack {
-                    Image("Check.Circle")
-                        .resizable().scaledToFill().frame(width: 60, height: 60).clipped()
+                    VStack {
+                        Image(statusImage)
+                            .resizable().scaledToFill().frame(width: 60, height: 60).clipped()
+
+                        Text(timeZone)
+                            .font(.caption)
+                    }
                     
-                    Text("18:00 ~ 20:00")
-                        .font(.caption)
-                }
-                
-                Spacer()
-                
-                VStack {
-                    Image("Minus.Circle")
-                        .resizable().scaledToFill().frame(width: 60, height: 60).clipped()
-                    
-                    Text("22:00 ~ 00:00")
-                        .font(.caption)
+                    //마지막 접수 현황 Spacer() 제외 처리
+                    if status != smellViewModel.receptionStatus.last {
+                        Spacer()
+                    }
                 }
             }
         }
@@ -200,7 +201,7 @@ struct ReceptionStatusView: View {
 //MARK: - 악취 강도 선택 화면
 struct SmellLevelView: View {
     @ObservedObject var smellViewModel: SmellReceptionViewModel
-
+    
     var body: some View {
         VStack {
             HStack {
@@ -209,13 +210,14 @@ struct SmellLevelView: View {
             }
 
             //악취 강도 선택 버튼 생성
-            ForEach(smellViewModel.smellCode, id: \.self) { smellCode in
-                let codeName: String = smellCode["codeName"] ?? ""  //코드 명
-                let codeComment: String = smellCode["codeComment"] ?? ""    //코드 설명
+            ForEach(smellViewModel.smellCode, id: \.self) { code in
+                let smellCode: String = code["code"] ?? ""  //코드
+                let smellName: String = code["codeName"] ?? ""  //코드 명
+                let smellComment: String = code["codeComment"] ?? ""    //코드 설명
 
                 //악취 강도 선택 버튼 색상
                 let smellColor: String = {
-                    switch smellCode["code"] ?? "" {
+                    switch smellCode {
                     case "001":
                         return "Zero.Degree"
                     case "002":
@@ -229,15 +231,15 @@ struct SmellLevelView: View {
                     case "006":
                         return "Five.Degree"
                     default:
-                        return "Color_ FFFFFF"
+                        return "Color_FFFFFF"
                     }
                 }()
 
                 //악취 강도 선택 버튼
                 NavigationLink(
-                    destination: SignUpView(),
+                    destination: ReceptionRegistView(selectSmell: code),    //악취 접수 등록 화면 - 선택한 악취 강도 정보 전달
                     label: {
-                        Text("\(codeName) - \(codeComment)")
+                        Text("\(smellName) - \(smellComment)")
                             .fontWeight(.bold)
                             .foregroundColor(Color.white)
                             .padding()
@@ -253,6 +255,12 @@ struct SmellLevelView: View {
 }
 
 struct SmellReceptionView_Previews: PreviewProvider {
+    @State private var viewOptionSet = ViewOptionSet() //화면 Option Set
+    
+    init() {
+        viewOptionSet.navigationBarOption() //Navigation Bar 옵션
+    }
+    
     static var previews: some View {
         SmellReceptionView()
     }

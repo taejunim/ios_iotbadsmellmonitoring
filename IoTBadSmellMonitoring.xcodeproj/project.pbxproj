@@ -24,7 +24,9 @@
 		BF673FF02668EEDF00B4D91B /* WeatherModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF673FEF2668EEDF00B4D91B /* WeatherModel.swift */; };
 		BF68AE102681ACC70086B88F /* CommonUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF68AE0F2681ACC70086B88F /* CommonUtil.swift */; };
 		BF698F6E26840CC20029785C /* ReceptionHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF698F6D26840CC20029785C /* ReceptionHistoryView.swift */; };
+		BF698F702684614D0029785C /* ReceptionRegistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF698F6F2684614D0029785C /* ReceptionRegistView.swift */; };
 		BF69F1112672FE8700141244 /* ViewUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF69F1102672FE8700141244 /* ViewUtil.swift */; };
+		BF6BB92126857428000FD8D7 /* ReceptionRegistViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF6BB92026857428000FD8D7 /* ReceptionRegistViewModel.swift */; };
 		BF6C106C26806D64006BDC44 /* WeatherAPIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF6C106B26806D64006BDC44 /* WeatherAPIService.swift */; };
 		BF6C106E26806E5A006BDC44 /* WeatherViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF6C106D26806E5A006BDC44 /* WeatherViewModel.swift */; };
 		BF6C107026808195006BDC44 /* SmellModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF6C106F26808195006BDC44 /* SmellModel.swift */; };
@@ -62,7 +64,9 @@
 		BF673FEF2668EEDF00B4D91B /* WeatherModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = WeatherModel.swift; path = IoTBadSmellMonitoring/Sources/Model/WeatherModel.swift; sourceTree = SOURCE_ROOT; };
 		BF68AE0F2681ACC70086B88F /* CommonUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonUtil.swift; sourceTree = "<group>"; };
 		BF698F6D26840CC20029785C /* ReceptionHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceptionHistoryView.swift; sourceTree = "<group>"; };
+		BF698F6F2684614D0029785C /* ReceptionRegistView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceptionRegistView.swift; sourceTree = "<group>"; };
 		BF69F1102672FE8700141244 /* ViewUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewUtil.swift; sourceTree = "<group>"; };
+		BF6BB92026857428000FD8D7 /* ReceptionRegistViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceptionRegistViewModel.swift; sourceTree = "<group>"; };
 		BF6C106B26806D64006BDC44 /* WeatherAPIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherAPIService.swift; sourceTree = "<group>"; };
 		BF6C106D26806E5A006BDC44 /* WeatherViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherViewModel.swift; sourceTree = "<group>"; };
 		BF6C106F26808195006BDC44 /* SmellModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmellModel.swift; sourceTree = "<group>"; };
@@ -168,6 +172,7 @@
 				BF673FE32668C75100B4D91B /* SignInView.swift */,
 				BF673FE12668C6D100B4D91B /* SignUpView.swift */,
 				BF085B89267C39590045778F /* SmellReceptionView.swift */,
+				BF698F6F2684614D0029785C /* ReceptionRegistView.swift */,
 				BF698F6D26840CC20029785C /* ReceptionHistoryView.swift */,
 				BF673FDF2668B8C900B4D91B /* MainView.swift */,
 				BF031BC1265F53CA008AB3F5 /* ContentView.swift */,
@@ -233,6 +238,7 @@
 				BF673FE52668C7B500B4D91B /* SignInViewModel.swift */,
 				BF673FEB2668CCDC00B4D91B /* SignUpViewModel.swift */,
 				BF085B8B267C837A0045778F /* SmellReceptionViewModel.swift */,
+				BF6BB92026857428000FD8D7 /* ReceptionRegistViewModel.swift */,
 				BF6C106D26806E5A006BDC44 /* WeatherViewModel.swift */,
 			);
 			path = ViewModel;
@@ -351,6 +357,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BF6BB92126857428000FD8D7 /* ReceptionRegistViewModel.swift in Sources */,
 				BF6C106C26806D64006BDC44 /* WeatherAPIService.swift in Sources */,
 				BF673FE42668C75100B4D91B /* SignInView.swift in Sources */,
 				BF8A3E4326705A980013B018 /* APIClient.swift in Sources */,
@@ -379,6 +386,7 @@
 				BF720DAD267749E200D03428 /* ViewOptionSet.swift in Sources */,
 				BFC8A41C266774770053995B /* LaunchScreen.swift in Sources */,
 				BF673FF02668EEDF00B4D91B /* WeatherModel.swift in Sources */,
+				BF698F702684614D0029785C /* ReceptionRegistView.swift in Sources */,
 				BFE2C6D8266DE2E000F03C90 /* UserAPIService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
