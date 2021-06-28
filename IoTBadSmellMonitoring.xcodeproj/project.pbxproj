@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0EE3B98B26844D6D00061F00 /* MyPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EE3B98A26844D6D00061F00 /* MyPageView.swift */; };
+		0EE3B98F2684759600061F00 /* MyPageViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EE3B98E2684759600061F00 /* MyPageViewModel.swift */; };
 		BF031BC0265F53CA008AB3F5 /* IoTBadSmellMonitoringApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF031BBF265F53CA008AB3F5 /* IoTBadSmellMonitoringApp.swift */; };
 		BF031BC2265F53CA008AB3F5 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF031BC1265F53CA008AB3F5 /* ContentView.swift */; };
 		BF031BC4265F53CB008AB3F5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BF031BC3265F53CB008AB3F5 /* Assets.xcassets */; };
@@ -44,6 +46,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0EE3B98A26844D6D00061F00 /* MyPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyPageView.swift; sourceTree = "<group>"; };
+		0EE3B98E2684759600061F00 /* MyPageViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyPageViewModel.swift; sourceTree = "<group>"; };
 		BCA40AAB0AA423D57BB3F697 /* Pods-IoTBadSmellMonitoring.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-IoTBadSmellMonitoring.debug.xcconfig"; path = "Target Support Files/Pods-IoTBadSmellMonitoring/Pods-IoTBadSmellMonitoring.debug.xcconfig"; sourceTree = "<group>"; };
 		BF031BBC265F53CA008AB3F5 /* IoTBadSmellMonitoring.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IoTBadSmellMonitoring.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BF031BBF265F53CA008AB3F5 /* IoTBadSmellMonitoringApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IoTBadSmellMonitoringApp.swift; sourceTree = "<group>"; };
@@ -176,6 +180,7 @@
 				BF698F6D26840CC20029785C /* ReceptionHistoryView.swift */,
 				BF673FDF2668B8C900B4D91B /* MainView.swift */,
 				BF031BC1265F53CA008AB3F5 /* ContentView.swift */,
+				0EE3B98A26844D6D00061F00 /* MyPageView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -240,6 +245,7 @@
 				BF085B8B267C837A0045778F /* SmellReceptionViewModel.swift */,
 				BF6BB92026857428000FD8D7 /* ReceptionRegistViewModel.swift */,
 				BF6C106D26806E5A006BDC44 /* WeatherViewModel.swift */,
+				0EE3B98E2684759600061F00 /* MyPageViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -360,6 +366,7 @@
 				BF6BB92126857428000FD8D7 /* ReceptionRegistViewModel.swift in Sources */,
 				BF6C106C26806D64006BDC44 /* WeatherAPIService.swift in Sources */,
 				BF673FE42668C75100B4D91B /* SignInView.swift in Sources */,
+				0EE3B98F2684759600061F00 /* MyPageViewModel.swift in Sources */,
 				BF8A3E4326705A980013B018 /* APIClient.swift in Sources */,
 				BF085B8C267C837A0045778F /* SmellReceptionViewModel.swift in Sources */,
 				BF673FEA2668CA6A00B4D91B /* CustomView.swift in Sources */,
@@ -381,6 +388,7 @@
 				BF720DB1267752F000D03428 /* CodeAPIService.swift in Sources */,
 				BF65E4622679965C00C7C6B1 /* MessageProperties.swift in Sources */,
 				BF6C1074268086F3006BDC44 /* APIResponse.swift in Sources */,
+				0EE3B98B26844D6D00061F00 /* MyPageView.swift in Sources */,
 				BF720DB526775C9600D03428 /* CodeModel.swift in Sources */,
 				BF6C106E26806E5A006BDC44 /* WeatherViewModel.swift in Sources */,
 				BF720DAD267749E200D03428 /* ViewOptionSet.swift in Sources */,
