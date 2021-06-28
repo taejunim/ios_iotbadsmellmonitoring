@@ -108,19 +108,18 @@ struct PasswordChange: View {
     
     var body: some View  {
         VStack(alignment: .leading) {
+            //현재 비밀번호
             Section(
                 header:HStack {
                     Text("현재 비밀번호")
                     RequiredInputLabel()    //필수입력(*) Label
                 }) {
-            HStack {
                 SecureField("", text: $myPageViewModel.currentPassword)
                     .autocapitalization(/*@START_MENU_TOKEN@*/.none/*@END_MENU_TOKEN@*/)    //첫 문자 항상 소문자
                     .keyboardType(.alphabet)    //키보드 타입 - 영문만 표시
-            }
-               
                 TextFiledUnderLine()    //Text Field 밑줄
             }
+            //새 비밀번호
             Section(
                 header:HStack {
                     Text("새 비밀번호")
@@ -131,6 +130,7 @@ struct PasswordChange: View {
                         .keyboardType(.alphabet)    //키보드 타입 - 영문만 표시
                 TextFiledUnderLine()    //Text Field 밑줄
             }
+            //새 비밀번호 확인
             Section(
                 header:HStack {
                     Text("새 비밀번호 확인")
@@ -157,37 +157,32 @@ struct PasswordChangeButton: View {
             action: {
                 viewUtil.dismissKeyboard() //키보드 닫기
                 
-                //입력한 비밀번호 수정 정보 유효성 검사
-                if !myPageViewModel.validate() {
-                    viewUtil.showToast = true
-                    viewUtil.toastMessage = myPageViewModel.validMessage
-                }
-                else {
-                    viewUtil.isLoading = true   //로딩 시작
+                //로그인 실행
+                myPageViewModel.signIn() { (result) in
+                    viewUtil.isLoading = false  //로딩 종료
                     
-                    
-                    //로그인 실행
-                    myPageViewModel.signIn() { (result) in
+                    //로그인 성공이 아닌 경우(현재비밀번호 불일치) Toast 팝업 메시지 호출
+                    if result != "success" {
+                        viewUtil.showToast = true
+                        viewUtil.toastMessage = myPageViewModel.message
+                    }
+                    //유효성 검사 성공이 아닌 경우 Toast 팝업 메시지 호출
+                    else if !myPageViewModel.validate() {
+                        viewUtil.showToast = true
+                        viewUtil.toastMessage = myPageViewModel.validMessage
+                    }
+                    //로그인과 유효성 검사 성공일 경우 비밀번호 수정 실행
+                    myPageViewModel.passwordChange() { (result) in
+                        
                         viewUtil.isLoading = false  //로딩 종료
                         
-                        //로그인 성공이 아닌 경우(현재비밀번호 불일치) Toast 팝업 메시지 호출
+                        
+                        //비밀번호 수정 성공이 아닌 경우 Toast 팝업 메시지 호출
                         if result != "success" {
                             viewUtil.showToast = true
                             viewUtil.toastMessage = myPageViewModel.message
                         }
-                        //로그인 성공일 경우 비밀번호 수정 실행
-                        myPageViewModel.passwordChange() { (result) in
-                            
-                            viewUtil.isLoading = false  //로딩 종료
-                            
-                            
-                            //비밀번호 수정 성공이 아닌 경우 Toast 팝업 메시지 호출
-                            if result != "success" {
-                                viewUtil.showToast = true
-                                viewUtil.toastMessage = myPageViewModel.message
-                            }
-                            
-                        }
+                        
                     }
                 }
             },
@@ -199,10 +194,9 @@ struct PasswordChangeButton: View {
                     .padding(/*@START_MENU_TOKEN@*/.horizontal/*@END_MENU_TOKEN@*/)
                     .frame(maxWidth: .infinity, maxHeight: 40)
                     .background(myPageViewModel.isInputComplete ? Color("Color_3498DB") : Color("Color_BEBEBE"))   //회원가입 정보 입력에 따른 배경색상 변경
-                    //.background(Color("Color_3498DB"))
             }
         )
-       .disabled(!myPageViewModel.isInputComplete)    //회원가입 정보 입력에 따른 버튼 활성화
+       .disabled(!myPageViewModel.isInputComplete)    //비밀번호 수정 정보 입력에 따른 버튼 활성화
     }
 }
 

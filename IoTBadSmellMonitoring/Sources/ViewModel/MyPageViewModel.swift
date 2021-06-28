@@ -82,7 +82,7 @@ class MyPageViewModel: ObservableObject {
                 //비밀번호 수정 실패
                 else {
                     self.result = passwordChange.result
-                    self.message = "비밀번호가 일치하지 않습니다."
+                    self.message = "비밀번호 수정에 실패하였습니다."
                 }
                 print(passwordChange)
                 completion(self.result)
@@ -101,12 +101,6 @@ class MyPageViewModel: ObservableObject {
     //MARK: - 유효성 검사
     func validate() -> Bool {
         
-//        //현재 비밀번호 형식 확인
-//        guard isCurrentPasswordValid() else {
-//            self.validMessage = "현재 비밀번호를 올바르게 입력하세요."
-//            return false
-//        }
-        
         //새 비밀번호 형식 확인
         guard isPasswordValid() else {
             self.validMessage = "새 비밀번호를 형식에 맞게 입력하세요."
@@ -122,14 +116,6 @@ class MyPageViewModel: ObservableObject {
         }
         return true
     }
-    
-//    //MARK: - 현재 비밀번호 유효성 검사
-//    func isCurrentPasswordValid() -> Bool {
-//        let regExp = "^[a-zA-Z0-9]{5,15}$"
-//        let passwordPredicate = NSPredicate(format: "SELF MATCHES %@", regExp)
-//
-//        return passwordPredicate.evaluate(with: currentPassword)
-//    }
     //MARK: - 새 비밀번호 유효성 검사
     func isPasswordValid() -> Bool {
         let regExp = "^[a-zA-Z0-9]{5,15}$"
@@ -137,13 +123,6 @@ class MyPageViewModel: ObservableObject {
         
         return passwordPredicate.evaluate(with: newpassword)
     }
-//    //MARK: - 비밀번호 확인 유효성 검사
-//    func isConfirmPasswordValid() -> Bool {
-//        let regExp = "^[a-zA-Z0-9]{5,15}$"
-//        let passwordPredicate = NSPredicate(format: "SELF MATCHES %@", regExp)
-//
-//        return passwordPredicate.evaluate(with: confirmPassword)
-//    }
     //MARK: - 입력 완료 여부
     var isInputComplete: Bool {
         if currentPassword.isEmpty || newpassword.isEmpty || confirmPassword.isEmpty {
