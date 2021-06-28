@@ -49,12 +49,13 @@ class UserAPIService {
         
         return apiClient.request(route: APIRouter.get(useApi: "base", path: "/api/userFindId", parameters: parameters))
     }
+    
     //MARK: - 비밀번호 변경 API 호출
-    // 비밀번호 변경 API 호출
-    // - Parameter parameters:
-    //   - User ID
-    //   - Password
-    // - Returns: User Model
+    /// 비밀번호 변경 API 호출
+    /// - Parameter parameters:
+    ///   - User ID
+    ///   - Password
+    /// - Returns: API Response - Result, Message
     public func requestPasswordChange(parameters: [String: Any]) -> Future<Response, AFError> {
 
         return apiClient.request(route: APIRouter.post(useApi: "base", path: "/api/userPasswordChange", parameters: parameters))
