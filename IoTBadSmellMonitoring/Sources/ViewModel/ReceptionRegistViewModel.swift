@@ -13,8 +13,11 @@ class ReceptionRegistViewModel: ObservableObject {
     
     @Published var smellTyepCode: [[String: String]] = [[:]]  //악취 취기 코드
     
-    @Published var selectSmellCode: [String: String] = [:]
+    @Published var currentWeather: [String: String] = [:]
+    @Published var selectSmellCode: String = ""
     @Published var selectSmellType: String = ""
+    @Published var selectTempSmellType: String = ""
+    @Published var addMessage: String = ""
     
     @Published var result: String = ""   //결과 상태
     @Published var message: String = "" //결과 메시지

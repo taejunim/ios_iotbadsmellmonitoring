@@ -34,7 +34,7 @@ struct SmellReceptionView: View {
                         
                         DividerLine()   //구분선
                         
-                        SmellLevelView(smellViewModel: smellViewModel)  //악취 강도 선택 화면
+                        SmellLevelView(weatherViewModel: weatherViewModel, smellViewModel: smellViewModel)  //악취 강도 선택 화면
                         
                         DividerLine()   //구분선
                     }
@@ -200,6 +200,7 @@ struct ReceptionStatusView: View {
 
 //MARK: - 악취 강도 선택 화면
 struct SmellLevelView: View {
+    @ObservedObject var weatherViewModel: WeatherViewModel
     @ObservedObject var smellViewModel: SmellReceptionViewModel
     
     var body: some View {
@@ -237,7 +238,7 @@ struct SmellLevelView: View {
 
                 //악취 강도 선택 버튼
                 NavigationLink(
-                    destination: ReceptionRegistView(selectSmell: code),    //악취 접수 등록 화면 - 선택한 악취 강도 정보 전달
+                    destination: ReceptionRegistView(selectSmell: code, currentWeather: weatherViewModel.currentWeather),    //악취 접수 등록 화면 - 선택한 악취 강도 정보 전달
                     label: {
                         Text("\(smellName) - \(smellComment)")
                             .fontWeight(.bold)
