@@ -15,6 +15,8 @@ class ViewUtil: ObservableObject {
     
     @Published var showToast = false    //Toast 팝업 노출 여부
     @Published var toastMessage = ""    //Toast 팝업 메시지
+    
+    @Published var showModal = false    //Toast 팝업 노출 여부
 
     //MARK: - 로딩 화면
     /// Loading  View Function

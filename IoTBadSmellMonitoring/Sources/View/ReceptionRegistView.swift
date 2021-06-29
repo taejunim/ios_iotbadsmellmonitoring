@@ -10,7 +10,6 @@ import SwiftUI
 struct ReceptionRegistView: View {
     @Environment(\.presentationMode) var presentationMode   //Back 버튼 기능 추가에 필요
     @ObservedObject var viewUtil = ViewUtil()
-    
     @ObservedObject var receptionViewModel = ReceptionRegistViewModel() //Reception Regist View Model
     
     @State var selectSmell: [String: String]    //선택한 악취 강도
@@ -24,20 +23,23 @@ struct ReceptionRegistView: View {
             
             VStack {
                 ScrollView {
-                    SelectSmellView(selectSmell: $selectSmell)
+                    SelectSmellView(viewUtil: viewUtil, receptionViewModel: receptionViewModel, selectSmell: $selectSmell)  //취기 및 악취 강도 선택 화면
+                    
+                    DividerLine()   //구분선
+
+                    AttachPictureView() //촬영사진 첨부 화면
                     
                     DividerLine()   //구분선
                     
-                    AttachPictureView()
+                    AddMessageView()    //전달사항 추가 화면
                     
                     DividerLine()   //구분선
-                    
-                    AddMessageView()
-                    
-                    DividerLine()
                 }
                 
-                ReceptionRegistButton()
+                //취기 선택 팝업 활성화 시 숨김 처리
+                if !viewUtil.showModal {
+                    ReceptionRegistButton() //접수 등록 버튼
+                }
             }
             .navigationBarTitle(Text("악취 접수 등록"), displayMode: .inline) //Navigation Bar 타이틀
             .navigationBarBackButtonHidden(true)    //기본 Back 버튼 숨김
@@ -58,27 +60,45 @@ struct ReceptionRegistView: View {
                 viewUtil.toast()    //팝업 화면
             }
         )
+        .popup(
+            isPresented: $viewUtil.showModal,
+            type: .default,
+            position: .bottom,
+            animation: .spring(),
+            closeOnTap: false,
+            closeOnTapOutside: false,
+            view: {
+                //취기 선택 팝업 화면
+                SmellTypeModalView(viewUtil: viewUtil, receptionViewModel: receptionViewModel)
+                    .edgesIgnoringSafeArea(/*@START_MENU_TOKEN@*/.all/*@END_MENU_TOKEN@*/)
+            }
+        )
         .gesture(DragGesture(minimumDistance: 0.00001).onChanged {_ in
             viewUtil.dismissKeyboard() //키보드 닫기
         })
+        .edgesIgnoringSafeArea(!viewUtil.showModal ? .horizontal : .bottom)
     }
 }
 
+//MARK: - 취기 및 악취 강도 선택 화면
 struct SelectSmellView: View {
-    @Binding var selectSmell: [String: String]  //선택한 악취 강도
+    @ObservedObject var viewUtil: ViewUtil
+    @ObservedObject var receptionViewModel: ReceptionRegistViewModel
     
+    @Binding var selectSmell: [String: String]  //선택한 악취 강도
+
     var body: some View {
         VStack {
             Text("취기 및 악취 강도 선택")
                 .fontWeight(/*@START_MENU_TOKEN@*/.bold/*@END_MENU_TOKEN@*/)
             
             VStack {
-                SmellTypeButton()
+                SmellTypeButton(viewUtil: viewUtil) //취기 선택 버튼
                 
                 let smellCode: String = selectSmell["code"] ?? ""  //코드
                 let smellName: String = selectSmell["codeName"] ?? ""  //코드 명
                 let smellComment: String = selectSmell["codeComment"] ?? ""    //코드 설명
-
+                
                 //악취 강도 선택 버튼 색상
                 let smellColor: String = {
                     switch smellCode {
@@ -112,14 +132,14 @@ struct SelectSmellView: View {
     }
 }
 
-//MARK: - 취기 선택 버튼
+//MARK: - 취기 선택 팝업 호출 버튼
 struct SmellTypeButton: View {
-    @State private var showModal = false
+    @ObservedObject var viewUtil: ViewUtil
     
     var body: some View {
         Button(
             action: {
-                self.showModal.toggle()
+                viewUtil.showModal.toggle()
             },
             label: {
                 Text("취기 선택")
@@ -131,44 +151,149 @@ struct SmellTypeButton: View {
             }
         )
         .padding()
-        .popup(
-            isPresented: $showModal,
-            type: .default,
-            position: .bottom,
-            animation: .spring(),
-            closeOnTap: false,
-            closeOnTapOutside: false,
-            view: {
-                SmellTypeModalView()
-            }
-        )
     }
 }
 
+//MARK: - 취기 선택 팝업
 struct SmellTypeModalView: View {
+    @ObservedObject var viewUtil: ViewUtil
+    @ObservedObject var receptionViewModel: ReceptionRegistViewModel
+    
     var body: some View {
-        VStack {
-            Text("취기 선택")
-                .fontWeight(.bold)
-            
-            HStack {
-                HStack {
-                    Button(
-                        action: {
-                            
-                        },
-                        label: {
-                            Text("취기 선택")
-                                .fontWeight(.bold)
-                                .foregroundColor(Color.white)
-                                .frame(width: 100, height: 100)
-                                .background(Color("Color_3498DB"))
-                                .cornerRadius(10)
-                        }
-                    )
-                    .padding()
+        GeometryReader { geometryReader in
+            VStack {
+                VStack {
+                    Text("취기 선택")
+                        .fontWeight(.bold)
+                    
+                    SmellTypeListView(receptionViewModel: receptionViewModel)   //취기 목록 화면
+                    SmellTypeModalButton(viewUtil: viewUtil) //취기 선택 팝업 하단 버튼
                 }
+                .padding(.top)
+                .background(Color.white)
+                .cornerRadius(5.0)
+                .frame(height: geometryReader.size.height/1.5)
             }
+            .padding()
+            .frame(width: geometryReader.size.width, height: geometryReader.size.height)
+            .background(Color.black.opacity(0.5))
+        }
+    }
+}
+
+//MARK: - 취기 선택 팝업: 취기 목록 화면
+struct SmellTypeListView: View {
+    @ObservedObject var receptionViewModel: ReceptionRegistViewModel
+    
+    var body: some View {
+        ScrollView{
+            let totalCount: Int = self.receptionViewModel.smellTyepCode.count   //취기 총 개수
+            
+            //한 줄에 3개씩 출력 (3 x n)
+            ForEach(0..<totalCount/3, id: \.self) { row in
+                HStack {
+                    ForEach(0..<3) { index in
+                        let codeIndex = row * 3 + index //코드 Index
+                        let smellTypeCode: String = receptionViewModel.smellTyepCode[codeIndex]["code"] ?? ""   //취기 코드
+                        let smellTypeName: String = receptionViewModel.smellTyepCode[codeIndex]["codeName"] ?? ""   //취기 명
+                        
+                        Button(
+                            action: {
+                                self.receptionViewModel.selectSmellType = smellTypeCode //선택한 취기 코드
+                            },
+                            label: {
+                                VStack {
+                                    VStack(alignment: .center) {
+                                        Spacer()
+                                        
+                                        Image("Chicken.Smell")
+                                            //.renderingMode(.template)
+                                            //.foregroundColor(Color.white)
+                                        
+                                        Spacer()
+                                        
+                                        Text(smellTypeName)
+                                            .font(.callout)
+                                            .fontWeight(.bold)
+                                            .foregroundColor(Color.black)
+                                            .multilineTextAlignment(.center)
+                                            .padding(.vertical, 5)
+                                    }
+                                    .frame(width: 100, height: 100)
+                                    .background(Color("Color_E0E0E0"))
+                                    .cornerRadius(10)
+                                    
+                                    //취기 선택한 경우 해당 라디오 버튼 체크 표시
+                                    if smellTypeCode == receptionViewModel.selectSmellType {
+                                        ZStack {
+                                            Circle()
+                                                .fill(Color.white)
+                                                .frame(width: 18, height: 18)
+                                                .overlay(Circle().stroke(Color.red, lineWidth: 1))
+                                            
+                                            Circle()
+                                                .fill(Color.red)
+                                                .frame(width: 10, height: 10)
+                                        }
+                                    }
+                                    else {
+                                        Circle()
+                                            .fill(Color.white)
+                                            .frame(width: 18, height: 18)
+                                            .overlay(Circle().stroke(Color.gray, lineWidth: 1))
+                                    }
+                                }
+                            }
+                        )
+                        
+                        //row의 마지막 Spacer 제외
+                        if index != 2 {
+                            Spacer()
+                        }
+                    }
+                }
+                .padding()
+            }
+        }
+    }
+}
+
+//MARK: - 취기 선택 팝업: 하단 버튼
+struct SmellTypeModalButton: View {
+    @ObservedObject var viewUtil: ViewUtil
+    
+    var body: some View {
+        HStack {
+            //취소 버튼 - 창닫기
+            Button(
+                action: {
+                    viewUtil.showModal.toggle()
+                },
+                label: {
+                    Text("취소")
+                        .fontWeight(.bold)
+                        .foregroundColor(Color.white)
+                        .padding(.horizontal)
+                        .frame(maxWidth: .infinity, maxHeight: 35)
+                        .background(Color("Color_E4513D"))
+                }
+            )
+            
+            Spacer().frame(width: 0)
+            
+            //선택 완료 버튼
+            Button(
+                action: {
+                },
+                label: {
+                    Text("완료")
+                        .fontWeight(.bold)
+                        .foregroundColor(Color.white)
+                        .padding(.horizontal)
+                        .frame(maxWidth: .infinity, maxHeight: 35)
+                        .background(Color("Color_3498DB"))
+                }
+            )
         }
     }
 }
@@ -189,13 +314,12 @@ struct AttachPictureView: View {
             ScrollView(.horizontal) {
                 HStack {
                     ForEach(0..<pickedImageCounter, id: \.self) { index in
-//                        pickedImage?
-//                            .resizable()
-//                            .frame(width: 150, height: 100)
-                        pickedImageArray[index]?
-                            .resizable()
-                            .frame(width: 195, height: 130)
-                            //.frame(width: 225, height: 150)
+                        ZStack {
+                            pickedImageArray[index]?
+                                .resizable()
+                                .frame(width: 195, height: 130)
+                                //.frame(width: 225, height: 150)
+                        }
                     }
                     
                     if maxImage > pickedImageCounter {
@@ -266,6 +390,7 @@ struct AddMessageView: View {
         VStack {
             Text("전달사항 추가")
                 .fontWeight(.bold)
+            TextEditor(text: /*@START_MENU_TOKEN@*/.constant("Placeholder")/*@END_MENU_TOKEN@*/)
         }
     }
 }
@@ -299,5 +424,6 @@ struct ReceptionRegistView_Previews: PreviewProvider {
     
     static var previews: some View {
         ReceptionRegistView(selectSmell: [:])
+        //SmellTypeModalView()
     }
 }

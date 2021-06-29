@@ -13,6 +13,9 @@ class ReceptionRegistViewModel: ObservableObject {
     
     @Published var smellTyepCode: [[String: String]] = [[:]]  //악취 취기 코드
     
+    @Published var selectSmellCode: [String: String] = [:]
+    @Published var selectSmellType: String = ""
+    
     @Published var result: String = ""   //결과 상태
     @Published var message: String = "" //결과 메시지
     @Published var validMessage: String = ""    //유효성 검사 메시지
