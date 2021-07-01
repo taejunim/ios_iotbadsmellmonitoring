@@ -75,6 +75,7 @@ class SmellReceptionViewModel: ObservableObject {
         //API 호출 - Request Parameters
         let parameters = [
             "userId": "test123" //임시
+            //"userId": UserDefaults.standard.string(forKey: "userId")!
         ]
         
         //금일 냄새 접수 현황 API 호출

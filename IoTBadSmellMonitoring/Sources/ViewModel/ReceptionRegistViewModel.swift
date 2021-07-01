@@ -9,11 +9,12 @@ import Foundation
 
 class ReceptionRegistViewModel: ObservableObject {
     private let codeViewModel = CodeViewModel() //Code View Model
+    private let weatherViewModel = WeatherViewModel() //Weather View Model
     private let smellAPI = SmellAPISerivce()    //Smell API Service
     
     @Published var smellTyepCode: [[String: String]] = [[:]]  //악취 취기 코드
     
-    @Published var currentWeather: [String: String] = [:]
+    @Published var weatherInfo: [String: String] = [:]   //날씨 정보
     @Published var selectSmellCode: String = ""
     @Published var selectSmellType: String = ""
     @Published var selectTempSmellType: String = ""
@@ -27,6 +28,12 @@ class ReceptionRegistViewModel: ObservableObject {
     func getSmellTypeCode() {
         codeViewModel.getCode(codeGroup: "STY") { (code) in
             self.smellTyepCode = code
+        }
+    }
+    
+    func registReception() {
+        weatherViewModel.getCurrentWeather() { (weather) in
+            
         }
     }
 }

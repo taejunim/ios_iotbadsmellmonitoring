@@ -46,14 +46,14 @@ struct ReceptionRegistView: View {
             .navigationBarBackButtonHidden(true)    //기본 Back 버튼 숨김
             .navigationBarItems(leading: BackButton())  //커스텀 Back 버튼 추가
             .onAppear {
-                receptionViewModel.currentWeather = currentWeather
+                //receptionViewModel.weatherInfo = currentWeather
                 receptionViewModel.selectSmellCode = selectSmell["code"] ?? ""
                 receptionViewModel.getSmellTypeCode()   //악취 취기 코드
                 
                 receptionViewModel.selectSmellType = "001"  //선택한 취기 초기화
                 receptionViewModel.selectTempSmellType = "001"  //선택한 임시 취기 초기화
                 
-                print(receptionViewModel.currentWeather)
+                print(receptionViewModel.weatherInfo)
             }
         }
         .popup(

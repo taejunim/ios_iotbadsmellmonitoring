@@ -37,6 +37,9 @@ class SignInViewModel: ObservableObject {
                 //로그인 성공
                 if signIn.result == "success" {
                     self.result = signIn.result
+                    
+                    UserDefaults.standard.set(self.id, forKey: "userId")    //사용자 ID 저장
+                    UserDefaults.standard.set(self.password, forKey: "password")    //패스워드 저장
                 }
                 //로그인 실패
                 else {

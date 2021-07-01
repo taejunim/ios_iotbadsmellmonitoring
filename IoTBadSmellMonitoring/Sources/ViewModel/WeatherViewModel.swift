@@ -101,13 +101,13 @@ class WeatherViewModel: ObservableObject {
                     self.result = "fail"
                     self.message = "날씨 정보를 불러오지 못하였습니다."
                     
-                    //현재 날씨 정보
+                    //현재 날씨 정보 - 날씨 API 오류인 경우 기본 값 설정
                     let currentWeather = [
                         "weatherState": "011",   //기상상태 코드 (011: 기타)
-                        "temp": "0",   //기온
-                        "humidity": "0",   //습도
-                        "windDirectionCode": "001", //풍향
-                        "windSpeed": "0"  //풍속
+                        "temp": "-",   //기온
+                        "humidity": "-",   //습도
+                        "windDirectionCode": "-", //풍향 코드
+                        "windSpeed": "-"  //풍속
                     ]
                     
                     completion(currentWeather)
@@ -118,13 +118,13 @@ class WeatherViewModel: ObservableObject {
                 self.result = "server error"
                 self.message = "서버와의 통신이 원활하지 않습니다."
                 
-                //가공된 현재 날씨 정보
+                //현재 날씨 정보 - 날씨 API 오류인 경우 기본 값 설정
                 let currentWeather = [
                     "weatherState": "011",   //기상상태 코드 (011: 기타)
-                    "temp": "0",   //기온
-                    "humidity": "0",   //습도
-                    "windDirectionCode": "001", //풍향
-                    "windSpeed": "0"  //풍속
+                    "temp": "-",   //기온
+                    "humidity": "-",   //습도
+                    "windDirectionCode": "-", //풍향 코드
+                    "windSpeed": "-"  //풍속
                 ]
                 
                 completion(currentWeather)
@@ -228,7 +228,7 @@ class WeatherViewModel: ObservableObject {
             "temp": temp,   //기온
             "humidity": humidity,   //습도
             "windDirection": windDirection, //풍향
-            "windDirectionCode": String(format: "%03d", convertValue),
+            "windDirectionCode": String(format: "%03d", convertValue),  //풍향 코드 - 풍향 변환 값 코드화
             "windSpeed": windSpeed  //풍속
         ]
         
