@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UserNotifications
 
 //MARK: - 마이페이지 화면
 struct MyPageView: View {
@@ -14,14 +15,14 @@ struct MyPageView: View {
     
     @ObservedObject var viewUtil = ViewUtil()
     @ObservedObject var myPageViewModel = MyPageViewModel()
-
+    
     init() {
         viewOptionSet.navigationBarOption() //Navigation Bar 옵션
         viewOptionSet.pickerOption()    //Picker 옵션
     }
-
+    
     var body: some View {
-      
+        
         ZStack {
             //로딩 표시 여부에 따라 표출
             if viewUtil.isLoading {
@@ -39,7 +40,7 @@ struct MyPageView: View {
                     }
                 }
                 PasswordChangeButton(viewUtil: viewUtil, myPageViewModel: myPageViewModel)               //비밀번호 수정 버튼
-               
+                
             }
             .navigationBarTitle(Text("My Page"), displayMode: .inline) //Navigation Bar 타이틀
             .navigationBarBackButtonHidden(true)                       //기본 Back 버튼 숨김
@@ -71,9 +72,9 @@ struct Profile: View {
         
         HStack{
             Image("")   //프로필 이미지
-                   .frame(width: 100, height: 100)
-                   .background(Color.black)
-                   .clipShape(Circle())
+                .frame(width: 100, height: 100)
+                .background(Color.black)
+                .clipShape(Circle())
             VStack(alignment: .leading){
                 Text("홍길동") //user name
                     .font(.title)
@@ -92,13 +93,22 @@ struct PushToggle: View {
     @State var showToggle = true
     var body: some View  {
         VStack {
-                    Toggle(isOn: $showToggle) {
-                        Text("푸쉬")
-                    }.frame(alignment: .leading)
-                    if showToggle {
-                        //Text("Hello")
-                    }
+            Toggle("푸시", isOn: $showToggle).padding(.trailing, 250)
+            
+            if showToggle{
+                Button("사용자 허락"){
+                    MyPageViewModel.instance.requestAuthorization()
                 }
+                Button("시간 알림"){
+                    MyPageViewModel.instance.scheduleNotification()
+                }
+                
+            }else{
+                //Text("버튼을 눌러주세요.")
+            }
+        }
+        
+        
     }
 }
 //MARK: - 비밀번호 변경 field
@@ -125,9 +135,9 @@ struct PasswordChange: View {
                     Text("새 비밀번호")
                     RequiredInputLabel()    //필수입력(*) Label
                 }) {
-                    SecureField("5자리 이상 15자리 이하 입력", text: $myPageViewModel.newpassword)
-                        .autocapitalization(/*@START_MENU_TOKEN@*/.none/*@END_MENU_TOKEN@*/)    //첫 문자 항상 소문자
-                        .keyboardType(.alphabet)    //키보드 타입 - 영문만 표시
+                SecureField("5자리 이상 15자리 이하 입력", text: $myPageViewModel.newpassword)
+                    .autocapitalization(/*@START_MENU_TOKEN@*/.none/*@END_MENU_TOKEN@*/)    //첫 문자 항상 소문자
+                    .keyboardType(.alphabet)    //키보드 타입 - 영문만 표시
                 TextFiledUnderLine()    //Text Field 밑줄
             }
             //새 비밀번호 확인
@@ -136,13 +146,13 @@ struct PasswordChange: View {
                     Text("새 비밀번호 확인")
                     RequiredInputLabel()    //필수입력(*) Label
                 }) {
-                    SecureField("5자리 이상 15자리 이하 입력", text: $myPageViewModel.confirmPassword)
-                        .autocapitalization(/*@START_MENU_TOKEN@*/.none/*@END_MENU_TOKEN@*/)    //첫 문자 항상 소문자
-                        .keyboardType(.alphabet)    //키보드 타입 - 영문만 표시
+                SecureField("5자리 이상 15자리 이하 입력", text: $myPageViewModel.confirmPassword)
+                    .autocapitalization(/*@START_MENU_TOKEN@*/.none/*@END_MENU_TOKEN@*/)    //첫 문자 항상 소문자
+                    .keyboardType(.alphabet)    //키보드 타입 - 영문만 표시
                 TextFiledUnderLine()    //Text Field 밑줄
             }
+        }
     }
-}
 }
 
 //MARK: - 비밀번호 수정 버튼
@@ -196,7 +206,7 @@ struct PasswordChangeButton: View {
                     .background(myPageViewModel.isInputComplete ? Color("Color_3498DB") : Color("Color_BEBEBE"))   //회원가입 정보 입력에 따른 배경색상 변경
             }
         )
-       .disabled(!myPageViewModel.isInputComplete)    //비밀번호 수정 정보 입력에 따른 버튼 활성화
+        .disabled(!myPageViewModel.isInputComplete)    //비밀번호 수정 정보 입력에 따른 버튼 활성화
     }
 }
 

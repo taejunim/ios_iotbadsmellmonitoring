@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UserNotifications
 
 class MyPageViewModel: ObservableObject {
     private let userAPI = UserAPIService()  //사용자 API Service
@@ -18,6 +19,40 @@ class MyPageViewModel: ObservableObject {
     @Published var newpassword: String = ""    //새 비밀번호
     @Published var confirmPassword: String = ""    //비밀번호 확인
     
+    //MARK: - 푸시 알림
+    static let instance = MyPageViewModel() //Singleton
+    
+    //사용자 확인 (푸시 알림 허가 받기)
+    func requestAuthorization(){
+        let options: UNAuthorizationOptions = [.alert, .sound, .badge]
+        UNUserNotificationCenter.current().requestAuthorization(options: options) { (success, error) in
+            if let error = error{
+                print("ERROR: \(error)")
+            }else{
+                print("SUCCESS")
+            }
+        }
+    }
+    
+    //시간 알림
+    func  scheduleNotification() {
+        let content = UNMutableNotificationContent()
+        content.title = "푸시알림"                  //제목
+        content.subtitle = "냄새 접수 시간입니다."     //소제목
+        content.sound = .default
+        
+        //calendar
+        var dateComponents = DateComponents()
+        dateComponents.hour = 14                  //시
+        dateComponents.minute = 33                //분
+        let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: true)
+        
+        
+        let request = UNNotificationRequest(identifier: UUID().uuidString,
+                                            content: content,
+                                            trigger: trigger)
+        UNUserNotificationCenter.current().add(request)
+    }
     //MARK: - 로그인 실행(로그인 API 호출)
     /// 로그인 API 호출을 통한 현재 비밀번호 일치 여부 확인
     /// - Parameter completion: 로그인 결과
@@ -133,3 +168,4 @@ class MyPageViewModel: ObservableObject {
         }
     }
 }
+
