@@ -6,15 +6,36 @@
 //
 
 import SwiftUI
+import UIKit
+
+class SceneDelegate: UIResponder, UIWindowSceneDelegate {
+    var window: UIWindow?
+    
+    func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
+        
+        let smellView = SmellReceptionView()
+        
+        DispatchQueue.global().async {
+            while true {
+                DispatchQueue.main.async {
+                    smellView.smellViewModel.objectWillChange.send()
+                    print("test!!!!!!!!!!!!!!")
+                }
+            }
+        }
+    }
+}
 
 //MARK: - 악취 접수 화면
 struct SmellReceptionView: View {
+    @Environment(\.presentationMode) var presentationMode
     @ObservedObject var viewUtil = ViewUtil()
+    @ObservedObject var viewOptionSet = ViewOptionSet() //화면 Option Set
     
     @ObservedObject var codeViewModel = CodeViewModel() //Code View Model
     @ObservedObject var weatherViewModel = WeatherViewModel() //Weather View Model
     @ObservedObject var smellViewModel = SmellReceptionViewModel() //Smell Reception View Model
-    
+
     var body: some View {
         NavigationView {
             ZStack {
@@ -23,17 +44,19 @@ struct SmellReceptionView: View {
                     viewUtil.loadingView()  //로딩 화면
                         .zIndex(1)  //Z Stack 순서 맨 앞으로
                 }
-                
+
                 VStack {
+                    VStack {
+                        Text("\(smellViewModel.result)")
+                    }
                     ScrollView {
                         CurrentWeatherView(viewUtil: viewUtil, weatherViewModel: weatherViewModel, smellViewModel: smellViewModel)  //현재 날씨 화면
                         
                         DividerLine()   //구분선
-                        
                         ReceptionStatusView(smellViewModel: smellViewModel) //금일 접수 현황 화면
                         
                         DividerLine()   //구분선
-                        
+
                         SmellLevelView(weatherViewModel: weatherViewModel, smellViewModel: smellViewModel)  //악취 강도 선택 화면
                         
                         DividerLine()   //구분선
@@ -50,7 +73,6 @@ struct SmellReceptionView: View {
             
             smellViewModel.weatherBackground = smellViewModel.setWeatherBackground()    //시간에 따른 날씨 배경 설정
             smellViewModel.getSmellCode()   //악취 강도 코드
-            
             smellViewModel.getReceptionStatus() //금일 냄새 접수 현황
             
             //현재 날씨 호출
@@ -59,6 +81,7 @@ struct SmellReceptionView: View {
                 viewUtil.isLoading = false  //로딩 종료
             }
         }
+        
     }
 }
 
@@ -84,6 +107,7 @@ struct MenuButton: View {
 //MARK: - 현재 날씨 정보
 struct CurrentWeatherView: View {
     @ObservedObject var viewUtil: ViewUtil
+    
     @ObservedObject var weatherViewModel: WeatherViewModel //Weather View Model
     @ObservedObject var smellViewModel: SmellReceptionViewModel //Smell Reception View Model
 
@@ -238,7 +262,7 @@ struct SmellLevelView: View {
 
                 //악취 강도 선택 버튼
                 NavigationLink(
-                    destination: ReceptionRegistView(selectSmell: code, currentWeather: weatherViewModel.currentWeather),    //악취 접수 등록 화면 - 선택한 악취 강도 정보 전달
+                    destination: ReceptionRegistView(selectSmell: code),   //악취 접수 등록 화면 - 선택한 악취 강도 정보 전달
                     label: {
                         Text("\(smellName) - \(smellComment)")
                             .fontWeight(.bold)
@@ -256,13 +280,9 @@ struct SmellLevelView: View {
 }
 
 struct SmellReceptionView_Previews: PreviewProvider {
-    @State private var viewOptionSet = ViewOptionSet() //화면 Option Set
-    
-    init() {
-        viewOptionSet.navigationBarOption() //Navigation Bar 옵션
-    }
-    
     static var previews: some View {
         SmellReceptionView()
     }
 }
+
+

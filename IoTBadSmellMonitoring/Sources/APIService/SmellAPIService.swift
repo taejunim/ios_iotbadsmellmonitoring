@@ -21,4 +21,13 @@ class SmellAPISerivce {
         
         return apiClient.request(route: APIRouter.get(useApi: "base", path: "/api/userTodayRegisterInfo", parameters: parameters))
     }
+
+    //MARK: - 악취 접수 등록 API 호출
+    /// 악취 접수 등록 API 호출
+    /// - Parameter parameters:
+    /// - Returns: API Response - Result, Message
+    public func requestReceptionRegist(parameters: [String: Any]) -> Future<Response, AFError> {
+        
+        return apiClient.request(route: APIRouter.post(useApi: "base", path: "/api/registerInsert", parameters: parameters))
+    }
 }

@@ -11,12 +11,13 @@ import Foundation
 import ExytePopupView
 
 class ViewUtil: ObservableObject {
-    @Published var isLoading = false    //로딩 화면 노출 여부
+    @Published var isLoading: Bool = false    //로딩 화면 노출 여부
     
-    @Published var showToast = false    //Toast 팝업 노출 여부
-    @Published var toastMessage = ""    //Toast 팝업 메시지
+    @Published var showToast: Bool = false    //Toast 팝업 노출 여부
+    @Published var toastMessage: String = ""    //Toast 팝업 메시지
     
-    @Published var showModal = false    //Toast 팝업 노출 여부
+    @Published var showModal: Bool = false    //Modal 팝업 노출 여부
+    @Published var closeNavigation: Bool = false
 
     //MARK: - 로딩 화면
     /// Loading  View Function

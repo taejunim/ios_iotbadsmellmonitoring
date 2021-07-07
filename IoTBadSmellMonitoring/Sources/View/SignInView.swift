@@ -6,10 +6,13 @@
 //
 
 import SwiftUI
+import CoreLocation
 
 //MARK: - 로그인 화면
 struct SignInView: View {
     @ObservedObject var viewUtil = ViewUtil()
+    @ObservedObject var location = Location()
+    
     @ObservedObject var signInViewModel = SignInViewModel()
     
     var body: some View {

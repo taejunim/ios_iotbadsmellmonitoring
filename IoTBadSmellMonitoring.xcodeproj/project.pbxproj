@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		0EE3B98B26844D6D00061F00 /* MyPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EE3B98A26844D6D00061F00 /* MyPageView.swift */; };
 		0EE3B98F2684759600061F00 /* MyPageViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EE3B98E2684759600061F00 /* MyPageViewModel.swift */; };
+		2BB2A25D2692A17D0071E796 /* Location.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BB2A25C2692A17D0071E796 /* Location.swift */; };
 		BF031BC0265F53CA008AB3F5 /* IoTBadSmellMonitoringApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF031BBF265F53CA008AB3F5 /* IoTBadSmellMonitoringApp.swift */; };
 		BF031BC2265F53CA008AB3F5 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF031BC1265F53CA008AB3F5 /* ContentView.swift */; };
 		BF031BC4265F53CB008AB3F5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BF031BC3265F53CB008AB3F5 /* Assets.xcassets */; };
@@ -48,6 +49,7 @@
 /* Begin PBXFileReference section */
 		0EE3B98A26844D6D00061F00 /* MyPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyPageView.swift; sourceTree = "<group>"; };
 		0EE3B98E2684759600061F00 /* MyPageViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyPageViewModel.swift; sourceTree = "<group>"; };
+		2BB2A25C2692A17D0071E796 /* Location.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Location.swift; sourceTree = "<group>"; };
 		BCA40AAB0AA423D57BB3F697 /* Pods-IoTBadSmellMonitoring.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-IoTBadSmellMonitoring.debug.xcconfig"; path = "Target Support Files/Pods-IoTBadSmellMonitoring/Pods-IoTBadSmellMonitoring.debug.xcconfig"; sourceTree = "<group>"; };
 		BF031BBC265F53CA008AB3F5 /* IoTBadSmellMonitoring.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IoTBadSmellMonitoring.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BF031BBF265F53CA008AB3F5 /* IoTBadSmellMonitoringApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IoTBadSmellMonitoringApp.swift; sourceTree = "<group>"; };
@@ -213,6 +215,7 @@
 			isa = PBXGroup;
 			children = (
 				BF68AE0F2681ACC70086B88F /* CommonUtil.swift */,
+				2BB2A25C2692A17D0071E796 /* Location.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -385,6 +388,7 @@
 				BF720DB326775C7400D03428 /* CodeViewModel.swift in Sources */,
 				BF673FEE2668EC6C00B4D91B /* UserModel.swift in Sources */,
 				BF6C1072268081AB006BDC44 /* SmellAPIService.swift in Sources */,
+				2BB2A25D2692A17D0071E796 /* Location.swift in Sources */,
 				BF720DB1267752F000D03428 /* CodeAPIService.swift in Sources */,
 				BF65E4622679965C00C7C6B1 /* MessageProperties.swift in Sources */,
 				BF6C1074268086F3006BDC44 /* APIResponse.swift in Sources */,

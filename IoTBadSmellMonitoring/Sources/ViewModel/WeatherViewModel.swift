@@ -232,7 +232,7 @@ class WeatherViewModel: ObservableObject {
             "windSpeed": windSpeed  //풍속
         ]
         
-        print(currentWeather)
+        //print(currentWeather)
         
         return currentWeather
     }

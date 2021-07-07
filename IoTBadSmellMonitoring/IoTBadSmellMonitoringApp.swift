@@ -9,10 +9,16 @@ import SwiftUI
 
 @main
 struct IoTBadSmellMonitoringApp: App {
+    @Environment(\.scenePhase) private var scenePhase
+     
     var body: some Scene {
         WindowGroup {
-            //LaunchScreen()
-            SmellReceptionView()
+            if UserDefaults.standard.string(forKey: "userId") == nil {
+                LaunchScreen()
+            }
+            else {
+                SmellReceptionView()
+            }
         }
     }
 }

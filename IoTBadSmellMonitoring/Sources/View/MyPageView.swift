@@ -11,18 +11,12 @@ import UserNotifications
 //MARK: - 마이페이지 화면
 struct MyPageView: View {
     @Environment(\.presentationMode) var presentationMode   //Back 버튼 기능 추가에 필요
-    @State private var viewOptionSet = ViewOptionSet() //화면 Option Set
-    
     @ObservedObject var viewUtil = ViewUtil()
+    @ObservedObject var viewOptionSet = ViewOptionSet() //화면 Option Set
+    
     @ObservedObject var myPageViewModel = MyPageViewModel()
     
-    init() {
-        viewOptionSet.navigationBarOption() //Navigation Bar 옵션
-        viewOptionSet.pickerOption()    //Picker 옵션
-    }
-    
     var body: some View {
-        
         ZStack {
             //로딩 표시 여부에 따라 표출
             if viewUtil.isLoading {
@@ -40,12 +34,11 @@ struct MyPageView: View {
                     }
                 }
                 PasswordChangeButton(viewUtil: viewUtil, myPageViewModel: myPageViewModel)               //비밀번호 수정 버튼
-                
             }
-            .navigationBarTitle(Text("My Page"), displayMode: .inline) //Navigation Bar 타이틀
-            .navigationBarBackButtonHidden(true)                       //기본 Back 버튼 숨김
-            .navigationBarItems(leading: BackButton())                 //커스텀 Back 버튼 추가
         }
+        .navigationBarTitle(Text("My Page"), displayMode: .inline) //Navigation Bar 타이틀
+        .navigationBarBackButtonHidden(true)                       //기본 Back 버튼 숨김
+        .navigationBarItems(leading: BackButton())                 //커스텀 Back 버튼 추가
         .popup(
             isPresented: $viewUtil.showToast,   //팝업 노출 여부
             type: .floater(verticalPadding: 40),

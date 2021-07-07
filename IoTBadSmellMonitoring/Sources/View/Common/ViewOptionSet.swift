@@ -8,7 +8,13 @@
 import SwiftUI
 import Foundation
     
-class ViewOptionSet {
+class ViewOptionSet: ObservableObject {
+    
+    init() {
+        self.navigationBarOption()
+        self.pickerOption()
+    }
+    
     //MARK: - Navigation Bar Option
     /// Navigation Bar 옵션 설정
     func navigationBarOption() {

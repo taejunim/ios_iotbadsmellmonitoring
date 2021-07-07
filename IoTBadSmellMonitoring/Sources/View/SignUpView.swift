@@ -10,14 +10,10 @@ import SwiftUI
 //MARK: - 회원가입 화면
 struct SignUpView: View {
     @Environment(\.presentationMode) var presentationMode   //Back 버튼 기능 추가에 필요
-    @State private var viewOptionSet = ViewOptionSet() //화면 Option Set
     @ObservedObject var viewUtil = ViewUtil()
+    @ObservedObject var viewOptionSet = ViewOptionSet() //화면 Option Set
     
     @ObservedObject var signUpViewModel = SignUpViewModel() //회원가입 View Model
-    
-    init() {
-        viewOptionSet.pickerOption()    //Picker 옵션
-    }
     
     var body: some View {
         ZStack {
@@ -36,13 +32,13 @@ struct SignUpView: View {
                     
                 AccountRegistButton(viewUtil: viewUtil, signUpViewModel: signUpViewModel)   //계정 등록 버튼
             }
-            .navigationBarTitle(Text("회원가입"), displayMode: .inline) //Navigation Bar 타이틀
-            .navigationBarBackButtonHidden(true)    //기본 Back 버튼 숨김
-            .navigationBarItems(leading: BackButton())  //커스텀 Back 버튼 추가
-            .onAppear {
-                signUpViewModel.getSexCode()    //성별 코드
-                signUpViewModel.getRegionCode() //지역 코ㄷ
-            }
+        }
+        .navigationBarTitle(Text("회원가입"), displayMode: .inline) //Navigation Bar 타이틀
+        .navigationBarBackButtonHidden(true)    //기본 Back 버튼 숨김
+        .navigationBarItems(leading: BackButton())  //커스텀 Back 버튼 추가
+        .onAppear {
+            signUpViewModel.getSexCode()    //성별 코드
+            signUpViewModel.getRegionCode() //지역 코ㄷ
         }
         .popup(
             isPresented: $viewUtil.showToast,   //팝업 노출 여부
@@ -254,12 +250,6 @@ struct AccountRegistButton: View {
 }
 
 struct SignUpView_Previews: PreviewProvider {
-    @State private var viewOptionSet = ViewOptionSet() //화면 Option Set
-    
-    init() {
-        viewOptionSet.navigationBarOption() //Navigation Bar 옵션
-    }
-    
     static var previews: some View {
         SignUpView()
     }

@@ -60,7 +60,7 @@ struct LaunchScreen: View {
                 self.degree = true //흐림 효과 처리 해제
             }
             //시작 화면 노출 시간 지연 설정
-            withAnimation(Animation.linear.delay(2.5)) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
                 showLaunchScreen = false    //시작 화면 노출 여부 변경
             }
         }
