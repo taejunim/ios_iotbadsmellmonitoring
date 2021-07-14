@@ -13,6 +13,7 @@ enum APIRouter: URLRequestConvertible {
     case post(useApi: String, path: String, parameters: [String: Any])  //POST
     case get(useApi: String, path: String, parameters: [String: String])    //GET
     
+    //static let baseApiUrl: String = "http:/172.30.1.6:8080"
     static let baseApiUrl: String = "http://101.101.219.152:8080"   //악취 모니터링 API URL
     static let weatherApiUrl: String = "http://apis.data.go.kr/1360000"    //기상청 초단기예보 API URL
     

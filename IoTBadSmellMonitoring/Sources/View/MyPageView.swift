@@ -7,6 +7,7 @@
 
 import SwiftUI
 import UserNotifications
+import Combine
 
 //MARK: - 마이페이지 화면
 struct MyPageView: View {
@@ -61,9 +62,9 @@ struct MyPageView: View {
 struct Profile: View {
     @ObservedObject var viewUtil: ViewUtil
     @ObservedObject var myPageViewModel = MyPageViewModel()
+    
     var body: some View  {
-        
-        HStack{
+        HStack {
             Image("")   //프로필 이미지
                 .frame(width: 100, height: 100)
                 .background(Color.black)
@@ -86,7 +87,17 @@ struct PushToggle: View {
     @State var showToggle = true
     var body: some View  {
         VStack {
-            Toggle("푸시", isOn: $showToggle).padding(.trailing, 250)
+            Toggle("푸시", isOn: $showToggle)
+                .padding(.trailing, 250)
+                .onReceive(Just(showToggle), perform: { toggleIsOn in
+                    if toggleIsOn {
+                        print("Schedule")
+                        MyPageViewModel.instance.scheduleNotification()
+                    }
+                    else {
+                        print("No Schedule")
+                    }
+                })
             
             if showToggle{
                 Button("사용자 허락"){
@@ -100,8 +111,6 @@ struct PushToggle: View {
                 //Text("버튼을 눌러주세요.")
             }
         }
-        
-        
     }
 }
 //MARK: - 비밀번호 변경 field

@@ -9,6 +9,7 @@ import Foundation
 import UserNotifications
 
 class MyPageViewModel: ObservableObject {
+    private let codeViewModel = CodeViewModel() //Code View Model
     private let userAPI = UserAPIService()  //사용자 API Service
     
     @Published var result: String = ""   //결과 상태
@@ -18,6 +19,8 @@ class MyPageViewModel: ObservableObject {
     @Published var currentPassword: String = ""   //현재 비밀번호
     @Published var newpassword: String = ""    //새 비밀번호
     @Published var confirmPassword: String = ""    //비밀번호 확인
+    
+    @Published var receptionTimeCode: [[String: String]] = [[:]]  //접수 시간대 코드
     
     //MARK: - 푸시 알림
     static let instance = MyPageViewModel() //Singleton
@@ -34,8 +37,15 @@ class MyPageViewModel: ObservableObject {
         }
     }
     
+    //MARK: - 접수 시간대 코드 API 호출
+    func getReceptionTimeCode() {
+        codeViewModel.getCode(codeGroup: "REN") { (code) in
+            self.receptionTimeCode = code
+        }
+    }
+    
     //시간 알림
-    func  scheduleNotification() {
+    func scheduleNotification() {
         let content = UNMutableNotificationContent()
         content.title = "푸시알림"                  //제목
         content.subtitle = "냄새 접수 시간입니다."     //소제목
@@ -43,10 +53,9 @@ class MyPageViewModel: ObservableObject {
         
         //calendar
         var dateComponents = DateComponents()
-        dateComponents.hour = 14                  //시
-        dateComponents.minute = 33                //분
+        dateComponents.hour = 16               //시
+        dateComponents.minute = 19                //분
         let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: true)
-        
         
         let request = UNNotificationRequest(identifier: UUID().uuidString,
                                             content: content,

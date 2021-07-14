@@ -10,24 +10,32 @@ import CoreLocation
 
 //MARK: - 로그인 화면
 struct SignInView: View {
-    @ObservedObject var viewUtil = ViewUtil()
     @ObservedObject var location = Location()
-    
     @ObservedObject var signInViewModel = SignInViewModel()
+    
+    @StateObject private var viewUtil = ViewUtil()
+    @StateObject private var weatherViewModel = WeatherViewModel()
+    @StateObject private var smellViewModel = SmellReceptionViewModel()
+    @StateObject private var sideMenuViewModel = SideMenuViewModel()
     
     var body: some View {
         //로그인 성공 시, 냄새 접수 화면 이동
-        if signInViewModel.result == "success" {
+        if signInViewModel.result == "success" || UserDefaults.standard.string(forKey: "userId") != nil{
             SmellReceptionView()    //냄새 접수 화면
+                .environmentObject(viewUtil)
+                .environmentObject(weatherViewModel)
+                .environmentObject(smellViewModel)
+                .environmentObject(sideMenuViewModel)
         }
         else {
-            NavigationView {
-                ZStack {
-                    //로딩 표시 여부에 따라 표출
-                    if viewUtil.isLoading {
-                        viewUtil.loadingView()  //로딩 화면
-                    }
-                    
+            ZStack {
+                //로딩 표시 여부에 따라 표출
+                if viewUtil.isLoading {
+                    viewUtil.loadingView()  //로딩 화면
+                        .zIndex(1)
+                }
+                
+                NavigationView {
                     VStack {
                         SignInEntryField(signInViewModel: signInViewModel)    //아이디, 비밀번호 입력 화면
                         
@@ -41,23 +49,23 @@ struct SignInView: View {
                     }
                     .padding()
                 }
-                .popup(
-                    isPresented: $viewUtil.showToast,   //팝업 노출 여부
-                    type: .floater(verticalPadding: 40),
-                    position: .bottom,
-                    animation: .easeInOut(duration: 0.0),   //애니메이션 효과
-                    autohideIn: 2,  //팝업 노출 시간
-                    closeOnTap: false,
-                    closeOnTapOutside: false,
-                    view: {
-                        viewUtil.toast()    //팝업 화면
-                    }
-                )
-                .gesture(DragGesture(minimumDistance: 0.00001).onChanged {_ in
-                    viewUtil.dismissKeyboard() //키보드 닫기
-                })
+                .navigationBarHidden(true)  //Navigation Bar 비활성화
             }
-            .navigationBarHidden(true)  //Navigation Bar 비활성화
+            .popup(
+                isPresented: $viewUtil.showToast,   //팝업 노출 여부
+                type: .floater(verticalPadding: 40),
+                position: .bottom,
+                animation: .easeInOut(duration: 0.0),   //애니메이션 효과
+                autohideIn: 2,  //팝업 노출 시간
+                closeOnTap: false,
+                closeOnTapOutside: false,
+                view: {
+                    viewUtil.toast()    //팝업 화면
+                }
+            )
+            .gesture(DragGesture(minimumDistance: 0.00001).onChanged {_ in
+                viewUtil.dismissKeyboard() //키보드 닫기
+            })
         }
     }
 }
@@ -156,5 +164,6 @@ struct FindPasswordButton: View {
 struct SignInView_Previews: PreviewProvider {
     static var previews: some View {
         SignInView()
+            .environmentObject(ViewUtil())
     }
 }

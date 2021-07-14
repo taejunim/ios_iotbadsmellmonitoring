@@ -6,25 +6,27 @@
 //
 
 import SwiftUI
-//import UIKit
 import Foundation
 import ExytePopupView
 
 class ViewUtil: ObservableObject {
     @Published var isLoading: Bool = false    //로딩 화면 노출 여부
-    
     @Published var showToast: Bool = false    //Toast 팝업 노출 여부
     @Published var toastMessage: String = ""    //Toast 팝업 메시지
-    
     @Published var showModal: Bool = false    //Modal 팝업 노출 여부
-    @Published var closeNavigation: Bool = false
+    @Published var showAlert: Bool = false  //알림창 노출 여부
+    @Published var alert: Alert?    //알림창
+    @Published var showMenu: Bool = false   //사이드 메뉴 노출 여부
+    @Published var isViewDismiss: Bool = false  //창 닫기 여부
+    
+    //@Published var isSignOut: Bool = false
 
     //MARK: - 로딩 화면
     /// Loading  View Function
     /// - Returns: Loading View
     func loadingView() -> some View {
         ZStack {
-            Color(.systemBackground).opacity(0)
+            Color(.gray).opacity(0.5)
                 .ignoresSafeArea()
             
             ProgressView()

@@ -20,6 +20,7 @@ class ViewOptionSet: ObservableObject {
     func navigationBarOption() {
         UINavigationBar.appearance().barTintColor = UIColor.white   //Navigation Bar 배경 색상
         //UINavigationBar.appearance().isTranslucent = false
+        //UIToolbar.appearance().barTintColor = UIColor.black
     }
     
     //MARK: - Picker Option

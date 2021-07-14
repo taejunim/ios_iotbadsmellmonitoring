@@ -10,6 +10,8 @@ import Foundation
 import CoreLocation
 
 class Location: ObservableObject {
+    private let viewUtil = ViewUtil()
+    
     @Published var locationManager = CLLocationManager()    //Location Manager 인스턴스 생성
     @Published var latitude: Double?    //위도
     @Published var longitude: Double?   //경도
@@ -76,8 +78,8 @@ class Location: ObservableObject {
         
         //위치 서비스 권한이 없는 경우 권한 요청 알림창 활성
         if locationStatus == "notDetermined" || locationStatus == "restricted" || locationStatus == "denied" {
-            showAlert = true    //알림창 활성
-            self.alert = requestAuthAlert() //위치 서비스 권한 요청 알림창
+            self.viewUtil.showAlert = true    //알림창 활성
+            self.viewUtil.alert = requestAuthAlert() //위치 서비스 권한 요청 알림창
         }
     }
     
@@ -98,7 +100,7 @@ class Location: ObservableObject {
             secondaryButton: .cancel(
                 Text("닫기"),
                 action: {
-                    self.showAlert = false
+                    self.viewUtil.showAlert = false
                 }
             )
         )

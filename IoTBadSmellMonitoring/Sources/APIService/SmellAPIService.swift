@@ -30,4 +30,24 @@ class SmellAPISerivce {
         
         return apiClient.request(route: APIRouter.post(useApi: "base", path: "/api/registerInsert", parameters: parameters))
     }
+    
+    //MARK: - 접수 이력 정보 API 호출
+    /// 악취 접수 이력 정보 API 호출
+    /// - Parameter parameters:
+    ///   -
+    /// - Returns: History Model
+    public func requestHistory(parameters: [String: String]) -> Future<Responses<[History]>, AFError> {
+        
+        return apiClient.request(route: APIRouter.get(useApi: "base", path: "/api/registerMasterHistory", parameters: parameters))
+    }
+    
+    //MARK: - 접수 이력 상세 정보 API 호출
+    /// 악취 접수 이력 상세 정보 API 호출
+    /// - Parameter parameters:
+    ///   -
+    /// - Returns: Detail History Model
+    public func requestDetailHistory(parameters: [String: String]) -> Future<Responses<[DetailHistory]>, AFError> {
+        
+        return apiClient.request(route: APIRouter.get(useApi: "base", path: "/api/registerDetailHistory", parameters: parameters))
+    }
 }

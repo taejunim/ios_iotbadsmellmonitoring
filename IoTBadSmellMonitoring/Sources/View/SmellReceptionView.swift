@@ -8,89 +8,108 @@
 import SwiftUI
 import UIKit
 
-class SceneDelegate: UIResponder, UIWindowSceneDelegate {
-    var window: UIWindow?
-    
-    func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
-        
-        let smellView = SmellReceptionView()
-        
-        DispatchQueue.global().async {
-            while true {
-                DispatchQueue.main.async {
-                    smellView.smellViewModel.objectWillChange.send()
-                    print("test!!!!!!!!!!!!!!")
-                }
-            }
-        }
-    }
-}
-
 //MARK: - 악취 접수 화면
 struct SmellReceptionView: View {
     @Environment(\.presentationMode) var presentationMode
-    @ObservedObject var viewUtil = ViewUtil()
-    @ObservedObject var viewOptionSet = ViewOptionSet() //화면 Option Set
     
+    @EnvironmentObject var viewUtil: ViewUtil   //화면 Util
+    @ObservedObject var viewOptionSet = ViewOptionSet() //화면 Option Set
     @ObservedObject var codeViewModel = CodeViewModel() //Code View Model
-    @ObservedObject var weatherViewModel = WeatherViewModel() //Weather View Model
-    @ObservedObject var smellViewModel = SmellReceptionViewModel() //Smell Reception View Model
+    @EnvironmentObject var weatherViewModel: WeatherViewModel //Weather View Model
+    @EnvironmentObject var smellViewModel: SmellReceptionViewModel  //Smell Reception View Model
+    @EnvironmentObject var sideMenuViewModel: SideMenuViewModel //Side Menu View Model
 
     var body: some View {
-        NavigationView {
+        //로그아웃 여부에 따라 로그인 화면 이동
+        if sideMenuViewModel.isSignOut {
+            //로그인 화면
+            SignInView()
+                .environmentObject(viewUtil)
+        }
+        else {
             ZStack {
                 //로딩 표시 여부에 따라 표출
                 if viewUtil.isLoading {
                     viewUtil.loadingView()  //로딩 화면
                         .zIndex(1)  //Z Stack 순서 맨 앞으로
                 }
-
-                VStack {
+                
+                //사이드 메뉴
+                if viewUtil.showMenu {
+                    SideMenuView()
+                        .environmentObject(viewUtil)
+                        .environmentObject(sideMenuViewModel)
+                        .zIndex(1)
+                        //.transition(.move(edge: .leading))
+                }
+                
+                //악취 접수 메인 화면
+                NavigationView {
                     VStack {
-                        Text("\(smellViewModel.result)")
-                    }
-                    ScrollView {
-                        CurrentWeatherView(viewUtil: viewUtil, weatherViewModel: weatherViewModel, smellViewModel: smellViewModel)  //현재 날씨 화면
-                        
-                        DividerLine()   //구분선
-                        ReceptionStatusView(smellViewModel: smellViewModel) //금일 접수 현황 화면
-                        
-                        DividerLine()   //구분선
+                        ScrollView {
+                            CurrentWeatherView(viewUtil: viewUtil, weatherViewModel: weatherViewModel, smellViewModel: smellViewModel)  //현재 날씨 화면
+                            
+                            DividerLine()   //구분선
+                            ReceptionStatusView(smellViewModel: smellViewModel) //금일 접수 현황 화면
+                            
+                            DividerLine()   //구분선
 
-                        SmellLevelView(weatherViewModel: weatherViewModel, smellViewModel: smellViewModel)  //악취 강도 선택 화면
-                        
-                        DividerLine()   //구분선
+                            SmellLevelView(weatherViewModel: weatherViewModel, smellViewModel: smellViewModel)  //악취 강도 선택 화면
+                            
+                            DividerLine()   //구분선
+                        }
+                    }
+                    .disabled(viewUtil.isLoading)   //로딩 중 화면 클릭 방지
+                    .navigationBarTitle(Text("악취 접수"), displayMode: .inline) //Navigation Bar 타이틀
+                    .navigationBarBackButtonHidden(true)    //기본 Back 버튼 숨김
+                    .navigationBarItems(leading: MenuButton(viewUtil: viewUtil))  //커스텀 Back 버튼 추가
+                }
+            }
+            .onAppear {
+                viewUtil.isLoading = true   //로딩 시작
+                
+                smellViewModel.weatherBackground = smellViewModel.setWeatherBackground()    //시간에 따른 날씨 배경 설정
+                smellViewModel.getSmellCode()   //악취 강도 코드
+                smellViewModel.getReceptionStatus() //금일 냄새 접수 현황
+                
+                //현재 날씨 호출
+                weatherViewModel.getCurrentWeather() { (weather) in
+                    weatherViewModel.currentWeather = weather   //현재 날씨 정보
+                    viewUtil.isLoading = false  //로딩 종료
+                }
+            }
+            .onChange(of: viewUtil.isViewDismiss, perform: { _ in
+                //isViewDismiss가 true인 경우만 실행 - 냄새 접수 등록 완료 후 재호출
+                if viewUtil.isViewDismiss {
+                    viewUtil.isLoading = true   //로딩 시작
+                    
+                    smellViewModel.weatherBackground = smellViewModel.setWeatherBackground()    //시간에 따른 날씨 배경 설정
+                    smellViewModel.getSmellCode()   //악취 강도 코드
+                    smellViewModel.getReceptionStatus() //금일 냄새 접수 현황
+                    
+                    //현재 날씨 호출
+                    weatherViewModel.getCurrentWeather() { (weather) in
+                        weatherViewModel.currentWeather = weather   //현재 날씨 정보
+                        viewUtil.isLoading = false  //로딩 종료
                     }
                 }
-                .disabled(viewUtil.isLoading)   //로딩 중 화면 클릭 방지
-            }
-            .navigationBarTitle(Text("악취 접수"), displayMode: .inline) //Navigation Bar 타이틀
-            .navigationBarBackButtonHidden(true)    //기본 Back 버튼 숨김
-            .navigationBarItems(leading: MenuButton())  //커스텀 Back 버튼 추가
+                
+                viewUtil.isViewDismiss = false
+            })
         }
-        .onAppear {
-            viewUtil.isLoading = true   //로딩 시작
-            
-            smellViewModel.weatherBackground = smellViewModel.setWeatherBackground()    //시간에 따른 날씨 배경 설정
-            smellViewModel.getSmellCode()   //악취 강도 코드
-            smellViewModel.getReceptionStatus() //금일 냄새 접수 현황
-            
-            //현재 날씨 호출
-            weatherViewModel.getCurrentWeather() { (weather) in
-                weatherViewModel.currentWeather = weather   //현재 날씨 정보
-                viewUtil.isLoading = false  //로딩 종료
-            }
-        }
-        
     }
 }
 
 //MARK: - Menu 버튼
 struct MenuButton: View {
+    @ObservedObject var viewUtil: ViewUtil
+    
     var body: some View {
         Button(
             action: {
-                
+                withAnimation {
+                    viewUtil.showMenu.toggle()
+                }
             },
             label: {
                 HStack {
@@ -151,7 +170,6 @@ struct CurrentWeatherView: View {
                 //날씨 API 호출 실패 시
                 else {
                     VStack(alignment: .center) {
-                        //Text("날씨 정보를 불러오지 못하였습니다.")
                         Text(weatherViewModel.message)
                             .fontWeight(/*@START_MENU_TOKEN@*/.bold/*@END_MENU_TOKEN@*/)
                     }
@@ -262,7 +280,8 @@ struct SmellLevelView: View {
 
                 //악취 강도 선택 버튼
                 NavigationLink(
-                    destination: ReceptionRegistView(selectSmell: code),   //악취 접수 등록 화면 - 선택한 악취 강도 정보 전달
+                    destination:
+                        ReceptionRegistView(selectSmell: code).environmentObject(ViewUtil()),   //악취 접수 등록 화면 - 선택한 악취 강도 정보 전달
                     label: {
                         Text("\(smellName) - \(smellComment)")
                             .fontWeight(.bold)
@@ -282,7 +301,9 @@ struct SmellLevelView: View {
 struct SmellReceptionView_Previews: PreviewProvider {
     static var previews: some View {
         SmellReceptionView()
+            .environmentObject(ViewUtil())
+            .environmentObject(WeatherViewModel())
+            .environmentObject(SmellReceptionViewModel())
+            .environmentObject(SideMenuViewModel())
     }
 }
-
-

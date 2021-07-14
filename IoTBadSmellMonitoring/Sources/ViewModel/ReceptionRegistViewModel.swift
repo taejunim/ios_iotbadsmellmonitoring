@@ -9,7 +9,7 @@ import Foundation
 import CoreLocation
 
 class ReceptionRegistViewModel: ObservableObject {
-    private let location = Location()
+    private let location = Location()   //위치 서비스
     private let codeViewModel = CodeViewModel() //Code View Model
     private let weatherViewModel = WeatherViewModel() //Weather View Model
     private let smellAPI = SmellAPISerivce()    //Smell API Service
@@ -49,7 +49,7 @@ class ReceptionRegistViewModel: ObservableObject {
         return (latitude, longitude)
     }
     
-    //현재 시간에 따른 접수 시간대 코드
+    //MARK: - 현재 시간에 따른 접수 시간대 코드
     var timeZoneCode: String? {
         let currentTime: Int = Int("HH00".dateFormatter(formatDate: Date()))!    //현재 시간
         
@@ -68,7 +68,7 @@ class ReceptionRegistViewModel: ObservableObject {
         }
         else {
             //return nil
-            return "004"
+            return "001"    //임시
         }
     }
     
@@ -105,11 +105,6 @@ class ReceptionRegistViewModel: ObservableObject {
             ]
             
             print(parameters)
-            
-            self.result = "success"
-            self.message = "정상적으로 악취 접수가 등록되었습니다."
-            
-            completion(self.result)
 
             //악취 접수 등록 API 호출
             let request = self.smellAPI.requestReceptionRegist(parameters: parameters)
@@ -143,7 +138,7 @@ class ReceptionRegistViewModel: ObservableObject {
     
     //MARK: - 접수 시간대 유효성 검사
     func isTimeZoneValid() -> Bool {
-        let registTimeZone: String? = timeZoneCode
+        let registTimeZone: String? = timeZoneCode  //접수 시간대 코드
         
         //접수 등록 시간대 확인
         if registTimeZone == nil {

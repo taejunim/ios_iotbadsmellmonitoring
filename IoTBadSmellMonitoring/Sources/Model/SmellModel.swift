@@ -22,3 +22,73 @@ struct TodayReception: Codable {
         case receptionDate = "regDt"
     }
 }
+
+//MARK: - 접수 이력 정보
+struct History: Codable {
+    let registNo: String    //접수 등록번호
+    let userId: String  //등록자 ID
+    let userName: String    //등록자 명
+    let registDate: String  //접수 등록일시
+
+    let timeZoneCode: String    //접수 시간대 코드
+    let timeZone: String    //접수 시간대
+
+    let smellLevelCode: String  //악취 강도 코드
+    let smellLevelName: String  //악취 강도 명
+    let smellTypeCode: String   //취기 코드
+    let smellTypeName: String   //취기 명
+
+    let weatherStateCode: String    //기상상태 코드
+    let weatherState: String    //기상상태
+    let temperature: String //기온
+    let humidity: String    //습도
+    let windDirectionCode: String   //풍향 코드
+    let windDirection: String   //풍향
+    let windSpeed: String   //풍속
+
+    let longitude: String   //GPS x 좌표
+    let latitude: String    //GPS y 좌표
+    let comment: String //추가 전달사항
+    
+    enum CodingKeys: String, CodingKey {
+        case registNo = "smellRegisterNo"
+        case userId = "regId"
+        case userName = "userName"
+        case registDate = "regDt"
+        
+        case timeZoneCode = "smellRegisterTime"
+        case timeZone = "smellRegisterTimeName"
+        
+        case smellLevelCode = "smellValue"
+        case smellLevelName = "smellValueName"
+        case smellTypeCode = "smellType"
+        case smellTypeName = "smellTypeName"
+        
+        case weatherStateCode = "weatherState"
+        case weatherState = "weatherStateName"
+        case temperature = "temperatureValue"
+        case humidity = "humidityValue"
+        case windDirectionCode = "windDirectionValue"
+        case windDirection = "windDirectionValueName"
+        case windSpeed = "windSpeedValue"
+        
+        case longitude = "gpsX"
+        case latitude = "gpsY"
+        case comment = "smellComment"
+    }
+}
+
+//MARK: - 접수 이력 상세 정보(첨부사진 이미지)
+struct DetailHistory: Codable {
+    let registNo: String    //접수 등록번호
+    let registDate: String  //접수 등록일시
+    let imageNo: String //이미지 번호
+    let imagePath: String   //이미지 URL 경로
+    
+    enum CodingKeys: String, CodingKey {
+        case registNo = "smellRegisterNo"
+        case registDate = "regDt"
+        case imageNo = "smellImageNo"
+        case imagePath = "smellImagePath"
+    }
+}

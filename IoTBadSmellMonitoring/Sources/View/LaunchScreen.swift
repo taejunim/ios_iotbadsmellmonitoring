@@ -15,6 +15,11 @@ struct LaunchScreen: View {
     @State private var dim = false  //불투명 효과
     @State private var degree = false //흐림 효과
     
+    @StateObject private var viewUtil = ViewUtil()
+    @StateObject private var weatherViewModel = WeatherViewModel()
+    @StateObject private var smellViewModel = SmellReceptionViewModel()
+    @StateObject private var sideMenuViewModel = SideMenuViewModel()
+    
     //전체 화면 - 그라데이션 효과 설정
     var gradient: LinearGradient {
         LinearGradient(
@@ -48,7 +53,17 @@ struct LaunchScreen: View {
                 .edgesIgnoringSafeArea(.all)    //Safe Area 전체 적용
             }
             else {
-                SignInView()    //로그인 화면 이동
+                if UserDefaults.standard.string(forKey: "userId") == nil {
+                    SignInView()    //로그인 화면 이동
+                        .environmentObject(viewUtil)
+                }
+                else {
+                    SmellReceptionView()    //악취 접수 화면
+                        .environmentObject(viewUtil)
+                        .environmentObject(weatherViewModel)
+                        .environmentObject(smellViewModel)
+                        .environmentObject(sideMenuViewModel)
+                }
             }
         }
         .onAppear {

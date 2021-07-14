@@ -17,6 +17,16 @@ struct DividerLine: View {
     }
 }
 
+//MARK: - 구분선 - Vertical
+struct VerticalDividerLine: View {
+    var body: some View {
+        Divider()
+            .frame(height: 1)
+            .background(Color("Color_EFEFEF"))
+            .padding(.vertical, 10)
+    }
+}
+
 //MARK: - Text Field 밑줄
 struct TextFiledUnderLine: View {
     var body: some View {
@@ -38,10 +48,12 @@ struct RequiredInputLabel: View {
 //MARK: - Back 버튼
 struct BackButton: View {
     @Environment(\.presentationMode) var presentationMode
+    @EnvironmentObject var viewUtil: ViewUtil
     
     var body: some View {
         Button(
             action: {
+                viewUtil.isViewDismiss = true
                 self.presentationMode.wrappedValue.dismiss()
             },
             label: {

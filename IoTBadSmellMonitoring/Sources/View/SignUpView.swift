@@ -10,9 +10,9 @@ import SwiftUI
 //MARK: - 회원가입 화면
 struct SignUpView: View {
     @Environment(\.presentationMode) var presentationMode   //Back 버튼 기능 추가에 필요
+    
     @ObservedObject var viewUtil = ViewUtil()
     @ObservedObject var viewOptionSet = ViewOptionSet() //화면 Option Set
-    
     @ObservedObject var signUpViewModel = SignUpViewModel() //회원가입 View Model
     
     var body: some View {
@@ -20,6 +20,7 @@ struct SignUpView: View {
             //로딩 표시 여부에 따라 표출
             if viewUtil.isLoading {
                 viewUtil.loadingView()  //로딩 화면
+                    .zIndex(1)
             }
             
             VStack {
@@ -32,10 +33,10 @@ struct SignUpView: View {
                     
                 AccountRegistButton(viewUtil: viewUtil, signUpViewModel: signUpViewModel)   //계정 등록 버튼
             }
+            .navigationBarTitle(Text("회원가입"), displayMode: .inline) //Navigation Bar 타이틀
+            .navigationBarBackButtonHidden(true)    //기본 Back 버튼 숨김
+            .navigationBarItems(leading: BackButton())  //커스텀 Back 버튼 추가
         }
-        .navigationBarTitle(Text("회원가입"), displayMode: .inline) //Navigation Bar 타이틀
-        .navigationBarBackButtonHidden(true)    //기본 Back 버튼 숨김
-        .navigationBarItems(leading: BackButton())  //커스텀 Back 버튼 추가
         .onAppear {
             signUpViewModel.getSexCode()    //성별 코드
             signUpViewModel.getRegionCode() //지역 코ㄷ

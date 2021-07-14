@@ -7,6 +7,7 @@
 
 import Foundation
 import UIKit
+import Combine
 
 class SmellReceptionViewModel: ObservableObject {
     
@@ -72,7 +73,6 @@ class SmellReceptionViewModel: ObservableObject {
     
     //MARK: - 금일 냄새 접수 현황
     func getReceptionStatus() {
-        
         //API 호출 - Request Parameters
         let parameters = [
             "userId": "test123" //임시
@@ -112,7 +112,6 @@ class SmellReceptionViewModel: ObservableObject {
                     
                     print(statusArray)
                     self.receptionStatus = statusArray
-                    //completion(statusArray)
                 }
             },
             //API 호출 실패
