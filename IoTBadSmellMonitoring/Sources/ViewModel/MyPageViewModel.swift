@@ -20,47 +20,64 @@ class MyPageViewModel: ObservableObject {
     @Published var newpassword: String = ""    //새 비밀번호
     @Published var confirmPassword: String = ""    //비밀번호 확인
     
-    @Published var receptionTimeCode: [[String: String]] = [[:]]  //접수 시간대 코드
-    
     //MARK: - 푸시 알림
     static let instance = MyPageViewModel() //Singleton
     
     //사용자 확인 (푸시 알림 허가 받기)
-    func requestAuthorization(){
-        let options: UNAuthorizationOptions = [.alert, .sound, .badge]
-        UNUserNotificationCenter.current().requestAuthorization(options: options) { (success, error) in
-            if let error = error{
-                print("ERROR: \(error)")
-            }else{
-                print("SUCCESS")
-            }
-        }
-    }
-    
-    //MARK: - 접수 시간대 코드 API 호출
-    func getReceptionTimeCode() {
-        codeViewModel.getCode(codeGroup: "REN") { (code) in
-            self.receptionTimeCode = code
-        }
-    }
+//    func requestAuthorization(){
+//        let options: UNAuthorizationOptions = [.alert, .sound, .badge]
+//        UNUserNotificationCenter.current().requestAuthorization(options: options) { (success, error) in
+//            if let error = error{
+//                print("ERROR: \(error)")
+//            }else{
+//                print("SUCCESS")
+//            }
+//        }
+//    }
     
     //시간 알림
     func scheduleNotification() {
-        let content = UNMutableNotificationContent()
-        content.title = "푸시알림"                  //제목
-        content.subtitle = "냄새 접수 시간입니다."     //소제목
-        content.sound = .default
         
-        //calendar
-        var dateComponents = DateComponents()
-        dateComponents.hour = 16               //시
-        dateComponents.minute = 19                //분
-        let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: true)
-        
-        let request = UNNotificationRequest(identifier: UUID().uuidString,
-                                            content: content,
-                                            trigger: trigger)
-        UNUserNotificationCenter.current().add(request)
+        //사용자 확인 완료 시 시간 알림 수행
+        let options: UNAuthorizationOptions = [.alert, .sound, .badge]
+        UNUserNotificationCenter.current().requestAuthorization(options: options) { (success, error) in
+            if let error = error{           //에러
+                print("ERROR: \(error)")
+            }else{                          //성공 시 수행
+                print("SUCCESS")
+                
+                //API codeComment 가져오기
+                self.codeViewModel.getCode(codeGroup: "REN") { (code) in
+                    
+                    // 푸시 알림 내용
+                    let content = UNMutableNotificationContent()
+                    
+                    content.title = "푸시알림"                  //제목
+                    content.subtitle = "냄새 접수 시간입니다."     //소제목
+                    content.sound = .default                
+                    
+                    //푸시 알림 시간
+                    var dateComponents = DateComponents()
+                    for i in 0...code.count-1 {     //0부터 3까지 4번 수행
+                        
+                        let time = code[i]["codeComment"]!  //codeComment 받아오기
+                        let pushHour = time.prefix(2)           //시 변수 선언 (codeComment 앞 두자리)
+                        let pushMinute = time.suffix(2)         //분 변수 선언 (codeComment 뒤 두자리)
+                        
+                        dateComponents.hour = Int(pushHour)!        //알림 시 INT형으로
+                        dateComponents.minute = Int(pushMinute)!    //알림 분 INT형으로
+                        
+                        let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: true)
+                        
+                        let request = UNNotificationRequest(identifier: UUID().uuidString,
+                                                            content: content,
+                                                            trigger: trigger)
+                        UNUserNotificationCenter.current().add(request)
+                    }
+                    
+                }
+            }
+        }
     }
     //MARK: - 로그인 실행(로그인 API 호출)
     /// 로그인 API 호출을 통한 현재 비밀번호 일치 여부 확인
@@ -177,4 +194,6 @@ class MyPageViewModel: ObservableObject {
         }
     }
 }
+
+
 

@@ -13,7 +13,7 @@ import Combine
 struct MyPageView: View {
     @Environment(\.presentationMode) var presentationMode   //Back 버튼 기능 추가에 필요
     @ObservedObject var viewUtil = ViewUtil()
-    @ObservedObject var viewOptionSet = ViewOptionSet() //화면 Option Set
+    @ObservedObject var viewOptionSet = ViewOptionSet()     //화면 Option Set
     
     @ObservedObject var myPageViewModel = MyPageViewModel()
     
@@ -92,25 +92,14 @@ struct PushToggle: View {
                 .onReceive(Just(showToggle), perform: { toggleIsOn in
                     if toggleIsOn {
                         print("Schedule")
-                        MyPageViewModel.instance.scheduleNotification()
+                        MyPageViewModel.instance.scheduleNotification()     //푸시 알림
                     }
                     else {
                         print("No Schedule")
                     }
                 })
-            
-            if showToggle{
-                Button("사용자 허락"){
-                    MyPageViewModel.instance.requestAuthorization()
-                }
-                Button("시간 알림"){
-                    MyPageViewModel.instance.scheduleNotification()
-                }
-                
-            }else{
-                //Text("버튼을 눌러주세요.")
-            }
         }
+        
     }
 }
 //MARK: - 비밀번호 변경 field
