@@ -61,6 +61,7 @@ struct SmellReceptionView: View {
                                 CurrentWeatherView(viewUtil: viewUtil, weatherViewModel: weatherViewModel, smellViewModel: smellViewModel)  //현재 날씨 화면
                                 
                                 DividerLine()   //구분선
+                                
                                 ReceptionStatusView(smellViewModel: smellViewModel) //금일 접수 현황 화면
                                 
                                 DividerLine()   //구분선
@@ -201,13 +202,19 @@ struct CurrentWeatherView: View {
                 
                 //날씨 API 호출 성공 시, 현재 날씨 정보
                 if weatherViewModel.result == "success" {
-                    Group {
-                        //날씨 아이콘
-                        Image(systemName: weatherViewModel.currentWeather["weatherIcon"] ?? "sun.max.fill")
-                            .renderingMode(.original)
-                            .font(Font.system(size: 70))
-                    }
-
+                    //날씨 아이콘 - 기존
+//                    Group {
+//                        Image(systemName: "cloud.sun.fill")
+//                            .renderingMode(.original)
+//                            .font(Font.system(size: 70))
+//                            .border(Color.black)
+//                    }
+                    //날씨 아이콘 - 변경
+                    Image(weatherViewModel.currentWeather["weatherIcon"] ?? "Sun")
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: 110, height: 90)
+                    
                     Spacer()
 
                     VStack(alignment: .leading, spacing: 20) {
