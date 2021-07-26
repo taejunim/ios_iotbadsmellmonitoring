@@ -225,8 +225,7 @@ struct PasswordChangeButton: View {
                 //로그인 실행
                 myPageViewModel.signIn() { (result) in
                     viewUtil.isLoading = false  //로딩 종료
-                    
-                    print(result)
+
                     //로그인 성공이 아닌 경우(현재비밀번호 불일치) Toast 팝업 메시지 호출
                     if result != "success" {
                         viewUtil.showToast = true
@@ -238,14 +237,14 @@ struct PasswordChangeButton: View {
                         viewUtil.toastMessage = myPageViewModel.validMessage
                     }
                     
-//                    //로그인과 유효성 검사 성공일 경우 비밀번호 수정 실행
-//                    myPageViewModel.passwordChange() { (result) in
-//
-//                        viewUtil.isLoading = false  //로딩 종료
-//
-//                        viewUtil.showToast = true
-//                        viewUtil.toastMessage = myPageViewModel.message
-//                    }
+                    //로그인과 유효성 검사 성공일 경우 비밀번호 수정 실행
+                    myPageViewModel.passwordChange() { (result) in
+
+                        viewUtil.isLoading = false  //로딩 종료
+
+                        viewUtil.showToast = true
+                        viewUtil.toastMessage = myPageViewModel.message
+                    }
                 }
             },
             label: {
