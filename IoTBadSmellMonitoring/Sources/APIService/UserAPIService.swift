@@ -21,7 +21,7 @@ class UserAPIService {
     /// - Returns: User Model
     public func requestSignIn(parameters: [String: Any]) -> Future<Responses<User>, AFError> {
         
-        return apiClient.request(route: APIRouter.post(useApi: "base", path: "/api/userLogin", parameters: parameters))
+        return apiClient.request(route: APIRouter.post(useApi: "base", path: "/api/userLogin", parameters: parameters, isUpload: false))
     }
     
     
@@ -38,7 +38,7 @@ class UserAPIService {
     /// - Returns: API Response - Result, Message
     public func requestSignUp(parameters: [String: Any]) -> Future<Response, AFError> {
         
-        return apiClient.request(route: APIRouter.post(useApi: "base", path: "/api/userJoinInsert", parameters: parameters))
+        return apiClient.request(route: APIRouter.post(useApi: "base", path: "/api/userJoinInsert", parameters: parameters, isUpload: false))
     }
      
     //MARK: - ID 찾기 API 호출
@@ -58,7 +58,7 @@ class UserAPIService {
     /// - Returns: API Response - Result, Message
     public func requestPasswordChange(parameters: [String: Any]) -> Future<Response, AFError> {
 
-        return apiClient.request(route: APIRouter.post(useApi: "base", path: "/api/userPasswordChange", parameters: parameters))
+        return apiClient.request(route: APIRouter.post(useApi: "base", path: "/api/userPasswordChange", parameters: parameters, isUpload: false))
     }
 }
 

@@ -27,60 +27,56 @@ struct SmellReceptionView: View {
                 .environmentObject(viewUtil)
         }
         else {
-            ZStack {
-                //로딩 표시 여부에 따라 표출
-                if viewUtil.isLoading {
-                    viewUtil.loadingView()  //로딩 화면
-                        .zIndex(1)  //Z Stack 순서 맨 앞으로
-                }
-                
-                //사이드 메뉴
-                if viewUtil.showMenu {
-                    SideMenuView()
-                        .environmentObject(viewUtil)
-                        .environmentObject(sideMenuViewModel)
-                        .zIndex(1)
-                        //.transition(.move(edge: .leading))
-                }
-                
-                //악취 접수 메인 화면
-                NavigationView {
-                    VStack {
-                        ScrollView {
-                            CurrentWeatherView(viewUtil: viewUtil, weatherViewModel: weatherViewModel, smellViewModel: smellViewModel)  //현재 날씨 화면
-                            
-                            DividerLine()   //구분선
-                            ReceptionStatusView(smellViewModel: smellViewModel) //금일 접수 현황 화면
-                            
-                            DividerLine()   //구분선
-
-                            SmellLevelView(weatherViewModel: weatherViewModel, smellViewModel: smellViewModel)  //악취 강도 선택 화면
-                            
-                            DividerLine()   //구분선
-                        }
+            //사이드 메뉴 선택 시, 해당 메뉴로 이동 - My Page
+            if sideMenuViewModel.moveMenu == "MyPage" {
+                MyPageView()
+                    .environmentObject(viewUtil)
+            }
+            //사이드 메뉴 선택 시, 해당 메뉴로 이동 - 접수 이력
+            else if sideMenuViewModel.moveMenu == "ReceptionHistory" {
+                ReceptionHistoryView()
+                    .environmentObject(viewUtil)
+            }
+            //악취 접수 메인 화면
+            else {
+                ZStack {
+                    //로딩 표시 여부에 따라 표출
+                    if viewUtil.isLoading {
+                        viewUtil.loadingView()  //로딩 화면
+                            .zIndex(1)  //Z Stack 순서 맨 앞으로
                     }
-                    .disabled(viewUtil.isLoading)   //로딩 중 화면 클릭 방지
-                    .navigationBarTitle(Text("악취 접수"), displayMode: .inline) //Navigation Bar 타이틀
-                    .navigationBarBackButtonHidden(true)    //기본 Back 버튼 숨김
-                    .navigationBarItems(leading: MenuButton(viewUtil: viewUtil))  //커스텀 Back 버튼 추가
+                    
+                    //사이드 메뉴
+                    if viewUtil.showMenu {
+                        SideMenuView()
+                            .environmentObject(viewUtil)
+                            .environmentObject(sideMenuViewModel)
+                            .zIndex(1)
+                    }
+                    
+                    //악취 접수 메인 화면
+                    NavigationView {
+                        VStack {
+                            ScrollView {
+                                CurrentWeatherView(viewUtil: viewUtil, weatherViewModel: weatherViewModel, smellViewModel: smellViewModel)  //현재 날씨 화면
+                                
+                                DividerLine()   //구분선
+                                ReceptionStatusView(smellViewModel: smellViewModel) //금일 접수 현황 화면
+                                
+                                DividerLine()   //구분선
+
+                                SmellLevelView(weatherViewModel: weatherViewModel, smellViewModel: smellViewModel)  //악취 강도 선택 화면
+                                
+                                DividerLine()   //구분선
+                            }
+                        }
+                        .disabled(viewUtil.isLoading)   //로딩 중 화면 클릭 방지
+                        .navigationBarTitle(Text("악취 접수"), displayMode: .inline) //Navigation Bar 타이틀
+                        .navigationBarBackButtonHidden(true)    //기본 Back 버튼 숨김
+                        .navigationBarItems(leading: MenuButton(viewUtil: viewUtil))  //커스텀 Back 버튼 추가
+                    }
                 }
-            }
-            .onAppear {
-                viewUtil.isLoading = true   //로딩 시작
-                
-                smellViewModel.weatherBackground = smellViewModel.setWeatherBackground()    //시간에 따른 날씨 배경 설정
-                smellViewModel.getSmellCode()   //악취 강도 코드
-                smellViewModel.getReceptionStatus() //금일 냄새 접수 현황
-                
-                //현재 날씨 호출
-                weatherViewModel.getCurrentWeather() { (weather) in
-                    weatherViewModel.currentWeather = weather   //현재 날씨 정보
-                    viewUtil.isLoading = false  //로딩 종료
-                }
-            }
-            .onChange(of: viewUtil.isViewDismiss, perform: { _ in
-                //isViewDismiss가 true인 경우만 실행 - 냄새 접수 등록 완료 후 재호출
-                if viewUtil.isViewDismiss {
+                .onAppear {
                     viewUtil.isLoading = true   //로딩 시작
                     
                     smellViewModel.weatherBackground = smellViewModel.setWeatherBackground()    //시간에 따른 날씨 배경 설정
@@ -93,9 +89,25 @@ struct SmellReceptionView: View {
                         viewUtil.isLoading = false  //로딩 종료
                     }
                 }
-                
-                viewUtil.isViewDismiss = false
-            })
+                .onChange(of: viewUtil.isViewDismiss, perform: { _ in
+                    //isViewDismiss가 true인 경우만 실행 - 냄새 접수 등록 완료 후 재호출
+                    if viewUtil.isViewDismiss {
+                        viewUtil.isLoading = true   //로딩 시작
+                        
+                        smellViewModel.weatherBackground = smellViewModel.setWeatherBackground()    //시간에 따른 날씨 배경 설정
+                        smellViewModel.getSmellCode()   //악취 강도 코드
+                        smellViewModel.getReceptionStatus() //금일 냄새 접수 현황
+                        
+                        //현재 날씨 호출
+                        weatherViewModel.getCurrentWeather() { (weather) in
+                            weatherViewModel.currentWeather = weather   //현재 날씨 정보
+                            viewUtil.isLoading = false  //로딩 종료
+                        }
+                    }
+                    
+                    viewUtil.isViewDismiss = false
+                })
+            }
         }
     }
 }
@@ -113,9 +125,11 @@ struct MenuButton: View {
             },
             label: {
                 HStack {
-                    Image(systemName: "line.horizontal.3")
+                    Image("Menu.Icon")
+                        .renderingMode(.template)
+                        .resizable()
                         .foregroundColor(.black)
-                        .font(Font.system(size: 25, weight: .bold))
+                        .frame(width: 35, height: 35, alignment: .leading)
                 }
                 .padding(.trailing)
             }
@@ -130,20 +144,63 @@ struct CurrentWeatherView: View {
     @ObservedObject var weatherViewModel: WeatherViewModel //Weather View Model
     @ObservedObject var smellViewModel: SmellReceptionViewModel //Smell Reception View Model
 
+    @State private var isRefresh: Bool = false  //새로고침 여부
+    
     var body: some View {
         VStack {
-            Text("현재 날씨")
-                .font(.title3)
-                .fontWeight(/*@START_MENU_TOKEN@*/.bold/*@END_MENU_TOKEN@*/)
-                .foregroundColor(.white)
-                .padding(.bottom, 5)
+            ZStack {
+                Text("현재 날씨")
+                    .font(.title3)
+                    .fontWeight(/*@START_MENU_TOKEN@*/.bold/*@END_MENU_TOKEN@*/)
+                    .foregroundColor(.white)
+                    .padding(.bottom, 5)
+
+                HStack {
+                    Spacer()
+                    
+                    //새로고침 버튼
+                    Button(
+                        action: {
+                            isRefresh = true    //새로고침 활성
+                            
+                            //현재 날씨 호출
+                            weatherViewModel.getCurrentWeather() { (weather) in
+                                weatherViewModel.currentWeather = weather   //현재 날씨 정보
+                                
+                                isRefresh = false   //새로고침 비활성
+                            }
+                        },
+                        label: {
+                            ZStack {
+                                //새로고침 여부에 따라 화면 출력
+                                if isRefresh {
+                                    //버튼 로딩 화면
+                                    ProgressView()
+                                        .progressViewStyle(CircularProgressViewStyle(tint: Color(.white)))
+                                        .scaleEffect(1) //로딩 크기
+                                }
+                                else {
+                                    //새로고침 버튼
+                                    Image("Refresh.Icon")
+                                        .renderingMode(.template)
+                                        .resizable()
+                                        .foregroundColor(.white)
+                                        .frame(width: 25, height: 25)
+                                }
+                            }
+                            .padding(.horizontal)
+                        }
+                    )
+                }
+            }
 
             HStack {
                 Spacer()
                 
-                //날씨 API 호출 성공 시
+                //날씨 API 호출 성공 시, 현재 날씨 정보
                 if weatherViewModel.result == "success" {
                     Group {
+                        //날씨 아이콘
                         Image(systemName: weatherViewModel.currentWeather["weatherIcon"] ?? "sun.max.fill")
                             .renderingMode(.original)
                             .font(Font.system(size: 70))
@@ -152,8 +209,10 @@ struct CurrentWeatherView: View {
                     Spacer()
 
                     VStack(alignment: .leading, spacing: 20) {
+                        //기온
                         Text("기온 : \(weatherViewModel.currentWeather["temp"] ?? "0")℃")
                             .fontWeight(/*@START_MENU_TOKEN@*/.bold/*@END_MENU_TOKEN@*/)
+                        //풍향
                         Text("풍향 : \(weatherViewModel.currentWeather["windDirection"] ?? "0")")
                             .fontWeight(/*@START_MENU_TOKEN@*/.bold/*@END_MENU_TOKEN@*/)
                     }
@@ -161,13 +220,15 @@ struct CurrentWeatherView: View {
                     Spacer()
 
                     VStack(alignment: .leading, spacing: 20) {
+                        //습도
                         Text("습도 : \(weatherViewModel.currentWeather["humidity"] ?? "0")%")
                             .fontWeight(/*@START_MENU_TOKEN@*/.bold/*@END_MENU_TOKEN@*/)
+                        //풍속
                         Text("풍속 : \(weatherViewModel.currentWeather["windSpeed"] ?? "0")m/s")
                             .fontWeight(/*@START_MENU_TOKEN@*/.bold/*@END_MENU_TOKEN@*/)
                     }
                 }
-                //날씨 API 호출 실패 시
+                //날씨 API 호출 실패 시, 메세지 출력
                 else {
                     VStack(alignment: .center) {
                         Text(weatherViewModel.message)
@@ -222,9 +283,10 @@ struct ReceptionStatusView: View {
                     }()
                     
                     VStack {
+                        //접수 상태 이미지
                         Image(statusImage)
                             .resizable().scaledToFill().frame(width: 60, height: 60).clipped()
-
+                        //접수 시간대
                         Text(timeZone)
                             .font(.caption)
                     }
@@ -281,8 +343,9 @@ struct SmellLevelView: View {
                 //악취 강도 선택 버튼
                 NavigationLink(
                     destination:
-                        ReceptionRegistView(selectSmell: code).environmentObject(ViewUtil()),   //악취 접수 등록 화면 - 선택한 악취 강도 정보 전달
+                        ReceptionRegistView(selectSmell: code),   //악취 접수 등록 화면 - 선택한 악취 강도 정보 전달
                     label: {
+                        //악취 강도 - 악취 설명
                         Text("\(smellName) - \(smellComment)")
                             .fontWeight(.bold)
                             .foregroundColor(Color.white)

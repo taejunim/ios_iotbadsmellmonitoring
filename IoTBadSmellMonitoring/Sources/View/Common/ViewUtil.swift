@@ -18,8 +18,23 @@ class ViewUtil: ObservableObject {
     @Published var alert: Alert?    //알림창
     @Published var showMenu: Bool = false   //사이드 메뉴 노출 여부
     @Published var isViewDismiss: Bool = false  //창 닫기 여부
+    @Published var isBack: Bool = false
     
-    //@Published var isSignOut: Bool = false
+    //MARK: - 메뉴 뒤로가기 버튼
+    func backMenuButton() -> some View {
+        Button(
+            action: {
+                self.isBack = true
+            },
+            label: {
+                HStack {
+                    Image(systemName: "chevron.left")
+                        .foregroundColor(.black)
+                }
+                .padding(.trailing)
+            }
+        )
+    }
 
     //MARK: - 로딩 화면
     /// Loading  View Function
@@ -27,6 +42,20 @@ class ViewUtil: ObservableObject {
     func loadingView() -> some View {
         ZStack {
             Color(.gray).opacity(0.5)
+                .ignoresSafeArea()
+            
+            ProgressView()
+                .progressViewStyle(CircularProgressViewStyle(tint: Color(.darkGray)))
+                .scaleEffect(2) //로딩 크기
+        }
+    }
+    
+    //MARK: - 조회 로딩 화면
+    /// Search Loading  View Function
+    /// - Returns: Search Loading View
+    func searchLoadingView() -> some View {
+        ZStack {
+            Color(.gray).opacity(0)
                 .ignoresSafeArea()
             
             ProgressView()
@@ -48,7 +77,7 @@ class ViewUtil: ObservableObject {
         .background(Color.black.opacity(0.7))   //배경 색상 및 투명도
         .cornerRadius(10)   //모서리 둥글게 처리
     }
-    
+
     //MARK: - 키보드 닫기
     /// Dismiss Keyboard
     func dismissKeyboard() {
@@ -56,7 +85,7 @@ class ViewUtil: ObservableObject {
     }
     
     //MARK: - 배경 그라데이션 효과
-    /// <#Description#>
+    /// 배경 그라데이션 효과 설정
     /// - Parameters:
     ///   - startColor: 그라데이션 시작 지점 색상
     ///   - endColor: 그라데이션 끝 지점 색상

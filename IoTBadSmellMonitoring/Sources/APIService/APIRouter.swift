@@ -10,10 +10,10 @@ import Alamofire
 /// API 연동을 위한 요청 URL 변환
 enum APIRouter: URLRequestConvertible {
     
-    case post(useApi: String, path: String, parameters: [String: Any])  //POST
+    case post(useApi: String, path: String, parameters: [String: Any], isUpload: Bool)  //POST
     case get(useApi: String, path: String, parameters: [String: String])    //GET
     
-    //static let baseApiUrl: String = "http:/172.30.1.6:8080"
+    //static let baseApiUrl: String = "http:/172.30.1.7:8080"
     static let baseApiUrl: String = "http://101.101.219.152:8080"   //악취 모니터링 API URL
     static let weatherApiUrl: String = "http://apis.data.go.kr/1360000"    //기상청 초단기예보 API URL
     
@@ -22,7 +22,7 @@ enum APIRouter: URLRequestConvertible {
         //사용할 API에 따른 Base URL 지정
         switch self {
         //POST - Base URL
-        case .post(let useApi, _, _):
+        case .post(let useApi, _, _, _):
             switch useApi {
             case "base":
                 return APIRouter.baseApiUrl
@@ -57,7 +57,7 @@ enum APIRouter: URLRequestConvertible {
     //MARK: - Path
     private var path: String {
         switch self {
-        case .post(_, let path, _):
+        case .post(_, let path, _, _):
             return path
         case .get(_, let path, _):
             return path
@@ -67,7 +67,7 @@ enum APIRouter: URLRequestConvertible {
     //MARK: - Parameters
     private var parameters: Parameters? {
         switch self {
-        case .post(_, _, let parameters):
+        case .post(_, _, let parameters, _):
             return parameters
         case .get(_, _, let parameters):
             return parameters
@@ -85,14 +85,25 @@ enum APIRouter: URLRequestConvertible {
         
         //MARK: - Method
         urlRequest.httpMethod = method.rawValue
-        
+
         //MARK: - Headers
-        urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        urlRequest.setValue("application/json", forHTTPHeaderField: "Accept")
+        switch self {
+        case .post(_, _, _, let isUpload):
+            if !isUpload {
+                urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+                urlRequest.setValue("application/json", forHTTPHeaderField: "Accept")
+            }
+            else {
+                urlRequest.setValue("multipart/form-data", forHTTPHeaderField: "Content-Type")
+            }
+        case .get:
+            urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            urlRequest.setValue("application/json", forHTTPHeaderField: "Accept")
+        }
 
         //MARK: - Parameters
         switch self {
-        case .post(_, _, let parameters):
+        case .post(_, _, let parameters, _):
             do {
                 urlRequest.httpBody = try JSONSerialization.data(withJSONObject: parameters, options: [])   //JSON Parsing
             } catch {

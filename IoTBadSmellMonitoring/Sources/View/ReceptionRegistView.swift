@@ -13,18 +13,13 @@ struct ReceptionRegistView: View {
     
     @EnvironmentObject var viewUtil: ViewUtil   //View Util
     @ObservedObject var viewOptionSet = ViewOptionSet() //화면 Option Set
+    @ObservedObject var keyboardUtil = KeyboardUtil()
     @ObservedObject var location = Location()   //위치 서비스 호출
     @ObservedObject var receptionViewModel = ReceptionRegistViewModel() //Reception Regist View Model
     @State var selectSmell: [String: String]    //선택한 악취 강도
     
     var body: some View {
         ZStack {
-            //로딩 표시 여부에 따라 표출
-            if viewUtil.isLoading {
-                viewUtil.loadingView()  //로딩 화면
-                    .zIndex(1)
-            }
-            
             if viewUtil.showModal {
                 SmellTypeModalView(viewUtil: viewUtil, receptionViewModel: receptionViewModel)
                     .zIndex(1)
@@ -32,21 +27,23 @@ struct ReceptionRegistView: View {
             
             VStack {
                 ScrollView {
-                    SelectSmellView(viewUtil: viewUtil, receptionViewModel: receptionViewModel, selectSmell: $selectSmell)  //취기 및 악취 강도 선택 화면
-                    
-                    DividerLine()   //구분선
+                    VStack {
+                        SelectSmellView(viewUtil: viewUtil, receptionViewModel: receptionViewModel, selectSmell: $selectSmell)  //취기 및 악취 강도 선택 화면
+                        
+                        DividerLine()   //구분선
 
-                    AttachPictureView() //촬영사진 첨부 화면
-                    
-                    DividerLine()   //구분선
-                    
-                    AddMessageView(receptionViewModel: receptionViewModel)    //전달사항 추가 화면
-                    
-                    DividerLine()   //구분선
+                        AttachPictureView(viewUtil: viewUtil, receptionViewModel: receptionViewModel) //촬영사진 첨부 화면
+                        
+                        DividerLine()   //구분선
+                        
+                        AddMessageView(receptionViewModel: receptionViewModel)    //전달사항 추가 화면
+                        
+                        DividerLine()   //구분선
+                    }
+                    .offset(x: 0, y: -keyboardUtil.currentHeight)   //키보드 활성화 시, 키보드 높이 만큼 화면 올리기
                 }
                 
                 ReceptionRegistButton(viewUtil: viewUtil, location: location, receptionViewModel: receptionViewModel)
-
             }
             .navigationBarTitle(Text("악취 접수 등록"), displayMode: .inline) //Navigation Bar 타이틀
             .navigationBarBackButtonHidden(true)    //기본 Back 버튼 숨김
@@ -58,6 +55,7 @@ struct ReceptionRegistView: View {
             
             receptionViewModel.selectSmellType = "001"  //선택한 취기 초기화
             receptionViewModel.selectTempSmellType = "001"  //선택한 임시 취기 초기화
+            receptionViewModel.pickedImageArray = [:]
         }
         .popup(
             isPresented: $viewUtil.showToast,   //팝업 노출 여부
@@ -179,7 +177,7 @@ struct SmellTypeButton: View {
                             Image(smellTypeIcon)
                                 .resizable()
                                 .renderingMode(.template)
-                                .foregroundColor(Color.black)
+                                .foregroundColor(Color.white)
                                 .aspectRatio(1, contentMode: .fit)
                             
                             Spacer()
@@ -194,7 +192,7 @@ struct SmellTypeButton: View {
                         }
                     }
                 }
-                .frame(width: 100, height: 100)
+                .frame(width: 120, height: 120)
                 .background(Color("Color_E4513D"))
                 .cornerRadius(10)
             }
@@ -286,8 +284,8 @@ struct SmellTypeListView: View {
                                         Image(smellTypeIcon)
                                             .resizable()
                                             .renderingMode(.template)
-                                            .foregroundColor(Color.black)
-                                            //.foregroundColor(smellTypeCode == receptionViewModel.selectTempSmellType ? Color.white : Color.black)
+                                            //.foregroundColor(Color.black)
+                                            .foregroundColor(smellTypeCode == receptionViewModel.selectTempSmellType ? Color.white : Color.black)
                                             .aspectRatio(1, contentMode: .fit)
                                         
                                         Spacer()
@@ -296,8 +294,8 @@ struct SmellTypeListView: View {
                                         Text(smellTypeName)
                                             .font(.callout)
                                             .fontWeight(.bold)
-                                            .foregroundColor(Color.black)
-                                            //.foregroundColor(smellTypeCode == receptionViewModel.selectTempSmellType ? Color.white : Color.black)
+                                            //.foregroundColor(Color.black)
+                                            .foregroundColor(smellTypeCode == receptionViewModel.selectTempSmellType ? Color.white : Color.black)
                                             .multilineTextAlignment(.center)
                                             .padding(.vertical, 5)
                                     }
@@ -384,56 +382,121 @@ struct SmellTypeModalButton: View {
 
 //MARK: - 촬영사진 첨부 화면
 struct AttachPictureView: View {
-    @State private var showImagePicker = false  //이미지 Picker 노출 여부
-    @State var pickedImage: Image?  //선택한 이미지
-    @State var pickedImageArray: [Int: Image] = [:] //선택한 이미지 Array
-    @State var pickedImageCount: Int = 0  //선택한 이미지 개수
+    @ObservedObject var viewUtil: ViewUtil
+    @ObservedObject var receptionViewModel: ReceptionRegistViewModel
+    
+    @State private var isReset: Bool = false  //초기화 여부
+    @State private var showImagePicker: Bool = false  //이미지 Picker 노출 여부
     @State var imageMaxCount: Int = 5    //이미지 최대 개수
+    @State var tapImage: String = ""
+    @Namespace var addImageButton   //이미지 추가 버튼
     
     var body: some View {
         VStack {
             Text("촬영사진 첨부")
                 .fontWeight(.bold)
             
-            ScrollView(.horizontal) {
-                HStack {
-                    ForEach(0..<pickedImageCount, id: \.self) { index in
-                        ZStack {
-                            pickedImageArray[index]?
-                                .resizable()
-                                .frame(width: 195, height: 130)
-                                //.frame(width: 225, height: 150)
+            HStack {
+                Label("\(receptionViewModel.pickedImageCount)/\(imageMaxCount)", systemImage: "camera.fill")
+                    .font(.subheadline)
+    
+                Spacer()
+                
+                //새로고침 버튼
+                Button(
+                    action: {
+                        var registAlert: Alert {
+                            return Alert(
+                                title: Text("촬영사진 첨부 초기화"),
+                                message: Text("첨부한 촬영사진 초기화를 진행 하시겠습니까?"),
+                                primaryButton: .destructive(
+                                    Text("확인"),
+                                    action: {
+                                        receptionViewModel.pickedImageArray = [:]   //선택한 이미지 배열에 추가
+                                        receptionViewModel.imageArray = []
+                                        receptionViewModel.pickedImageCount = 0   //선택한 이미지 개수 Count
+                                    }
+                                ),
+                                secondaryButton: .cancel(
+                                    Text("닫기"),
+                                    action: {
+                                        viewUtil.showAlert = false
+                                    }
+                                )
+                            )
                         }
+                        
+                        viewUtil.showAlert = true   //알림창 호출 여부
+                        viewUtil.alert = registAlert    //등록 알림창 호
+                    },
+                    label: {
+                        //새로고침 버튼
+                        Image("Refresh.Icon")
+                            .renderingMode(.template)
+                            .resizable()
+                            .foregroundColor(.black)
+                            .frame(width: 20, height: 20)
                     }
-                    
-                    //이미지 추가 버튼
-                    if imageMaxCount > pickedImageCount {
-                        Button(
-                            action: {
-                                self.showImagePicker.toggle()
-                            },
-                            label: {
-                                HStack {
-                                    //Image(systemName: "photo.on.rectangle.angled")
-                                    //Image(systemName: "plus.viewfinder")
-                                    Image(systemName: "plus.rectangle.on.rectangle")
-                                        .renderingMode(.template)
-                                        .foregroundColor(Color("Color_BEBEBE"))
-                                        .font(Font.system(size: 50))
+                )
+                .alert(isPresented: $viewUtil.showAlert) {
+                    viewUtil.alert! //알림창 호출
+                }
+            }
+            .padding(.horizontal)
+            
+            ScrollView(.horizontal) {
+                ScrollViewReader { proxy in
+                    HStack {
+                        //선택한 이미지 개수만큼 이미지 출력
+                        ForEach(0..<receptionViewModel.pickedImageCount, id: \.self) { index in
+                            ZStack {
+                                receptionViewModel.pickedImageArray[index]?
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                                    .frame(width: 140, height: 105)
+                                    //.frame(width: 195, height: 130)
+                                    //.frame(width: 225, height: 150)
+                                
+                                if index == Int(tapImage) {
+                                    Color(.gray).opacity(0.5)
+                                        .ignoresSafeArea()
+                                        .zIndex(1)
                                 }
-                                .frame(width: 195, height: 130).clipped()
-                                .border(Color("Color_BEBEBE"))
                             }
-                        )
-                        .sheet(isPresented: $showImagePicker) {
-                            ImagePicker(sourceType: .photoLibrary) { (image) in
-                                self.pickedImage = Image(uiImage: image)
-                                pickedImageArray.updateValue(pickedImage!, forKey: pickedImageCount)    //선택한 이미지 배열에 추가
-                                
-                                pickedImageCount += 1   //선택한 이미지 개수 Count
-                                
-                                print(image)
-                                print(image.jpegData(compressionQuality: 0.5)!)
+                            .onTapGesture {
+                                //tapImage.toggle()
+                                tapImage = String(index)
+                            }
+                        }
+                        .onAppear {
+                            proxy.scrollTo(addImageButton)  //스크롤 이동 처리
+                        }
+                        
+                        //이미지 추가 버튼
+                        if imageMaxCount > receptionViewModel.pickedImageCount {
+                            Button(
+                                action: {
+                                    self.showImagePicker.toggle()
+                                },
+                                label: {
+                                    HStack {
+                                        Image(systemName: "plus.rectangle.on.rectangle")
+                                            .renderingMode(.template)
+                                            .foregroundColor(Color("Color_BEBEBE"))
+                                            .font(Font.system(size: 50))
+                                    }
+                                    .frame(width: 140, height: 105)
+                                    .border(Color("Color_BEBEBE"))
+                                    .id(addImageButton)
+                                }
+                            )
+                            .sheet(isPresented: $showImagePicker) {
+                                ImagePicker(sourceType: .photoLibrary) { (image) in
+                                    receptionViewModel.pickedImage = Image(uiImage: image)
+                                    receptionViewModel.pickedImageArray.updateValue(receptionViewModel.pickedImage!, forKey: receptionViewModel.pickedImageCount)    //선택한 이미지 배열에 추가
+                                    receptionViewModel.imageArray.append(image)
+                                    receptionViewModel.pickedImageCount += 1   //선택한 이미지 개수 Count
+                                }
                             }
                         }
                     }
@@ -454,6 +517,7 @@ struct AddMessageView: View {
             Text("추가 전달사항")
                 .fontWeight(.bold)
             
+            //전달사항 입력 창
             TextEditor(text: $receptionViewModel.addMessage)
                 .padding()
                 .border(Color("Color_7F7F7F"), width: 1)
@@ -471,9 +535,13 @@ struct ReceptionRegistButton: View {
     @ObservedObject var location: Location  //위치 서비스
     @ObservedObject var receptionViewModel: ReceptionRegistViewModel
     
+    @State var disabledButton: Bool = false //버튼 Disabled 여부
+    
     var body: some View {
         Button(
             action: {
+                viewUtil.dismissKeyboard() //키보드 닫기
+                
                 let locationStatus = location.getAuthStatus()   //위치 서비스 권한 상태
                 
                 //위치 서비스 권한 상태에 따른 등록 가능 여부 처리
@@ -493,20 +561,24 @@ struct ReceptionRegistButton: View {
                                     Text("확인"),
                                     action: {
                                         viewUtil.isLoading = true   //로딩 시작
-
+                                        disabledButton = true  //버튼 비활성화
+                                        
                                         //악취 접수 등록 실행
                                         receptionViewModel.registReception() { (result) in
-                                        
+                                            viewUtil.isLoading = false   //로딩 종료
+                                            
                                             viewUtil.showToast = true   //Toast 팝업
                                             viewUtil.toastMessage = receptionViewModel.message
-
+                                            
                                             if result == "success" {
                                                 //현재시간 기준으로 1.5초 후 실행
                                                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                                                    viewUtil.isLoading = false   //로딩 종료
                                                     viewUtil.isViewDismiss = true   //창 닫힘 여부
                                                     self.presentationMode.wrappedValue.dismiss()    //Navigation View 닫기
                                                 }
+                                            }
+                                            else {
+                                                self.disabledButton = false //버튼 활성화
                                             }
                                         }
                                     }
@@ -537,13 +609,13 @@ struct ReceptionRegistButton: View {
                     .foregroundColor(Color.white)
                     .padding(.horizontal)
                     .frame(maxWidth: .infinity, maxHeight: 40)
-                    .background(Color("Color_3498DB"))
-                    //.background(signUpViewModel.isInputComplete ? Color("Color_3498DB") : Color("Color_BEBEBE"))   //회원가입 정보 입력에 따른 배경색상 변경
+                    .background(disabledButton ? Color("Color_BEBEBE"): Color("Color_3498DB"))   //등록 진행 여부에 따른 버튼 색상 변경
             }
         )
         .alert(isPresented: $viewUtil.showAlert) {
             viewUtil.alert! //알림창 호출
         }
+        .disabled(disabledButton)    //등록 진행 시에 버튼 클릭 방지를 위한 비활성화
     }
 }
 

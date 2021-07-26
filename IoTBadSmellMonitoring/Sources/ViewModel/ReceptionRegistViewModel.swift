@@ -5,8 +5,10 @@
 //  Created by KJ on 2021/06/25.
 //
 
+import SwiftUI
 import Foundation
 import CoreLocation
+import Alamofire
 
 class ReceptionRegistViewModel: ObservableObject {
     private let location = Location()   //위치 서비스
@@ -21,6 +23,11 @@ class ReceptionRegistViewModel: ObservableObject {
     @Published var selectSmellType: String = "" //선택한 취기 코드
     @Published var selectTempSmellType: String = "" //선택한 임시 취기 코드
     @Published var addMessage: String = ""  //추가 전달사항
+    
+    @Published var pickedImage: Image?  //선택한 이미지
+    @Published var pickedImageArray: [Int: Image] = [:] //선택한 이미지 Array
+    @Published var pickedImageCount: Int = 0  //선택한 이미지 개수
+    @Published var imageArray: [UIImage] = []
     
     @Published var result: String = ""   //결과 상태
     @Published var message: String = "" //결과 메시지
@@ -67,8 +74,8 @@ class ReceptionRegistViewModel: ObservableObject {
             return "004"
         }
         else {
-            //return nil
-            return "001"    //임시
+            return nil
+            //return "001"    //임시
         }
     }
     
@@ -101,15 +108,13 @@ class ReceptionRegistViewModel: ObservableObject {
                 "gpsY": coordinate.latitude!,   //y 좌표 - 위도
                 "smellComment": self.addMessage,    //추가 전달사항
                 "smellRegisterTime": registTimeZone!,    //접수 등록 시간대
-                "regId": UserDefaults.standard.string(forKey: "userId") ?? "test123"    //등록자 ID
+                "regId": UserDefaults.standard.string(forKey: "userId")!    //등록자 ID
             ]
             
             print(parameters)
-
-            //악취 접수 등록 API 호출
-            let request = self.smellAPI.requestReceptionRegist(parameters: parameters)
-            request.execute(
-                //API 호출 성공
+            
+            let upload = self.smellAPI.uploadReceptionRegist(parameters: parameters, images: self.imageArray)
+            upload.execute(
                 onSuccess: { (regist) in
                     //접수 등록 성공
                     if regist.result == "success" {
@@ -121,14 +126,13 @@ class ReceptionRegistViewModel: ObservableObject {
                         self.result = regist.result
                         self.message = "악취 접수 등록이 실패하였습니다."
                     }
-                    
+
                     completion(self.result)
                 },
-                //API 호출 실패
                 onFailure: { (error) in
                     self.result = "server error"
                     self.message = "서버와의 통신이 원활하지 않습니다."
-                    
+
                     completion(self.result)
                     print(error.localizedDescription)
                 }

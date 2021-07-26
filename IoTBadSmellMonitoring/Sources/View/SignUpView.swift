@@ -39,7 +39,7 @@ struct SignUpView: View {
         }
         .onAppear {
             signUpViewModel.getSexCode()    //성별 코드
-            signUpViewModel.getRegionCode() //지역 코ㄷ
+            signUpViewModel.getRegionCode() //지역 코드
         }
         .popup(
             isPresented: $viewUtil.showToast,   //팝업 노출 여부

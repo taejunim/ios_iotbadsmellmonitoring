@@ -28,7 +28,7 @@ class SmellAPISerivce {
     /// - Returns: API Response - Result, Message
     public func requestReceptionRegist(parameters: [String: Any]) -> Future<Response, AFError> {
         
-        return apiClient.request(route: APIRouter.post(useApi: "base", path: "/api/registerInsert", parameters: parameters))
+        return apiClient.request(route: APIRouter.post(useApi: "base", path: "/api/registerInsert", parameters: parameters, isUpload: false))
     }
     
     //MARK: - 접수 이력 정보 API 호출
@@ -49,5 +49,11 @@ class SmellAPISerivce {
     public func requestDetailHistory(parameters: [String: String]) -> Future<Responses<[DetailHistory]>, AFError> {
         
         return apiClient.request(route: APIRouter.get(useApi: "base", path: "/api/registerDetailHistory", parameters: parameters))
+    }
+    
+    
+    public func uploadReceptionRegist(parameters: [String: Any], images: [UIImage]) -> Future<Response, AFError> {
+        
+        return apiClient.upload(route: APIRouter.post(useApi: "base", path: "/api/registerInsert", parameters: parameters, isUpload: true), parameters: parameters, images: images)
     }
 }

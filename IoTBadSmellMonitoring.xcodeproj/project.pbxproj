@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		0EE3B98B26844D6D00061F00 /* MyPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EE3B98A26844D6D00061F00 /* MyPageView.swift */; };
 		0EE3B98F2684759600061F00 /* MyPageViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EE3B98E2684759600061F00 /* MyPageViewModel.swift */; };
+		2B8A5D4D26A7B6C400057AF3 /* KeyboardUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B8A5D4C26A7B6C400057AF3 /* KeyboardUtil.swift */; };
 		2B8ACB6D269BDF810019C647 /* SideMenuViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B8ACB6C269BDF810019C647 /* SideMenuViewModel.swift */; };
 		2B8ACB6F269C3D570019C647 /* ReceptionHistoryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B8ACB6E269C3D570019C647 /* ReceptionHistoryViewModel.swift */; };
 		2BAF67E82697F02100769321 /* SideMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BAF67E72697F02100769321 /* SideMenuView.swift */; };
@@ -52,6 +53,7 @@
 /* Begin PBXFileReference section */
 		0EE3B98A26844D6D00061F00 /* MyPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyPageView.swift; sourceTree = "<group>"; };
 		0EE3B98E2684759600061F00 /* MyPageViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyPageViewModel.swift; sourceTree = "<group>"; };
+		2B8A5D4C26A7B6C400057AF3 /* KeyboardUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardUtil.swift; sourceTree = "<group>"; };
 		2B8ACB6C269BDF810019C647 /* SideMenuViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SideMenuViewModel.swift; sourceTree = "<group>"; };
 		2B8ACB6E269C3D570019C647 /* ReceptionHistoryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceptionHistoryViewModel.swift; sourceTree = "<group>"; };
 		2BAF67E72697F02100769321 /* SideMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SideMenuView.swift; sourceTree = "<group>"; };
@@ -200,6 +202,7 @@
 				BF673FE92668CA6A00B4D91B /* CustomView.swift */,
 				BF69F1102672FE8700141244 /* ViewUtil.swift */,
 				BF720DAC267749E200D03428 /* ViewOptionSet.swift */,
+				2B8A5D4C26A7B6C400057AF3 /* KeyboardUtil.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -377,6 +380,7 @@
 			files = (
 				BF6BB92126857428000FD8D7 /* ReceptionRegistViewModel.swift in Sources */,
 				BF6C106C26806D64006BDC44 /* WeatherAPIService.swift in Sources */,
+				2B8A5D4D26A7B6C400057AF3 /* KeyboardUtil.swift in Sources */,
 				BF673FE42668C75100B4D91B /* SignInView.swift in Sources */,
 				0EE3B98F2684759600061F00 /* MyPageViewModel.swift in Sources */,
 				2B8ACB6D269BDF810019C647 /* SideMenuViewModel.swift in Sources */,

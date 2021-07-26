@@ -10,13 +10,14 @@ import CoreLocation
 
 //MARK: - 로그인 화면
 struct SignInView: View {
-    @ObservedObject var location = Location()
-    @ObservedObject var signInViewModel = SignInViewModel()
+    @ObservedObject var location = Location()   //Location
+    @ObservedObject var signInViewModel = SignInViewModel() //Sign In View Model
+    @ObservedObject var myPageViewModel = MyPageViewModel()
     
-    @StateObject private var viewUtil = ViewUtil()
-    @StateObject private var weatherViewModel = WeatherViewModel()
-    @StateObject private var smellViewModel = SmellReceptionViewModel()
-    @StateObject private var sideMenuViewModel = SideMenuViewModel()
+    @StateObject private var viewUtil = ViewUtil()  //View Util
+    @StateObject private var weatherViewModel = WeatherViewModel()  //Weater View Model
+    @StateObject private var smellViewModel = SmellReceptionViewModel() //Smell Reception View Model
+    @StateObject private var sideMenuViewModel = SideMenuViewModel()    //Side Menu View Model
     
     var body: some View {
         //로그인 성공 시, 냄새 접수 화면 이동
@@ -75,11 +76,13 @@ struct SignInEntryField: View {
     @ObservedObject var signInViewModel: SignInViewModel
     
     var body: some View {
+        //아이디 입력 창
         TextField("아이디", text: $signInViewModel.id)
             .autocapitalization(/*@START_MENU_TOKEN@*/.none/*@END_MENU_TOKEN@*/)    //첫 문자 항상 소문자
             .keyboardType(.alphabet)    //키보드 타입 - 영문만 표시
         TextFiledUnderLine()    //Text Field 밑줄
         
+        //비밀번호 입력 창
         SecureField("비밀번호", text: $signInViewModel.password)
             .autocapitalization(/*@START_MENU_TOKEN@*/.none/*@END_MENU_TOKEN@*/)    //첫 문자 항상 소문자
             .keyboardType(/*@START_MENU_TOKEN@*/.alphabet/*@END_MENU_TOKEN@*/)    //키보드 타입 - 영문만 표시
@@ -95,6 +98,8 @@ struct SignInButton: View {
     var body: some View {
         Button(
             action: {
+                viewUtil.dismissKeyboard() //키보드 닫기
+                
                 //입력한 로그인 정보 유효성 검사
                 if !signInViewModel.validate() {
                     viewUtil.showToast = true

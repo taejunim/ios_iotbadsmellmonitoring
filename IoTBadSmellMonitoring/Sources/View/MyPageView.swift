@@ -12,100 +12,161 @@ import Combine
 //MARK: - 마이페이지 화면
 struct MyPageView: View {
     @Environment(\.presentationMode) var presentationMode   //Back 버튼 기능 추가에 필요
-    @ObservedObject var viewUtil = ViewUtil()
-    @ObservedObject var viewOptionSet = ViewOptionSet()     //화면 Option Set
     
-    @ObservedObject var myPageViewModel = MyPageViewModel()
+    @EnvironmentObject var viewUtil: ViewUtil   //View Util
+    @ObservedObject var viewOptionSet = ViewOptionSet()     //화면 Option Set
+    @ObservedObject var myPageViewModel = MyPageViewModel() //My Page View Model
+    
+    @StateObject private var stateViewUtil = ViewUtil()
+    @StateObject private var stateWeatherViewModel = WeatherViewModel()
+    @StateObject private var stateSmellViewModel = SmellReceptionViewModel()
+    @StateObject private var stateSideMenuViewModel = SideMenuViewModel()
     
     var body: some View {
-        ZStack {
-            //로딩 표시 여부에 따라 표출
-            if viewUtil.isLoading {
-                viewUtil.loadingView()  //로딩 화면
-            }
-            
-            VStack {
-                ScrollView {
-                    VStack(alignment: .leading) {
-                        Profile(viewUtil: viewUtil, myPageViewModel: myPageViewModel).padding()          //프로필
-                        Divider()
-                        PushToggle(viewUtil: viewUtil, myPageViewModel: myPageViewModel).padding()       //푸쉬(토글버튼)
-                        Divider()
-                        PasswordChange(viewUtil: viewUtil, myPageViewModel: myPageViewModel).padding()   //비밀번호 변경 field
+        if viewUtil.isBack {
+            //악취 접수 등록 화면
+            SmellReceptionView()
+                .environmentObject(stateViewUtil)
+                .environmentObject(stateWeatherViewModel)
+                .environmentObject(stateSmellViewModel)
+                .environmentObject(stateSideMenuViewModel)
+        }
+        else {
+            NavigationView {
+                ZStack {
+                    //로딩 표시 여부에 따라 표출
+                    if viewUtil.isLoading {
+                        viewUtil.loadingView()  //로딩 화면
+                    }
+                    
+                    VStack {
+                        ScrollView {
+                            VStack {
+                                Profile()   //프로필
+                                
+                                VerticalDividerLine()
+                                
+                                PushToggle(viewUtil: viewUtil, myPageViewModel: myPageViewModel)    //푸쉬(토글버튼)
+                                VerticalDividerLine()
+                                
+                                PasswordChange(viewUtil: viewUtil, myPageViewModel: myPageViewModel)    //비밀번호 변경 field
+                            }
+                        }
+                        .padding()
+                        
+                        PasswordChangeButton(viewUtil: viewUtil, myPageViewModel: myPageViewModel)               //비밀번호 수정 버튼
                     }
                 }
-                PasswordChangeButton(viewUtil: viewUtil, myPageViewModel: myPageViewModel)               //비밀번호 수정 버튼
+                .navigationBarTitle(Text("My Page"), displayMode: .inline)  //Navigation Bar 타이틀
+                .navigationBarBackButtonHidden(true)    //기본 Back 버튼 숨김
+                .navigationBarItems(leading: viewUtil.backMenuButton()) //커스텀 Back 버튼 추가
+                .popup(
+                    isPresented: $viewUtil.showToast,   //팝업 노출 여부
+                    type: .floater(verticalPadding: 40),
+                    position: .bottom,
+                    animation: .easeInOut(duration: 0.0),   //애니메이션 효과
+                    autohideIn: 2,  //팝업 노출 시간
+                    closeOnTap: false,
+                    closeOnTapOutside: false,
+                    view: {
+                        viewUtil.toast()    //팝업 화면
+                    }
+                )
+                .gesture(DragGesture(minimumDistance: 0.00001).onChanged {_ in
+                    viewUtil.dismissKeyboard() //키보드 닫기
+                })
+                .onAppear {
+                    myPageViewModel.showToggle = UserDefaults.standard.bool(forKey: "notificationStatus")
+                }
             }
         }
-        .navigationBarTitle(Text("My Page"), displayMode: .inline) //Navigation Bar 타이틀
-        .navigationBarBackButtonHidden(true)                       //기본 Back 버튼 숨김
-        .navigationBarItems(leading: BackButton())                 //커스텀 Back 버튼 추가
-        .popup(
-            isPresented: $viewUtil.showToast,   //팝업 노출 여부
-            type: .floater(verticalPadding: 40),
-            position: .bottom,
-            animation: .easeInOut(duration: 0.0),   //애니메이션 효과
-            autohideIn: 2,  //팝업 노출 시간
-            closeOnTap: false,
-            closeOnTapOutside: false,
-            view: {
-                viewUtil.toast()    //팝업 화면
-            }
-        )
-        .gesture(DragGesture(minimumDistance: 0.00001).onChanged {_ in
-            viewUtil.dismissKeyboard() //키보드 닫기
-        })
     }
 }
 
 //MARK: - 프로필
 struct Profile: View {
-    @ObservedObject var viewUtil: ViewUtil
-    @ObservedObject var myPageViewModel = MyPageViewModel()
-    
     var body: some View  {
-        HStack {
-            Image("")   //프로필 이미지
-                .frame(width: 100, height: 100)
-                .background(Color.black)
-                .clipShape(Circle())
-            VStack(alignment: .leading){
-                Text("홍길동") //user name
+        VStack(spacing: 10) {
+            HStack {
+                Text(UserDefaults.standard.string(forKey: "userName") ?? "User Name")
                     .font(.title)
                     .fontWeight(.bold)
-                Text("test 1234") //user ID
                 
-            }.padding(.leading, 10)
+                Spacer()
+            }
+            
+            HStack {
+                Text(UserDefaults.standard.string(forKey: "userId") ?? "User ID")
+                    .fontWeight(.bold)
+                
+                Spacer()
+            }
         }
     }
 }
+
 //MARK: - 푸쉬설정
 struct PushToggle: View {
     @ObservedObject var viewUtil: ViewUtil
-    @ObservedObject var myPageViewModel = MyPageViewModel()
+    @ObservedObject var myPageViewModel: MyPageViewModel
+    @State var showAlert: Bool = false  //알림창 노출 여부
+    @State var alert: Alert?    //알림창
     
-    @State var showToggle = true
     var body: some View  {
-        VStack {
-            Toggle("푸시", isOn: $showToggle)
+        HStack {
+            Text("푸시 알림")
+            
+            Toggle("", isOn: $myPageViewModel.showToggle)
                 .padding(.trailing, 250)
-                .onReceive(Just(showToggle), perform: { toggleIsOn in
+                .onChange(of: myPageViewModel.showToggle, perform: { toggleIsOn in
+                    
+                    UserDefaults.standard.set(toggleIsOn, forKey: "notificationStatus")
+                    
                     if toggleIsOn {
-                        print("Schedule")
-                        MyPageViewModel.instance.scheduleNotification()     //푸시 알림
+                        myPageViewModel.showToggle = true
+                        
+                        myPageViewModel.checkAuthStatus() { status in
+                            print(status)
+                            myPageViewModel.scheduleNotification()
+                            if !status {
+                                showAlert = true
+                                alert = myPageViewModel.requestAuthAlert()
+                            }
+                        }
                     }
                     else {
-                        print("No Schedule")
+                        myPageViewModel.showToggle = false
+                        myPageViewModel.removeNotification()
                     }
                 })
+                .alert(isPresented: $showAlert) {
+                    alert!
+                }
+//                .onReceive(Just(myPageViewModel.showToggle), perform: { toggleIsOn in
+//
+//                    UserDefaults.standard.set(toggleIsOn, forKey: "notificationStatus")
+//
+//                    if toggleIsOn {
+//                        //myPageViewModel.scheduleNotification()
+//
+//                        myPageViewModel.checkAuthStatus() { status in
+//                            if status {
+//                                myPageViewModel.scheduleNotification()
+//                            }
+//                            else {
+//                                myPageViewModel.showAlert = true
+//                                myPageViewModel.alert = myPageViewModel.requestAuthAlert()
+//                            }
+//                        }
+//                    }
+//                })
         }
-        
     }
 }
 //MARK: - 비밀번호 변경 field
 struct PasswordChange: View {
     @ObservedObject var viewUtil: ViewUtil
-    @ObservedObject var myPageViewModel = MyPageViewModel()
+    @ObservedObject var myPageViewModel: MyPageViewModel
     
     var body: some View  {
         VStack(alignment: .leading) {
@@ -120,6 +181,7 @@ struct PasswordChange: View {
                     .keyboardType(.alphabet)    //키보드 타입 - 영문만 표시
                 TextFiledUnderLine()    //Text Field 밑줄
             }
+            
             //새 비밀번호
             Section(
                 header:HStack {
@@ -131,6 +193,7 @@ struct PasswordChange: View {
                     .keyboardType(.alphabet)    //키보드 타입 - 영문만 표시
                 TextFiledUnderLine()    //Text Field 밑줄
             }
+            
             //새 비밀번호 확인
             Section(
                 header:HStack {
@@ -154,6 +217,7 @@ struct PasswordChangeButton: View {
     @ObservedObject var myPageViewModel: MyPageViewModel
     
     var body: some View {
+        
         Button(
             action: {
                 viewUtil.dismissKeyboard() //키보드 닫기
@@ -162,6 +226,7 @@ struct PasswordChangeButton: View {
                 myPageViewModel.signIn() { (result) in
                     viewUtil.isLoading = false  //로딩 종료
                     
+                    print(result)
                     //로그인 성공이 아닌 경우(현재비밀번호 불일치) Toast 팝업 메시지 호출
                     if result != "success" {
                         viewUtil.showToast = true
@@ -172,19 +237,15 @@ struct PasswordChangeButton: View {
                         viewUtil.showToast = true
                         viewUtil.toastMessage = myPageViewModel.validMessage
                     }
-                    //로그인과 유효성 검사 성공일 경우 비밀번호 수정 실행
-                    myPageViewModel.passwordChange() { (result) in
-                        
-                        viewUtil.isLoading = false  //로딩 종료
-                        
-                        
-                        //비밀번호 수정 성공이 아닌 경우 Toast 팝업 메시지 호출
-                        if result != "success" {
-                            viewUtil.showToast = true
-                            viewUtil.toastMessage = myPageViewModel.message
-                        }
-                        
-                    }
+                    
+//                    //로그인과 유효성 검사 성공일 경우 비밀번호 수정 실행
+//                    myPageViewModel.passwordChange() { (result) in
+//
+//                        viewUtil.isLoading = false  //로딩 종료
+//
+//                        viewUtil.showToast = true
+//                        viewUtil.toastMessage = myPageViewModel.message
+//                    }
                 }
             },
             label: {
@@ -205,5 +266,6 @@ struct PasswordChangeButton: View {
 struct MyPageView_Previews: PreviewProvider {
     static var previews: some View {
         MyPageView()
+            .environmentObject(ViewUtil())
     }
 }

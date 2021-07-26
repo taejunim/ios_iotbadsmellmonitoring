@@ -36,6 +36,7 @@ struct LaunchScreen: View {
     
     var body: some View {
         Group {
+            //Launch Screen 노출 여부
             if showLaunchScreen {
                 ZStack {
                     Rectangle().fill(gradient)  //화면 Gradation 처리
@@ -53,10 +54,12 @@ struct LaunchScreen: View {
                 .edgesIgnoringSafeArea(.all)    //Safe Area 전체 적용
             }
             else {
+                //로그인 정보가 없는 경우, 로그인 화면 이동
                 if UserDefaults.standard.string(forKey: "userId") == nil {
                     SignInView()    //로그인 화면 이동
                         .environmentObject(viewUtil)
                 }
+                //로그인 정보가 있는 경우, 악취 접수 화면 이동
                 else {
                     SmellReceptionView()    //악취 접수 화면
                         .environmentObject(viewUtil)

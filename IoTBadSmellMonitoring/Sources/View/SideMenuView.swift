@@ -65,9 +65,9 @@ struct SideMenuView: View {
                     }
                 }
             }
-        }
+        } 
         .background(Color.black.opacity(0.5))
-        .edgesIgnoringSafeArea(/*@START_MENU_TOKEN@*/.all/*@END_MENU_TOKEN@*/)
+        .edgesIgnoringSafeArea(.all)
     }
 }
 
@@ -101,6 +101,9 @@ struct MenuButtonListView: View {
             //마이페이지 메뉴 버튼
             Button(
                 action: {
+                    withAnimation {
+                        sideMenuViewModel.moveMenu = "MyPage"
+                    }
                 },
                 label: {
                     HStack {
@@ -116,6 +119,9 @@ struct MenuButtonListView: View {
             //악취 접수 이력 메뉴 버튼
             Button(
                 action: {
+                    withAnimation {
+                        sideMenuViewModel.moveMenu = "ReceptionHistory"
+                    }
                 },
                 label: {
                     HStack {

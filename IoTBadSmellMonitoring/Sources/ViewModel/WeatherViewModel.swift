@@ -29,7 +29,7 @@ class WeatherViewModel: ObservableObject {
         }
     }
     
-    //MARK: - 현재 날씨 API 호출
+    //MARK: - 현재 날씨 API 호출c
     /// 기상청 날씨 API 호출
     /// - Parameter completion: 가공된 현재 날씨 정보 - createCurrentWeather() 함수 참고
     func getCurrentWeather(completion: @escaping ([String: String]) -> Void) {
