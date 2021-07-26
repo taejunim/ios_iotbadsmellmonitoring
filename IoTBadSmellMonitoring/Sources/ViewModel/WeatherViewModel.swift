@@ -23,6 +23,7 @@ class WeatherViewModel: ObservableObject {
     @Published var message: String = "" //결과 메시지
     
     //MARK: - 풍향 코드 API 호출
+    /// - Parameter completion: 풍향 코드 정보
     func getWindDirectionCode(completion: @escaping ([[String: String]]) -> Void) {
         codeViewModel.getCode(codeGroup: "WND") { (code) in
             completion(code)
@@ -58,9 +59,7 @@ class WeatherViewModel: ObservableObject {
         request.execute(
             //API 호출 성공
             onSuccess: { (weather) in
-                
-                var weatherDictionary: [String: String] = [:]
-                
+                var weatherDictionary: [String: String] = [:]   //날씨 정보 Dictionary
                 let resultCode: String = weather.response.header.resultCode //날씨 API 조회 결과 코드
                 
                 //결과 코드 - 정상(00)
@@ -148,15 +147,15 @@ class WeatherViewModel: ObservableObject {
         let windVector: Int = Int(weatherValues["VEC"]!)!   //풍향
         let windSpeed: String = weatherValues["WSD"]!   //풍속
 
-        var weatherStateCode: String = "011"    //기상 상태 코드 (011: 기타)
+        var weatherStateCode: String = "011"    //기상상태 코드 (011: 기타)
         
         //날씨 아이콘
         var weatherIcon: String {
             //강수 형태 코드 "0" = 강수 형태 없음
             if precip == "0" {
                 switch skyState {
-                case "1":   //맑음
-                    weatherStateCode = "001"
+                case "1":
+                    weatherStateCode = "001"    //기상상태 코드 (001: 맑음)
                     
                     //시간에 따른 아이콘 선택
                     if currentTime >= 6 && currentTime < 18 {
@@ -164,51 +163,47 @@ class WeatherViewModel: ObservableObject {
                     } else {
                         return "moon.fill"
                     }
-                case "3":    //구름많음
-                    weatherStateCode = "002"
+                case "3":
+                    weatherStateCode = "002"    //기상상태 코드 (002: 구름많음)
                     
                     if currentTime >= 6 && currentTime < 18 {
                         return "cloud.sun.fill"
                     } else {
                         return "cloud.moon.fill"
                     }
-                case "4":   //흐림
-                    weatherStateCode = "003"
+                case "4":
+                    weatherStateCode = "003"    //기상상태 코드 (003: 흐림)
                     return"cloud.fill"
                 default:
-                    weatherStateCode = "011"
+                    weatherStateCode = "011"    //기상상태 코드 (011: 기타)
                     return "sun.max.fill"
                 }
             }
             else {
                 switch precip {
-                case "1":   //비
-                    weatherStateCode = "004"
+                case "1":
+                    weatherStateCode = "004"    //기상상태 코드 (004: 비)
                     return "cloud.rain.fill"
-                case "2":   //비/눈 - 진눈개비
-                    weatherStateCode = "005"
+                case "2":
+                    weatherStateCode = "005"    //기상상태 코드 (005: 비/눈 - 진눈개비)
                     return "cloud.sleet.fill"
-                case "3":   //눈
-                    weatherStateCode = "006"
+                case "3":
+                    weatherStateCode = "006"    //기상상태 코드 (006: 눈)
                     return "cloud.snow.fill"
-                    
-                case "4":   //소나기
-                    weatherStateCode = "007"
+                case "4":
+                    weatherStateCode = "007"    //기상상태 코드 (007: 소나기)
                     return "cloud.rain.fill"
-                    
-                case "5":   //빗방울
-                    weatherStateCode = "008"
+                case "5":
+                    weatherStateCode = "008"    //기상상태 코드 (008: 빗방울)
                     return "cloud.drizzle.fill"
-                    
-                case "6":   //빗방울/눈날림
-                    weatherStateCode = "009"
+                case "6":
+                    weatherStateCode = "009"    //기상상태 코드 (009: 빗방울/눈날림)
                     return "cloud.sleet.fill"
-                    
-                case "7":   //눈날림
-                    weatherStateCode = "010"
+                case "7":
+                    weatherStateCode = "010"    //기상상태 코드 (010: 눈날림)
                     return "cloud.snow.fill"
                 default:
-                    weatherStateCode = "011"
+                    weatherStateCode = "011"    //기상상태 코드 (011: 기타)
                     return "cloud.rain.fill"
                 }
             }
@@ -231,8 +226,6 @@ class WeatherViewModel: ObservableObject {
             "windDirectionCode": String(format: "%03d", convertValue),  //풍향 코드 - 풍향 변환 값 코드화
             "windSpeed": windSpeed  //풍속
         ]
-        
-        //print(currentWeather)
         
         return currentWeather
     }

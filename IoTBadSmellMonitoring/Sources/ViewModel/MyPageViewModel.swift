@@ -18,27 +18,23 @@ class MyPageViewModel: ObservableObject {
     @Published var validMessage: String = ""    //유효성 검사 메시지
     
     @Published var currentPassword: String = ""   //현재 비밀번호
-    @Published var newpassword: String = ""    //새 비밀번호
+    @Published var newPassword: String = ""    //새 비밀번호
     @Published var confirmPassword: String = ""    //비밀번호 확인
-    @Published var showToggle: Bool = false
+    @Published var showToggle: Bool = false //토글 상태
     
     init() {
+        //알림 허용 권한 상태 확인
         self.checkAuthStatus() { status in
-            
             UserDefaults.standard.set(status, forKey: "notificationAuth") //알림 권한
-            self.showToggle = UserDefaults.standard.bool(forKey: "notificationAuth")
             
+            //알림 권한이 없는 경우 알림 허용 요청
             if !status {
-                print("tlqkf")
-                self.requestAuthorization() //알림 허용 확인
+                self.requestAuthorization() //알림 허용 요청
             }
         }
     }
     
-    //MARK: - 푸시 알림
-    static let instance = MyPageViewModel() //Singleton
-    
-    //사용자 확인 (푸시 알림 허가 받기)
+    //MARK: - 사용자 확인 (푸시 알림 허가 받기)
     func requestAuthorization() {
         UNUserNotificationCenter.current().requestAuthorization (
             options: [.alert,.sound,.badge], completionHandler: { didAllow, Error in
@@ -59,9 +55,9 @@ class MyPageViewModel: ObservableObject {
         let notificationCurrent = UNUserNotificationCenter.current()
         
         notificationCurrent.getNotificationSettings(completionHandler: { (setting) in
-            var isAuthStatus = false
+            var isAuthStatus = false    //권한 허용 여부
             
-            let status = setting.authorizationStatus
+            let status = setting.authorizationStatus    //알림 권한 상태
             
             //알림 여부 미 선택
             if status == .notDetermined {
@@ -90,6 +86,9 @@ class MyPageViewModel: ObservableObject {
     
     //MARK: - 푸시 알림 설정 및 실행
     func scheduleNotification() {
+        
+        self.removeNotification()   //기존 푸시 알림 설정 삭제
+        
         //사용자 확인 완료 시 시간 알림 수행
         let options: UNAuthorizationOptions = [.alert, .sound, .badge]
         UNUserNotificationCenter.current().requestAuthorization(options: options) { (success, error) in
@@ -106,7 +105,7 @@ class MyPageViewModel: ObservableObject {
                     content.title = "악취 접수 알림"                  //제목
                     content.subtitle = "근처에서 악취가 난다면 접수해주세요!"     //소제목
                     content.sound = .default
-                    content.badge = 1
+                    content.badge = 1   //Badge 표시 - 알림 올 경우, 앱 아이콘 숫자 표시
                     
                     //푸시 알림 시간
                     var dateComponents = DateComponents()
@@ -142,7 +141,7 @@ class MyPageViewModel: ObservableObject {
             primaryButton: .destructive(
                 Text("설정"),
                 action: {
-                    UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)    //앱의 설정 화면으로 이동
+                    UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)    //앱 설정 화면으로 이동
                 }
             ),
             secondaryButton: .cancel(
@@ -161,11 +160,9 @@ class MyPageViewModel: ObservableObject {
         
         //API 호출 - Request Body
         let parameters = [
-            "userId": UserDefaults.standard.string(forKey: "userId")!,
-            "userPassword": self.currentPassword
+            "userId": UserDefaults.standard.string(forKey: "userId")!,  //사용자 기본값에 저장된 사용자 ID
+            "userPassword": self.currentPassword    //현재 비밀번호
         ]
-        
-        print(parameters)
         
         //로그인 API 호출
         let request = userAPI.requestSignIn(parameters: parameters)
@@ -204,10 +201,8 @@ class MyPageViewModel: ObservableObject {
         //API 호출 - Request Body
         let parameters = [
             "userId": UserDefaults.standard.string(forKey: "userId")!,
-            "userPassword": self.newpassword
+            "userPassword": self.newPassword
         ]
-        
-        print(parameters)
         
         //비밀번호 수정 API 호출
         let request = userAPI.requestPasswordChange(parameters: parameters)
@@ -249,9 +244,11 @@ class MyPageViewModel: ObservableObject {
         }
         
         //입력한 비밀번호 일치 여부 확인
-        if newpassword != confirmPassword {
+        if newPassword != confirmPassword {
+            currentPassword = ""
+            newPassword = ""
             confirmPassword = ""
-            self.validMessage = "비밀번호가 일치하지 않습니다."
+            self.validMessage = "새 비밀번호가 일치하지 않습니다."
             
             return false
         }
@@ -264,12 +261,12 @@ class MyPageViewModel: ObservableObject {
         let regExp = "^[a-zA-Z0-9]{5,15}$"
         let passwordPredicate = NSPredicate(format: "SELF MATCHES %@", regExp)
         
-        return passwordPredicate.evaluate(with: newpassword)
+        return passwordPredicate.evaluate(with: newPassword)
     }
     
     //MARK: - 입력 완료 여부
     var isInputComplete: Bool {
-        if currentPassword.isEmpty || newpassword.isEmpty || confirmPassword.isEmpty {
+        if currentPassword.isEmpty || newPassword.isEmpty || confirmPassword.isEmpty {
             return false
         }
         else {

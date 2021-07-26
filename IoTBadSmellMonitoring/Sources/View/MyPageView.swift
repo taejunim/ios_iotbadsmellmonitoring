@@ -23,6 +23,7 @@ struct MyPageView: View {
     @StateObject private var stateSideMenuViewModel = SideMenuViewModel()
     
     var body: some View {
+        //뒤로가기 버튼 클릭 시, 악취 접수 등록 화면 이동
         if viewUtil.isBack {
             //악취 접수 등록 화면
             SmellReceptionView()
@@ -32,6 +33,7 @@ struct MyPageView: View {
                 .environmentObject(stateSideMenuViewModel)
         }
         else {
+            //My Page 화면
             NavigationView {
                 ZStack {
                     //로딩 표시 여부에 따라 표출
@@ -46,10 +48,10 @@ struct MyPageView: View {
                                 
                                 VerticalDividerLine()
                                 
-                                PushToggle(viewUtil: viewUtil, myPageViewModel: myPageViewModel)    //푸쉬(토글버튼)
+                                PushToggle(myPageViewModel: myPageViewModel)    //푸쉬(토글버튼)
                                 VerticalDividerLine()
                                 
-                                PasswordChange(viewUtil: viewUtil, myPageViewModel: myPageViewModel)    //비밀번호 변경 field
+                                PasswordChange(myPageViewModel: myPageViewModel)    //비밀번호 변경 field
                             }
                         }
                         .padding()
@@ -76,7 +78,13 @@ struct MyPageView: View {
                     viewUtil.dismissKeyboard() //키보드 닫기
                 })
                 .onAppear {
-                    myPageViewModel.showToggle = UserDefaults.standard.bool(forKey: "notificationStatus")
+                    //사용자 정보에 저장된 푸시 알림 여부 상태에 따른 토글 버튼의 상태 변경
+                    if UserDefaults.standard.objectIsForced(forKey: "notificationStatus") {
+                        myPageViewModel.showToggle = UserDefaults.standard.bool(forKey: "notificationStatus")
+                    }
+                    else {
+                        myPageViewModel.showToggle = UserDefaults.standard.bool(forKey: "notificationAuth")
+                    }
                 }
             }
         }
@@ -87,6 +95,7 @@ struct MyPageView: View {
 struct Profile: View {
     var body: some View  {
         VStack(spacing: 10) {
+            //사용자 명
             HStack {
                 Text(UserDefaults.standard.string(forKey: "userName") ?? "User Name")
                     .font(.title)
@@ -95,6 +104,7 @@ struct Profile: View {
                 Spacer()
             }
             
+            //사용자 ID
             HStack {
                 Text(UserDefaults.standard.string(forKey: "userId") ?? "User ID")
                     .fontWeight(.bold)
@@ -107,8 +117,8 @@ struct Profile: View {
 
 //MARK: - 푸쉬설정
 struct PushToggle: View {
-    @ObservedObject var viewUtil: ViewUtil
     @ObservedObject var myPageViewModel: MyPageViewModel
+    
     @State var showAlert: Bool = false  //알림창 노출 여부
     @State var alert: Alert?    //알림창
     
@@ -120,52 +130,38 @@ struct PushToggle: View {
                 .padding(.trailing, 250)
                 .onChange(of: myPageViewModel.showToggle, perform: { toggleIsOn in
                     
-                    UserDefaults.standard.set(toggleIsOn, forKey: "notificationStatus")
+                    UserDefaults.standard.set(toggleIsOn, forKey: "notificationStatus") //푸시 알림 상태 저장
                     
+                    //토글 상태 ON
                     if toggleIsOn {
                         myPageViewModel.showToggle = true
                         
+                        //알림 권한 상태 체크 후 푸시 알림 실행
                         myPageViewModel.checkAuthStatus() { status in
-                            print(status)
-                            myPageViewModel.scheduleNotification()
+                            
+                            myPageViewModel.scheduleNotification()  //푸시 알림 스케쥴 실행
+                            
+                            //알림 권한이 없는 경우, 알림 설정 이동 알림창 호출
                             if !status {
-                                showAlert = true
-                                alert = myPageViewModel.requestAuthAlert()
+                                showAlert = true    //알림창 호출
+                                alert = myPageViewModel.requestAuthAlert()  //알림 설정 이동 알림창
                             }
                         }
                     }
+                    //토글 상태 OFF
                     else {
                         myPageViewModel.showToggle = false
-                        myPageViewModel.removeNotification()
+                        myPageViewModel.removeNotification()    //푸시 알림 정보 삭제
                     }
                 })
                 .alert(isPresented: $showAlert) {
                     alert!
                 }
-//                .onReceive(Just(myPageViewModel.showToggle), perform: { toggleIsOn in
-//
-//                    UserDefaults.standard.set(toggleIsOn, forKey: "notificationStatus")
-//
-//                    if toggleIsOn {
-//                        //myPageViewModel.scheduleNotification()
-//
-//                        myPageViewModel.checkAuthStatus() { status in
-//                            if status {
-//                                myPageViewModel.scheduleNotification()
-//                            }
-//                            else {
-//                                myPageViewModel.showAlert = true
-//                                myPageViewModel.alert = myPageViewModel.requestAuthAlert()
-//                            }
-//                        }
-//                    }
-//                })
         }
     }
 }
 //MARK: - 비밀번호 변경 field
 struct PasswordChange: View {
-    @ObservedObject var viewUtil: ViewUtil
     @ObservedObject var myPageViewModel: MyPageViewModel
     
     var body: some View  {
@@ -177,7 +173,7 @@ struct PasswordChange: View {
                     RequiredInputLabel()    //필수입력(*) Label
                 }) {
                 SecureField("", text: $myPageViewModel.currentPassword)
-                    .autocapitalization(/*@START_MENU_TOKEN@*/.none/*@END_MENU_TOKEN@*/)    //첫 문자 항상 소문자
+                    .autocapitalization(.none)    //첫 문자 항상 소문자
                     .keyboardType(.alphabet)    //키보드 타입 - 영문만 표시
                 TextFiledUnderLine()    //Text Field 밑줄
             }
@@ -188,8 +184,8 @@ struct PasswordChange: View {
                     Text("새 비밀번호")
                     RequiredInputLabel()    //필수입력(*) Label
                 }) {
-                SecureField("5자리 이상 15자리 이하 입력", text: $myPageViewModel.newpassword)
-                    .autocapitalization(/*@START_MENU_TOKEN@*/.none/*@END_MENU_TOKEN@*/)    //첫 문자 항상 소문자
+                SecureField("5자리 이상 15자리 이하 입력", text: $myPageViewModel.newPassword)
+                    .autocapitalization(.none)    //첫 문자 항상 소문자
                     .keyboardType(.alphabet)    //키보드 타입 - 영문만 표시
                 TextFiledUnderLine()    //Text Field 밑줄
             }
@@ -201,7 +197,7 @@ struct PasswordChange: View {
                     RequiredInputLabel()    //필수입력(*) Label
                 }) {
                 SecureField("5자리 이상 15자리 이하 입력", text: $myPageViewModel.confirmPassword)
-                    .autocapitalization(/*@START_MENU_TOKEN@*/.none/*@END_MENU_TOKEN@*/)    //첫 문자 항상 소문자
+                    .autocapitalization(.none)    //첫 문자 항상 소문자
                     .keyboardType(.alphabet)    //키보드 타입 - 영문만 표시
                 TextFiledUnderLine()    //Text Field 밑줄
             }
@@ -217,31 +213,36 @@ struct PasswordChangeButton: View {
     @ObservedObject var myPageViewModel: MyPageViewModel
     
     var body: some View {
-        
         Button(
             action: {
                 viewUtil.dismissKeyboard() //키보드 닫기
+                viewUtil.isLoading = true  //로딩 실행
                 
                 //로그인 실행
                 myPageViewModel.signIn() { (result) in
-                    viewUtil.isLoading = false  //로딩 종료
+                    //현재 비밀번호가 일치 하는 경우
+                    if result == "success" {
+                        //유효성 검사 성공이 아닌 경우 Toast 팝업 메시지 호출
+                        if !myPageViewModel.validate() {
+                            viewUtil.isLoading = false  //로딩 종료
+                            
+                            viewUtil.showToast = true
+                            viewUtil.toastMessage = myPageViewModel.validMessage
+                        }
+                        //새 비밀번호 유효성 검사가 성공인 경우, 비밀번호 변경 실행
+                        else {
+                            myPageViewModel.passwordChange() { (result) in
+                                viewUtil.isLoading = false  //로딩 종료
 
+                                viewUtil.showToast = true
+                                viewUtil.toastMessage = myPageViewModel.message
+                            }
+                        }
+                    }
                     //로그인 성공이 아닌 경우(현재비밀번호 불일치) Toast 팝업 메시지 호출
-                    if result != "success" {
-                        viewUtil.showToast = true
-                        viewUtil.toastMessage = myPageViewModel.message
-                    }
-                    //유효성 검사 성공이 아닌 경우 Toast 팝업 메시지 호출
-                    else if !myPageViewModel.validate() {
-                        viewUtil.showToast = true
-                        viewUtil.toastMessage = myPageViewModel.validMessage
-                    }
-                    
-                    //로그인과 유효성 검사 성공일 경우 비밀번호 수정 실행
-                    myPageViewModel.passwordChange() { (result) in
-
+                    else {
                         viewUtil.isLoading = false  //로딩 종료
-
+                        
                         viewUtil.showToast = true
                         viewUtil.toastMessage = myPageViewModel.message
                     }

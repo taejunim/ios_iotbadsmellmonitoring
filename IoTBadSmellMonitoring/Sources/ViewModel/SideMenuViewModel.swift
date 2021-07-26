@@ -9,14 +9,12 @@ import SwiftUI
 import Foundation
 
 class SideMenuViewModel: ObservableObject {
-    //private let viewUtil = ViewUtil()
-    
     @Published var showAlert: Bool = false  //알림창 노출 여부
     @Published var alert: Alert?    //알림창
     @Published var isSignOut: Bool = false  //로그아웃 여부
-    @Published var moveMenu: String = ""
+    @Published var moveMenu: String = ""    //이동할 메뉴
     
-    //로그아웃 확인 알림창
+    //MARK: - 로그아웃 확인 알림창
     func signOutAlert() -> Alert {
         return Alert(
             title: Text("로그아웃"),
@@ -36,7 +34,7 @@ class SideMenuViewModel: ObservableObject {
         )
     }
     
-    //로그아웃 실행
+    //MARK: - 로그아웃 실행
     func signOut() {
         //UserDefaults 값 초기화
         for key in UserDefaults.standard.dictionaryRepresentation().keys {

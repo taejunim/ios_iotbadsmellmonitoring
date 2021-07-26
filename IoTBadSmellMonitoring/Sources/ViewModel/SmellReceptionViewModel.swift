@@ -25,6 +25,7 @@ class SmellReceptionViewModel: ObservableObject {
     @Published var validMessage: String = ""    //유효성 검사 메시지
     
     //MARK: - 시간에 따른 날씨 화면 배경 설정
+    /// - Returns: 배경 그라데이션 시작 색상, 종료 색상
     func setWeatherBackground() -> (String, String) {
         
         let currentTime: Int = Int("HH".dateFormatter(formatDate: Date()))!    //현재 시간
@@ -75,7 +76,7 @@ class SmellReceptionViewModel: ObservableObject {
     func getReceptionStatus() {
         //API 호출 - Request Parameters
         let parameters = [
-            "userId": UserDefaults.standard.string(forKey: "userId")!
+            "userId": UserDefaults.standard.string(forKey: "userId")!   //사용자 기본값에 저장된 사용자 ID
         ]
         
         //금일 냄새 접수 현황 API 호출
@@ -83,8 +84,6 @@ class SmellReceptionViewModel: ObservableObject {
         request.execute(
             //API 호출 성공
             onSuccess: { (status) in
-                print(status)
-                
                 self.result = status.result   //API 호출 결과 메시지
                 
                 if self.result == "success" {
@@ -101,15 +100,14 @@ class SmellReceptionViewModel: ObservableObject {
                         }
 
                         statusDictionary = [
-                            "timeZoneCode": statusData.timeZoneCode,
-                            "timeZone": statusData.timeZone,
-                            "statusCode": statusData.status
+                            "timeZoneCode": statusData.timeZoneCode,    //접수 시간대 코드
+                            "timeZone": statusData.timeZone,    //접수 시간대 00:00 ~ 00:00
+                            "statusCode": statusData.status //접수 상태 코드
                         ]
 
                         statusArray.append(statusDictionary)
                     }
                     
-                    print(statusArray)
                     self.receptionStatus = statusArray
                 }
             },

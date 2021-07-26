@@ -64,7 +64,7 @@ class SignUpViewModel: ObservableObject {
         
         //API 호출 - Request Parameters
         let parameters = [
-            "userId": id
+            "userId": id    //사용자 ID
         ]
         
         //ID 찾기 API 호출
@@ -103,13 +103,13 @@ class SignUpViewModel: ObservableObject {
     func signUp(completion: @escaping (String) -> Void) {
         //API 호출 - Request Body
         let parameters = [
-            "userType": userType,
-            "userId": confirmId,
-            "userPassword": password,
-            "userName": name,
-            "userAge": String(age),
-            "userSex": selectSex,
-            "userRegion": selectRegion
+            "userType": userType,   //사용자 타입
+            "userId": confirmId,    //중복 확인된 ID
+            "userPassword": password,   //비밀번호
+            "userName": name,   //사용자 명
+            "userAge": String(age), //나이
+            "userSex": selectSex,   //성별
+            "userRegion": selectRegion  //지역
         ]
 
         //회원가입 API 호출

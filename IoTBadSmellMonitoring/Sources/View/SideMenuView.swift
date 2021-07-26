@@ -7,11 +7,12 @@
 
 import SwiftUI
 
+//MARK: - 사이드 메뉴 화면
 struct SideMenuView: View {
-    @EnvironmentObject var viewUtil: ViewUtil
-    @EnvironmentObject var sideMenuViewModel: SideMenuViewModel
+    @EnvironmentObject var viewUtil: ViewUtil   //View Util
+    @EnvironmentObject var sideMenuViewModel: SideMenuViewModel //Side Menu View Model
     
-    @State var dragOffset = CGSize.zero
+    @State var dragOffset = CGSize.zero //Drag Offset
     
     var body: some View {
         GeometryReader { geometryReader in
@@ -22,11 +23,11 @@ struct SideMenuView: View {
                         .foregroundColor(Color.white)
                     
                     VStack {
-                        UserInfoView()
+                        UserInfoView()  //사용자 정보
                         
                         VerticalDividerLine()
                         
-                        MenuButtonListView(viewUtil: viewUtil, sideMenuViewModel: sideMenuViewModel)
+                        MenuButtonListView(viewUtil: viewUtil, sideMenuViewModel: sideMenuViewModel)    //메뉴 버튼 목록
                     
                         Spacer()
                     }
@@ -38,22 +39,26 @@ struct SideMenuView: View {
                 .gesture(
                     DragGesture()
                         .onChanged { gesture in
+                            //사이드 메뉴 영역 좌우 드래그 시, 사이드 메뉴 이동
                             if gesture.translation.width < 0 {
                                 dragOffset.width = gesture.translation.width
                             }
                         }
                         .onEnded { gesture in
+                            //사이드 메뉴 좌측으로 드래그 시, 이동한 넓이가 -160 이하인 경우 사이드 메뉴 닫기
                             if gesture.translation.width < -160 {
                                 withAnimation {
                                     viewUtil.showMenu.toggle()
                                 }
                             }
+                            //사이드 메뉴 제자리 위치로 초기화
                             else {
                                 dragOffset = .zero
                             }
                         }
                 )
                 
+                //사이드 메뉴 우측 불투명 영역
                 VStack {
                     Rectangle()
                         .frame(width: geometryReader.size.width - geometryReader.size.width/1.2)
@@ -61,7 +66,7 @@ struct SideMenuView: View {
                 }
                 .onTapGesture {
                     withAnimation {
-                        viewUtil.showMenu.toggle()
+                        viewUtil.showMenu.toggle()  //사이드 메뉴 닫기
                     }
                 }
             }
@@ -71,9 +76,11 @@ struct SideMenuView: View {
     }
 }
 
+//MARK: 사용자 정보 화면
 struct UserInfoView: View {
     var body: some View {
         VStack(spacing: 10) {
+            //사용자 명
             HStack {
                 Text(UserDefaults.standard.string(forKey: "userName") ?? "User Name")
                     .font(.title)
@@ -82,6 +89,7 @@ struct UserInfoView: View {
                 Spacer()
             }
             
+            //사용자 ID
             HStack {
                 Text(UserDefaults.standard.string(forKey: "userId") ?? "User ID")
                     .fontWeight(.bold)
@@ -92,6 +100,7 @@ struct UserInfoView: View {
     }
 }
 
+//MARK: - 메뉴 버튼 목록 화면
 struct MenuButtonListView: View {
     @ObservedObject var viewUtil: ViewUtil
     @ObservedObject var sideMenuViewModel: SideMenuViewModel
@@ -102,7 +111,7 @@ struct MenuButtonListView: View {
             Button(
                 action: {
                     withAnimation {
-                        sideMenuViewModel.moveMenu = "MyPage"
+                        sideMenuViewModel.moveMenu = "MyPage"   //이동할 메뉴 - My Page
                     }
                 },
                 label: {
@@ -120,7 +129,7 @@ struct MenuButtonListView: View {
             Button(
                 action: {
                     withAnimation {
-                        sideMenuViewModel.moveMenu = "ReceptionHistory"
+                        sideMenuViewModel.moveMenu = "ReceptionHistory" //이동할 메뉴 - 접수 이력
                     }
                 },
                 label: {

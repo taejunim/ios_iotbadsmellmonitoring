@@ -9,6 +9,7 @@ import SwiftUI
 import Foundation
 
 class KeyboardUtil: ObservableObject {
+    
     private var _center: NotificationCenter
     @Published var currentHeight: CGFloat = 0
     
@@ -22,12 +23,14 @@ class KeyboardUtil: ObservableObject {
         _center.removeObserver(self)
     }
     
+    //키보드 활성화 시, 키보드 높이만큼 화면 이동
     @objc func keyBoardWillShow(notification: Notification) {
         if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
             currentHeight = keyboardSize.height
         }
     }
     
+    //키보드 비활성화 시, 이동된 화면 복구
     @objc func keyBoardWillHide(notification: Notification) {
         currentHeight = 0
     }

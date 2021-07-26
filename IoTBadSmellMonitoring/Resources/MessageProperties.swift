@@ -9,7 +9,7 @@ import Foundation
 
 enum Message {
     enum Server: String {
-        case error = "dddd"
+        case error = "error"
     }
     
     enum SignIn {

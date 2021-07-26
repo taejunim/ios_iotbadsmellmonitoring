@@ -21,14 +21,14 @@ class ReceptionHistoryViewModel: ObservableObject {
     
     @Published var pageIndex: Int = 0  //페이지 번호(0: 시작, 10 단위)
     @Published var rowsCount: Int = 10 //페이지 당 결과 수
-    @Published var searchStartDate: Date = Calendar.current.date(byAdding: .day, value: -7, to: Date())!   //조회 시작일자
+    @Published var searchStartDate: Date = Calendar.current.date(byAdding: .day, value: -7, to: Date())!   //조회 시작일자 - 7일 전으로 설정
     @Published var searchEndDate: Date = Date() //조회 종료일자
     
     @Published var selectSmellCode: String = "" //선택한 악취 강도 코드
     @Published var selectSmellName: String = "" //선택한 악취 강도 명
     
-    @Published var showImageModal: Bool = false
-    @Published var showImagePath: String = ""
+    @Published var showImageModal: Bool = false //이미지 상세 팝업 활성 여부
+    @Published var showImagePath: String = ""   //이미지 URL 경로
     
     @Published var result: String = ""   //결과 상태
     @Published var message: String = "" //결과 메시지
@@ -42,6 +42,19 @@ class ReceptionHistoryViewModel: ObservableObject {
     }
     
     //MARK: - 접수 이력 정보 조회
+    /// 접수 이력 정보 조회 API 호출
+    /// - Parameters:
+    ///   - completion: Array
+    ///     - registNo: 접수 등록번호
+    ///     - smellCode: 악취 강도 코드
+    ///     - smellName: 악취 강도 명
+    ///     - smellColor: 악취 강도 색상
+    ///     - smellComment: 악취 강도 설명
+    ///     - smellTypeCode: 취기 코드
+    ///     - smellTypeName: 취기 명
+    ///     - smellTypeIcon: 취기 아이콘
+    ///     - comment: 추가 전달사항
+    ///     - registDate: 접수 등록일자
     func getHistory(completion: @escaping ([[String:String]]) -> Void) {
         
         let searchStartDate: String = "yyyy-MM-dd".dateFormatter(formatDate: self.searchStartDate)  //조회 시작일자
@@ -123,6 +136,13 @@ class ReceptionHistoryViewModel: ObservableObject {
     }
     
     //MARK: - 접수 이력 상세 정보 조회
+    /// 접수 이력 상세 정보 API 호출
+    /// - Parameters:
+    ///   - registNo: 접수 등록번호
+    ///   - completion:
+    ///     - registNo: 접수 등록번호
+    ///     - imageNo: 이미지 번호
+    ///     - imagePath: 이미지 URL 경로
     func getDetailHistory(registNo: String, completion: @escaping ([[String:String]]) -> Void) {
         
         //API 호출 - Request Parameters
@@ -132,7 +152,6 @@ class ReceptionHistoryViewModel: ObservableObject {
         
         //접수 이력 상세 정보 API 호출
         let request = smellAPI.requestDetailHistory(parameters: parameters)
-        
         request.execute(
             //API 호출 성공
             onSuccess: { (detail) in
@@ -141,6 +160,7 @@ class ReceptionHistoryViewModel: ObservableObject {
                     var detailArray: [[String:String]] = []  //Array
                     
                     if detail.data != nil {
+                        //접수 이력 상세 정보 추출
                         for index in 0..<detail.data!.count {
                             let detailData = detail.data![index]
                             
@@ -200,7 +220,6 @@ class ReceptionHistoryViewModel: ObservableObject {
                 
                 //API 호출 결과가 성공인 경우
                 if self.result == "success" {
-                    print("success")
                     
                     //접수 이력 데이터 추출 후 Array에 할당
                     for index in 0..<history.data!.count {
@@ -251,6 +270,7 @@ class ReceptionHistoryViewModel: ObservableObject {
     }
     
     //MARK: - 다음 접수 이력 페이지 확인
+    /// - Parameter currentPageIndex: 현재 페이지 Index
     func checkNextPage(currentPageIndex: Int) {
         let searchStartDate: String = "yyyy-MM-dd".dateFormatter(formatDate: self.searchStartDate)  //조회 시작일자
         let searchEndDate: String = "yyyy-MM-dd".dateFormatter(formatDate: self.searchEndDate)  //조회 종료일자
@@ -279,6 +299,8 @@ class ReceptionHistoryViewModel: ObservableObject {
     }
     
     //MARK: - 악취 강도 코드에 따른 악취 아이콘
+    /// - Parameter smellCode: 악취 강도 코드
+    /// - Returns: 악취 강도 색상
     func getSmellColor(smellCode: String) -> String {
         switch smellCode {
         case "001":
@@ -299,6 +321,8 @@ class ReceptionHistoryViewModel: ObservableObject {
     }
 
     //MARK: - 악취 강도 코드에 따른 악취 강도 설명
+    /// - Parameter smellCode: 악취 강도 코드
+    /// - Returns: Code Comment (코드 설명)
     func getSmellComment(smellCode: String) -> String {
         var smellComment: String = ""   //악취 강도 설명
         
@@ -313,6 +337,8 @@ class ReceptionHistoryViewModel: ObservableObject {
     }
     
     //MARK: - 취기 코드에 따른 취기 아이콘
+    /// - Parameter smellTypeCode: 취기 코드
+    /// - Returns: 취기 이미지 아이콘
     func getSmellTypeIcon(smellTypeCode: String) -> String {
         switch smellTypeCode {
         case "001":

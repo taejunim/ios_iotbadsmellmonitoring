@@ -56,7 +56,6 @@ class SignInViewModel: ObservableObject {
                 self.message = "서버와의 통신이 원활하지 않습니다."
                 
                 completion(self.result)
-                
                 print(error.localizedDescription)
             }
         )

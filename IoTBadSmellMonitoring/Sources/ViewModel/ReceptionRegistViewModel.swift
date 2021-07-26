@@ -75,11 +75,11 @@ class ReceptionRegistViewModel: ObservableObject {
         }
         else {
             return nil
-            //return "001"    //임시
         }
     }
     
     //MARK: - 악취 접수 등록 실행
+    /// - Parameter completion: API 등록 결과 상태
     func registReception(completion: @escaping (String) -> Void) {
         let coordinate = getLocation()    //현재 위치 정보 호출
 
@@ -111,8 +111,7 @@ class ReceptionRegistViewModel: ObservableObject {
                 "regId": UserDefaults.standard.string(forKey: "userId")!    //등록자 ID
             ]
             
-            print(parameters)
-            
+            //악취 접수 등록 API 호출(접수 등록 정보, 첨부사진 업로드)
             let upload = self.smellAPI.uploadReceptionRegist(parameters: parameters, images: self.imageArray)
             upload.execute(
                 onSuccess: { (regist) in
@@ -141,6 +140,7 @@ class ReceptionRegistViewModel: ObservableObject {
     }
     
     //MARK: - 접수 시간대 유효성 검사
+    /// - Returns: 접수 시간대 여부
     func isTimeZoneValid() -> Bool {
         let registTimeZone: String? = timeZoneCode  //접수 시간대 코드
         

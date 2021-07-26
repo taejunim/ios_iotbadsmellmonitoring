@@ -15,13 +15,11 @@
 		2BAF67E82697F02100769321 /* SideMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BAF67E72697F02100769321 /* SideMenuView.swift */; };
 		2BB2A25D2692A17D0071E796 /* Location.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BB2A25C2692A17D0071E796 /* Location.swift */; };
 		BF031BC0265F53CA008AB3F5 /* IoTBadSmellMonitoringApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF031BBF265F53CA008AB3F5 /* IoTBadSmellMonitoringApp.swift */; };
-		BF031BC2265F53CA008AB3F5 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF031BC1265F53CA008AB3F5 /* ContentView.swift */; };
 		BF031BC4265F53CB008AB3F5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BF031BC3265F53CB008AB3F5 /* Assets.xcassets */; };
 		BF031BC7265F53CB008AB3F5 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BF031BC6265F53CB008AB3F5 /* Preview Assets.xcassets */; };
 		BF085B8A267C39590045778F /* SmellReceptionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF085B89267C39590045778F /* SmellReceptionView.swift */; };
 		BF085B8C267C837A0045778F /* SmellReceptionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF085B8B267C837A0045778F /* SmellReceptionViewModel.swift */; };
 		BF65E4622679965C00C7C6B1 /* MessageProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF65E4612679965C00C7C6B1 /* MessageProperties.swift */; };
-		BF673FE02668B8C900B4D91B /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF673FDF2668B8C900B4D91B /* MainView.swift */; };
 		BF673FE22668C6D100B4D91B /* SignUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF673FE12668C6D100B4D91B /* SignUpView.swift */; };
 		BF673FE42668C75100B4D91B /* SignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF673FE32668C75100B4D91B /* SignInView.swift */; };
 		BF673FE62668C7B500B4D91B /* SignInViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF673FE52668C7B500B4D91B /* SignInViewModel.swift */; };
@@ -61,14 +59,12 @@
 		BCA40AAB0AA423D57BB3F697 /* Pods-IoTBadSmellMonitoring.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-IoTBadSmellMonitoring.debug.xcconfig"; path = "Target Support Files/Pods-IoTBadSmellMonitoring/Pods-IoTBadSmellMonitoring.debug.xcconfig"; sourceTree = "<group>"; };
 		BF031BBC265F53CA008AB3F5 /* IoTBadSmellMonitoring.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IoTBadSmellMonitoring.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BF031BBF265F53CA008AB3F5 /* IoTBadSmellMonitoringApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IoTBadSmellMonitoringApp.swift; sourceTree = "<group>"; };
-		BF031BC1265F53CA008AB3F5 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		BF031BC3265F53CB008AB3F5 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		BF031BC6265F53CB008AB3F5 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		BF031BC8265F53CB008AB3F5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		BF085B89267C39590045778F /* SmellReceptionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmellReceptionView.swift; sourceTree = "<group>"; };
 		BF085B8B267C837A0045778F /* SmellReceptionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmellReceptionViewModel.swift; sourceTree = "<group>"; };
 		BF65E4612679965C00C7C6B1 /* MessageProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageProperties.swift; sourceTree = "<group>"; };
-		BF673FDF2668B8C900B4D91B /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		BF673FE12668C6D100B4D91B /* SignUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpView.swift; sourceTree = "<group>"; };
 		BF673FE32668C75100B4D91B /* SignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInView.swift; sourceTree = "<group>"; };
 		BF673FE52668C7B500B4D91B /* SignInViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SignInViewModel.swift; path = IoTBadSmellMonitoring/Sources/ViewModel/SignInViewModel.swift; sourceTree = SOURCE_ROOT; };
@@ -188,8 +184,6 @@
 				BF085B89267C39590045778F /* SmellReceptionView.swift */,
 				BF698F6F2684614D0029785C /* ReceptionRegistView.swift */,
 				BF698F6D26840CC20029785C /* ReceptionHistoryView.swift */,
-				BF673FDF2668B8C900B4D91B /* MainView.swift */,
-				BF031BC1265F53CA008AB3F5 /* ContentView.swift */,
 				0EE3B98A26844D6D00061F00 /* MyPageView.swift */,
 				2BAF67E72697F02100769321 /* SideMenuView.swift */,
 			);
@@ -391,11 +385,9 @@
 				BF68AE102681ACC70086B88F /* CommonUtil.swift in Sources */,
 				BF673FE62668C7B500B4D91B /* SignInViewModel.swift in Sources */,
 				BF085B8A267C39590045778F /* SmellReceptionView.swift in Sources */,
-				BF031BC2265F53CA008AB3F5 /* ContentView.swift in Sources */,
 				BF673FEC2668CCDC00B4D91B /* SignUpViewModel.swift in Sources */,
 				BF673FE22668C6D100B4D91B /* SignUpView.swift in Sources */,
 				BF698F6E26840CC20029785C /* ReceptionHistoryView.swift in Sources */,
-				BF673FE02668B8C900B4D91B /* MainView.swift in Sources */,
 				BF031BC0265F53CA008AB3F5 /* IoTBadSmellMonitoringApp.swift in Sources */,
 				BF8A3E452670A0150013B018 /* APIRouter.swift in Sources */,
 				BF6C107026808195006BDC44 /* SmellModel.swift in Sources */,

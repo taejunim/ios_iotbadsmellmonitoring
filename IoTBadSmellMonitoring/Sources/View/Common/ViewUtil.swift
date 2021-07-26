@@ -18,13 +18,13 @@ class ViewUtil: ObservableObject {
     @Published var alert: Alert?    //알림창
     @Published var showMenu: Bool = false   //사이드 메뉴 노출 여부
     @Published var isViewDismiss: Bool = false  //창 닫기 여부
-    @Published var isBack: Bool = false
+    @Published var isBack: Bool = false //뒤로가기 여부
     
     //MARK: - 메뉴 뒤로가기 버튼
     func backMenuButton() -> some View {
         Button(
             action: {
-                self.isBack = true
+                self.isBack = true  //뒤로가기 여부
             },
             label: {
                 HStack {
@@ -41,9 +41,11 @@ class ViewUtil: ObservableObject {
     /// - Returns: Loading View
     func loadingView() -> some View {
         ZStack {
+            //로딩 화면 색상
             Color(.gray).opacity(0.5)
-                .ignoresSafeArea()
+                .ignoresSafeArea()  //범위 지정
             
+            //로딩 Progress View
             ProgressView()
                 .progressViewStyle(CircularProgressViewStyle(tint: Color(.darkGray)))
                 .scaleEffect(2) //로딩 크기
@@ -55,9 +57,7 @@ class ViewUtil: ObservableObject {
     /// - Returns: Search Loading View
     func searchLoadingView() -> some View {
         ZStack {
-            Color(.gray).opacity(0)
-                .ignoresSafeArea()
-            
+            //로딩 Progress View
             ProgressView()
                 .progressViewStyle(CircularProgressViewStyle(tint: Color(.darkGray)))
                 .scaleEffect(2) //로딩 크기

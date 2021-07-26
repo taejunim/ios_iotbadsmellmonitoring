@@ -10,6 +10,7 @@ import Alamofire
 /// API 연동을 위한 요청 URL 변환
 enum APIRouter: URLRequestConvertible {
     
+    //Request Method
     case post(useApi: String, path: String, parameters: [String: Any], isUpload: Bool)  //POST
     case get(useApi: String, path: String, parameters: [String: String])    //GET
     
@@ -89,10 +90,12 @@ enum APIRouter: URLRequestConvertible {
         //MARK: - Headers
         switch self {
         case .post(_, _, _, let isUpload):
+            //업로드할 파일이 없는 경우
             if !isUpload {
                 urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
                 urlRequest.setValue("application/json", forHTTPHeaderField: "Accept")
             }
+            //업로드할 파일이 있는 경우 - Content-Type: multipart/form-data 설정
             else {
                 urlRequest.setValue("multipart/form-data", forHTTPHeaderField: "Content-Type")
             }

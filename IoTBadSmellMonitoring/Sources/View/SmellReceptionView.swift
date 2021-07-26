@@ -148,6 +148,7 @@ struct CurrentWeatherView: View {
     
     var body: some View {
         VStack {
+            //현재 날씨 타이틀 및 새로고침 버튼
             ZStack {
                 Text("현재 날씨")
                     .font(.title3)
@@ -194,6 +195,7 @@ struct CurrentWeatherView: View {
                 }
             }
 
+            //현재 날씨 정보
             HStack {
                 Spacer()
                 

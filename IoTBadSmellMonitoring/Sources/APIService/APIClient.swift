@@ -45,10 +45,10 @@ class APIClient {
     ///   - decoder: JSON Decoder
     /// - Returns: Future<T, AFError>
     public func upload<T: Decodable>(route: APIRouter, parameters: [String:Any], images: [UIImage], decoder: JSONDecoder = JSONDecoder()) -> Future<T, AFError> {
-        print(parameters)
+
         return Future { (completion) in
             let upload = AF.upload(
-                //Multipart Form Data 추가
+                //Multipart Form Data 변환
                 multipartFormData: { multipartFormData in
                     //Paramers
                     for (key, value) in parameters {
@@ -57,15 +57,16 @@ class APIClient {
                         }
                     }
                     
-                    //이미지
+                    //Image
                     for (index, image) in images.enumerated() {
-                        let withName = "img" + String(index + 1)
-                        let imageData = image.jpegData(compressionQuality: 0.5)
+                        let withName = "img" + String(index + 1)    //이미지 Key
+                        let imageData = image.jpegData(compressionQuality: 0.5) //이미지 파일
 
+                        //Data(이미지 데이터), withName: Key, fileName: 파일명 + 확장자, mimeType: 파일형식
                         multipartFormData.append(imageData!, withName: withName, fileName: ".jpeg", mimeType: "image/jpeg")
                     }
                 },
-                with: route
+                with: route //API Router
             )
             
             upload.responseDecodable(decoder: decoder, completionHandler: { (response: DataResponse<T, AFError>) in

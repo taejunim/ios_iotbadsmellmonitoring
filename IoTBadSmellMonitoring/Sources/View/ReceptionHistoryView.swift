@@ -38,6 +38,7 @@ struct ReceptionHistoryView: View {
                         .zIndex(1)
                 }
                 
+                //접수 이력 화면
                 NavigationView {
                     VStack {
                         SearchFieldView(viewUtil: viewUtil, historyViewModel: historyViewModel)   //조회 조건 화면
@@ -134,7 +135,7 @@ struct SeatchDateView: View {
     }
 }
 
-//MARK: - 조회 악취 강도
+//MARK: - 조회 악취 강도 선택 박스
 struct SearchSmellLevelView: View {
     @ObservedObject var historyViewModel: ReceptionHistoryViewModel
     
@@ -163,27 +164,28 @@ struct SearchSmellLevelView: View {
                     
                     //악취 강도 선택
                     ForEach(historyViewModel.smellCode, id: \.self) { code in
-                        let smellCode: String = code["code"] ?? ""  //코드
-                        let smellName: String = code["codeName"] ?? ""  //코드 명
+                        let smellCode: String = code["code"] ?? ""  //악취 강도 코드
+                        let smellName: String = code["codeName"] ?? ""  //악취 강도 코드 명
                         
                         Button(
                             action: {
-                                isExpanded.toggle()
+                                isExpanded.toggle() //활성화 여부
                                 historyViewModel.selectSmellCode = smellCode    //선택한 악취 강도 코드
                                 historyViewModel.selectSmellName = smellName    //선택한 악취 강도 명
                             },
                             label: {
-                                Text(smellName)
+                                Text(smellName) //악취 강도 명
                             }
                         )
                     }
                 } label: {
                     HStack {
+                        //악취 강도 선택에 따라 선택박스 변경
                         Text(historyViewModel.selectSmellCode == "" ? "전체" : historyViewModel.selectSmellName)
                             
                         Spacer()
 
-                        Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
+                        Image(systemName: isExpanded ? "chevron.up" : "chevron.down")   //선택박스 활성화 여부에 따라 이미지 변경
                     }
                     .foregroundColor(.black)
                     .padding(.horizontal)
@@ -233,11 +235,10 @@ struct SearchButton: View {
 struct HistoryListView: View {
     @ObservedObject var historyViewModel: ReceptionHistoryViewModel
     
-    @State private var offset = CGFloat.zero
-    
     var body: some View {
         //악취 접수 이력 조회가 성공인 경우
         if historyViewModel.result == "success" {
+            
             VStack(alignment: .leading, spacing: 15) {
                 Text("이력")
                     .font(.title3)
@@ -249,10 +250,12 @@ struct HistoryListView: View {
                         
                         //접수 이력 목록 출력
                         ForEach(historyList, id: \.self) { history in
+                            //조회된 접수 이력 개별 영역(이력 간략 정보, 이력 상세 정보) - 이력 Row
                             HistorySection(historyViewModel: historyViewModel, history: history)
                                 .onAppear {
                                     //조회 종료 여부에 따라 추가 조회
                                     if !historyViewModel.isSearchEnd {
+                                        
                                         //스크롤 하단 이동 시, 마지막 이력 정보일 때 추가 조회 실행
                                         if historyList.last == history {
                                             historyViewModel.pageIndex += 10    //다음 페이지

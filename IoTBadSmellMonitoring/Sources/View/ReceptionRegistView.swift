@@ -20,11 +20,13 @@ struct ReceptionRegistView: View {
     
     var body: some View {
         ZStack {
+            //취기 선택 팝업 창
             if viewUtil.showModal {
                 SmellTypeModalView(viewUtil: viewUtil, receptionViewModel: receptionViewModel)
                     .zIndex(1)
             }
             
+            //악취 접수 등록 화면
             VStack {
                 ScrollView {
                     VStack {
@@ -43,7 +45,7 @@ struct ReceptionRegistView: View {
                     .offset(x: 0, y: -keyboardUtil.currentHeight)   //키보드 활성화 시, 키보드 높이 만큼 화면 올리기
                 }
                 
-                ReceptionRegistButton(viewUtil: viewUtil, location: location, receptionViewModel: receptionViewModel)
+                ReceptionRegistButton(viewUtil: viewUtil, location: location, receptionViewModel: receptionViewModel)   //접수 등록 버튼
             }
             .navigationBarTitle(Text("악취 접수 등록"), displayMode: .inline) //Navigation Bar 타이틀
             .navigationBarBackButtonHidden(true)    //기본 Back 버튼 숨김
@@ -55,7 +57,7 @@ struct ReceptionRegistView: View {
             
             receptionViewModel.selectSmellType = "001"  //선택한 취기 초기화
             receptionViewModel.selectTempSmellType = "001"  //선택한 임시 취기 초기화
-            receptionViewModel.pickedImageArray = [:]
+            receptionViewModel.pickedImageArray = [:]   //선택한 이미지 배열 초기화
         }
         .popup(
             isPresented: $viewUtil.showToast,   //팝업 노출 여부
@@ -69,7 +71,7 @@ struct ReceptionRegistView: View {
                 viewUtil.toast()    //팝업 화면
             }
         )
-        .gesture(DragGesture(minimumDistance: 0.00001).onChanged {_ in
+        .gesture(DragGesture(minimumDistance: 0.00001).onChanged { _ in
             viewUtil.dismissKeyboard() //키보드 닫기
         })
     }
@@ -114,6 +116,7 @@ struct SelectSmellView: View {
                     }
                 }()
                 
+                //악취 강도 명 - 악취 강도 설명
                 Text("\(smellName) - \(smellComment)")
                     .fontWeight(.bold)
                     .foregroundColor(Color.white)
@@ -225,7 +228,7 @@ struct SmellTypeModalView: View {
             .frame(width: geometryReader.size.width, height: geometryReader.size.height)
             .background(Color.black.opacity(0.5))
         }
-        .edgesIgnoringSafeArea(/*@START_MENU_TOKEN@*/.all/*@END_MENU_TOKEN@*/)
+        .edgesIgnoringSafeArea(.all)
     }
 }
 
@@ -271,6 +274,7 @@ struct SmellTypeListView: View {
                             }
                         }()
                         
+                        //취기 선택 버튼
                         Button(
                             action: {
                                 self.receptionViewModel.selectTempSmellType = smellTypeCode //선택한 취기 코드
@@ -396,13 +400,14 @@ struct AttachPictureView: View {
             Text("촬영사진 첨부")
                 .fontWeight(.bold)
             
+            //선택한 사진 개수 및 선택한 사진 초기화 버튼
             HStack {
                 Label("\(receptionViewModel.pickedImageCount)/\(imageMaxCount)", systemImage: "camera.fill")
                     .font(.subheadline)
     
                 Spacer()
                 
-                //새로고침 버튼
+                //선택한 사진 초기화 버튼
                 Button(
                     action: {
                         var registAlert: Alert {
@@ -413,7 +418,7 @@ struct AttachPictureView: View {
                                     Text("확인"),
                                     action: {
                                         receptionViewModel.pickedImageArray = [:]   //선택한 이미지 배열에 추가
-                                        receptionViewModel.imageArray = []
+                                        receptionViewModel.imageArray = []  //접수 등록 API 이미지 데이터
                                         receptionViewModel.pickedImageCount = 0   //선택한 이미지 개수 Count
                                     }
                                 ),
@@ -457,16 +462,16 @@ struct AttachPictureView: View {
                                     //.frame(width: 195, height: 130)
                                     //.frame(width: 225, height: 150)
                                 
-                                if index == Int(tapImage) {
-                                    Color(.gray).opacity(0.5)
-                                        .ignoresSafeArea()
-                                        .zIndex(1)
-                                }
+                                //추후 사진 개별 삭제 필요 시 추가
+                                //if index == Int(tapImage) {
+                                //    Color(.gray).opacity(0.5)
+                                //        .ignoresSafeArea()
+                                //        .zIndex(1)
+                                //}
                             }
-                            .onTapGesture {
-                                //tapImage.toggle()
-                                tapImage = String(index)
-                            }
+                            //.onTapGesture {
+                            //    tapImage = String(index)
+                            //}
                         }
                         .onAppear {
                             proxy.scrollTo(addImageButton)  //스크롤 이동 처리
@@ -476,7 +481,7 @@ struct AttachPictureView: View {
                         if imageMaxCount > receptionViewModel.pickedImageCount {
                             Button(
                                 action: {
-                                    self.showImagePicker.toggle()
+                                    self.showImagePicker.toggle()   //이미지 선택 창 호출
                                 },
                                 label: {
                                     HStack {
@@ -492,9 +497,9 @@ struct AttachPictureView: View {
                             )
                             .sheet(isPresented: $showImagePicker) {
                                 ImagePicker(sourceType: .photoLibrary) { (image) in
-                                    receptionViewModel.pickedImage = Image(uiImage: image)
+                                    receptionViewModel.pickedImage = Image(uiImage: image)  //선택한 이미지 변환 UIImage -> Image
                                     receptionViewModel.pickedImageArray.updateValue(receptionViewModel.pickedImage!, forKey: receptionViewModel.pickedImageCount)    //선택한 이미지 배열에 추가
-                                    receptionViewModel.imageArray.append(image)
+                                    receptionViewModel.imageArray.append(image) //접수 등록 API 이미지 데이터 추가
                                     receptionViewModel.pickedImageCount += 1   //선택한 이미지 개수 Count
                                 }
                             }
@@ -552,13 +557,14 @@ struct ReceptionRegistButton: View {
                 else {
                     //접수 시간대에 따른 등록 가능 여부 확인 후, 등록 실행
                     if receptionViewModel.isTimeZoneValid() {
+                        
                         //등록 알림창
                         var registAlert: Alert {
                             return Alert(
                                 title: Text("악취 접수 등록"),
                                 message: Text("악취 접수 등록을 진행하시겠습니까?"),
                                 primaryButton: .destructive(
-                                    Text("확인"),
+                                    Text("등록"),
                                     action: {
                                         viewUtil.isLoading = true   //로딩 시작
                                         disabledButton = true  //버튼 비활성화
@@ -584,7 +590,7 @@ struct ReceptionRegistButton: View {
                                     }
                                 ),
                                 secondaryButton: .cancel(
-                                    Text("닫기"),
+                                    Text("취소"),
                                     action: {
                                         viewUtil.showAlert = false
                                     }

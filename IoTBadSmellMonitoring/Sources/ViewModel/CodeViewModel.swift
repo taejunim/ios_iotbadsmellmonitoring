@@ -49,7 +49,7 @@ class CodeViewModel: ObservableObject {
 
                         codeArray.append(codeDictionary)
                     }
-                    //print(codeArray)
+                    
                     completion(codeArray)
                 }
             },

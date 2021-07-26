@@ -7,7 +7,7 @@
 
 import SwiftUI
 import Foundation
-    
+
 class ViewOptionSet: ObservableObject {
     
     init() {

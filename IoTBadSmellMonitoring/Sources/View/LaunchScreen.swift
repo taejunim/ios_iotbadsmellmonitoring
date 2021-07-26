@@ -25,12 +25,12 @@ struct LaunchScreen: View {
         LinearGradient(
             gradient: Gradient(
                 colors: [
-                    Color.black.opacity(0.6),
-                    Color.black.opacity(0)
+                    Color.black.opacity(0),
+                    Color.black.opacity(0.6)
                 ]
             ),
-            startPoint: .bottom,
-            endPoint: .top
+            startPoint: .top,
+            endPoint: .bottom
         )
     }
     
