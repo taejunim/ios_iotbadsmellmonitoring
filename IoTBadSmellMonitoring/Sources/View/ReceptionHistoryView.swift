@@ -97,7 +97,7 @@ struct SearchFieldView: View {
 //MARK: - 조회 일자
 struct SeatchDateView: View {
     @ObservedObject var historyViewModel: ReceptionHistoryViewModel
-    
+
     var body: some View {
         VStack {
             HStack {
@@ -114,6 +114,7 @@ struct SeatchDateView: View {
                 )
                 .labelsHidden()
                 .accentColor(.black)
+                .environment(\.locale, Locale(identifier:"ko_KR"))  //한국어 언어 변경
                 
                 Spacer()
                 
@@ -129,6 +130,7 @@ struct SeatchDateView: View {
                 )
                 .labelsHidden()
                 .accentColor(.black)
+                .environment(\.locale, Locale(identifier:"ko_KR"))  //한국어 언어 변경
             }
             .frame(maxWidth: .infinity)
         }

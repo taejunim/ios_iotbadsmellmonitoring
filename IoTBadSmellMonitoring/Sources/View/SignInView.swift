@@ -46,7 +46,7 @@ struct SignInView: View {
                             SignUpButton()  //회원가입 화면 이동 버튼
                         }
                         
-                        FindPasswordButton()    //비밀번호 찾기 버튼
+                        FindPasswordButton(viewUtil: viewUtil, signInViewModel: signInViewModel)    //비밀번호 찾기 버튼
                     }
                     .padding()
                 }
@@ -151,9 +151,17 @@ struct SignUpButton: View {
 
 //MARK: - 비밀번호 찾기 버튼
 struct FindPasswordButton: View {
+    @ObservedObject var viewUtil: ViewUtil
+    @ObservedObject var signInViewModel: SignInViewModel
+    
     var body: some View {
-        NavigationLink(
-            destination: SignUpView(),  //비밀번호 찾기 화면 이동
+        Button(
+            action: {
+                let resultMessage = signInViewModel.findPassword()
+                
+                viewUtil.showToast = true
+                viewUtil.toastMessage = resultMessage
+            },
             label: {
                 Text("비밀번호를 잊으셨나요?")
                     .font(.caption)

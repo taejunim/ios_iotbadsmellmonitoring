@@ -105,4 +105,11 @@ class SignInViewModel: ObservableObject {
         
         return passwordPredicate.evaluate(with: password)
     }
+    
+    //MARK: - 비밀번호 찾기
+    func findPassword() -> String {
+        self.message = "관리자에게 문의 바랍니다."
+        
+        return message
+    }
 }

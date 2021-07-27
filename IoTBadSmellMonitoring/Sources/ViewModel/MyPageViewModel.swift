@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UIKit
 import Foundation
 import UserNotifications
 
@@ -89,6 +90,7 @@ class MyPageViewModel: ObservableObject {
         
         self.removeNotification()   //기존 푸시 알림 설정 삭제
         
+        
         //사용자 확인 완료 시 시간 알림 수행
         let options: UNAuthorizationOptions = [.alert, .sound, .badge]
         UNUserNotificationCenter.current().requestAuthorization(options: options) { (success, error) in
@@ -99,13 +101,16 @@ class MyPageViewModel: ObservableObject {
                 //API codeComment 가져오기
                 self.codeViewModel.getCode(codeGroup: "REN") { (code) in
                     
+                    UIApplication.shared.applicationIconBadgeNumber = 0
+                    
                     // 푸시 알림 내용
                     let content = UNMutableNotificationContent()
-                    
-                    content.title = "악취 접수 알림"                  //제목
-                    content.subtitle = "근처에서 악취가 난다면 접수해주세요!"     //소제목
+                    let badgeCount = 1 + UIApplication.shared.applicationIconBadgeNumber as NSNumber
+
+                    content.title = "악취 접수 알림"                  //제목	
+                    content.body = "근처에서 악취가 난다면 접수 해주세요!"     //내용
                     content.sound = .default
-                    content.badge = 1   //Badge 표시 - 알림 올 경우, 앱 아이콘 숫자 표시
+                    content.badge = badgeCount  //Badge 표시 - 알림 올 경우, 앱 아이콘 숫자 표시
                     
                     //푸시 알림 시간
                     var dateComponents = DateComponents()

@@ -73,7 +73,7 @@
 		BF673FED2668EC6C00B4D91B /* UserModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = UserModel.swift; path = IoTBadSmellMonitoring/Sources/Model/UserModel.swift; sourceTree = SOURCE_ROOT; };
 		BF673FEF2668EEDF00B4D91B /* WeatherModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = WeatherModel.swift; path = IoTBadSmellMonitoring/Sources/Model/WeatherModel.swift; sourceTree = SOURCE_ROOT; };
 		BF68AE0F2681ACC70086B88F /* CommonUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonUtil.swift; sourceTree = "<group>"; };
-		BF698F6D26840CC20029785C /* ReceptionHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceptionHistoryView.swift; sourceTree = "<group>"; };
+		BF698F6D26840CC20029785C /* ReceptionHistoryView.swift */ = {isa = PBXFileReference; fileEncoding = 2147483651; lastKnownFileType = sourcecode.swift; path = ReceptionHistoryView.swift; sourceTree = "<group>"; };
 		BF698F6F2684614D0029785C /* ReceptionRegistView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceptionRegistView.swift; sourceTree = "<group>"; };
 		BF69F1102672FE8700141244 /* ViewUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewUtil.swift; sourceTree = "<group>"; };
 		BF6BB92026857428000FD8D7 /* ReceptionRegistViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceptionRegistViewModel.swift; sourceTree = "<group>"; };
@@ -538,6 +538,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1.0;
 				DEVELOPMENT_ASSET_PATHS = "\"IoTBadSmellMonitoring/Preview Content\"";
 				DEVELOPMENT_TEAM = P439X3ST2G;
 				ENABLE_PREVIEWS = YES;
@@ -563,6 +564,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1.0;
 				DEVELOPMENT_ASSET_PATHS = "\"IoTBadSmellMonitoring/Preview Content\"";
 				DEVELOPMENT_TEAM = P439X3ST2G;
 				ENABLE_PREVIEWS = YES;
