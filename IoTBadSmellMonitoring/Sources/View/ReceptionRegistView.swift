@@ -578,48 +578,54 @@ struct ReceptionRegistButton: View {
                     //접수 시간대에 따른 등록 가능 여부 확인 후, 등록 실행
                     if receptionViewModel.isTimeZoneValid() {
                         
-                        //등록 알림창
-                        var registAlert: Alert {
-                            return Alert(
-                                title: Text("악취 접수 등록"),
-                                message: Text("악취 접수 등록을 진행하시겠습니까?"),
-                                primaryButton: .destructive(
-                                    Text("등록"),
-                                    action: {
-                                        viewUtil.isLoading = true   //로딩 시작
-                                        disabledButton = true  //버튼 비활성화
-                                        
-                                        //악취 접수 등록 실행
-                                        receptionViewModel.registReception() { (result) in
-                                            viewUtil.isLoading = false   //로딩 종료
+                        if receptionViewModel.isSmellTypeValid() {
+                            //등록 알림창
+                            var registAlert: Alert {
+                                return Alert(
+                                    title: Text("악취 접수 등록"),
+                                    message: Text("악취 접수 등록을 진행하시겠습니까?"),
+                                    primaryButton: .destructive(
+                                        Text("등록"),
+                                        action: {
+                                            viewUtil.isLoading = true   //로딩 시작
+                                            disabledButton = true  //버튼 비활성화
                                             
-                                            viewUtil.showToast = true   //Toast 팝업
-                                            viewUtil.toastMessage = receptionViewModel.message
-                                            
-                                            if result == "success" {
-                                                //현재시간 기준으로 1.5초 후 실행
-                                                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                                                    viewUtil.isViewDismiss = true   //창 닫힘 여부
-                                                    self.presentationMode.wrappedValue.dismiss()    //Navigation View 닫기
+                                            //악취 접수 등록 실행
+                                            receptionViewModel.registReception() { (result) in
+                                                viewUtil.isLoading = false   //로딩 종료
+                                                
+                                                viewUtil.showToast = true   //Toast 팝업
+                                                viewUtil.toastMessage = receptionViewModel.message
+                                                
+                                                if result == "success" {
+                                                    //현재시간 기준으로 1.5초 후 실행
+                                                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                                                        viewUtil.isViewDismiss = true   //창 닫힘 여부
+                                                        self.presentationMode.wrappedValue.dismiss()    //Navigation View 닫기
+                                                    }
+                                                }
+                                                else {
+                                                    self.disabledButton = false //버튼 활성화
                                                 }
                                             }
-                                            else {
-                                                self.disabledButton = false //버튼 활성화
-                                            }
                                         }
-                                    }
-                                ),
-                                secondaryButton: .cancel(
-                                    Text("취소"),
-                                    action: {
-                                        viewUtil.showAlert = false
-                                    }
+                                    ),
+                                    secondaryButton: .cancel(
+                                        Text("취소"),
+                                        action: {
+                                            viewUtil.showAlert = false
+                                        }
+                                    )
                                 )
-                            )
+                            }
+                            
+                            viewUtil.showAlert = true   //알림창 호출 여부
+                            viewUtil.alert = registAlert    //등록 알림창 호출
                         }
-                        
-                        viewUtil.showAlert = true   //알림창 호출 여부
-                        viewUtil.alert = registAlert    //등록 알림창 호출
+                        else {
+                            viewUtil.showToast = true
+                            viewUtil.toastMessage = receptionViewModel.validMessage
+                        }
                     }
                     //접수 등록 불가인 경우 Toast 메시지 출력
                     else {

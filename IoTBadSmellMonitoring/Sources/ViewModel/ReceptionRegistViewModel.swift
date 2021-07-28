@@ -154,6 +154,22 @@ class ReceptionRegistViewModel: ObservableObject {
         
         return true
     }
+    
+    //MARK: - 취기 선택 유효성 검사
+    func isSmellTypeValid() -> Bool {
+        let selectSmellType = selectSmellType
+        
+        if selectSmellType == "000" {
+            
+            self.result = "not selected"
+            self.validMessage = "취기를 선택하지 않았습니다."
+            
+            return false
+        }
+        else {
+            return true
+        }
+    }
 }
     
 
