@@ -55,8 +55,8 @@ struct ReceptionRegistView: View {
             receptionViewModel.selectSmellCode = selectSmell["code"] ?? ""  //선택한 악취 코드
             receptionViewModel.getSmellTypeCode()   //악취 취기 코드
             
-            receptionViewModel.selectSmellType = "001"  //선택한 취기 초기화
-            receptionViewModel.selectTempSmellType = "001"  //선택한 임시 취기 초기화
+            receptionViewModel.selectSmellType = "000"  //선택한 취기 초기화
+            receptionViewModel.selectTempSmellType = "000"  //선택한 임시 취기 초기화
             receptionViewModel.pickedImageArray = [:]   //선택한 이미지 배열 초기화
         }
         .popup(
@@ -142,61 +142,81 @@ struct SmellTypeButton: View {
             },
             label: {
                 VStack(alignment: .center) {
-                    ForEach(receptionViewModel.smellTyepCode, id: \.self) { code in
-                        let smellTypeCode: String = code["code"] ?? ""  //코드
-                        let smellTypeName: String = code["codeName"] ?? ""  //코드
+                    Spacer()
+                    if receptionViewModel.selectSmellType == "000" {
+                        Spacer()
+                        //취기 이미지
+                        Image(systemName: "plus.rectangle")
+                            .renderingMode(.template)
+                            .foregroundColor(Color("Color_BEBEBE"))
+                            .font(Font.system(size: 65))
                         
-                        //취기 선택 버튼 아이콘 이미지명
-                        let smellTypeIcon: String = {
-                            switch smellTypeCode {
-                            case "001":
-                                return "Chicken.Smell"
-                            case "002":
-                                return "Etc.Smell"
-                            case "003":
-                                return "Pig.Smell"
-                            case "004":
-                                return "Fertilizer.Smell"
-                            case "005":
-                                return "Cow.Smell"
-                            case "006":
-                                return "Waste.Smell"
-                            case "007":
-                                return "Boiled.Smell"
-                            case "008":
-                                return "No.Smell"
-                            case "009":
-                                return "Compost.Smell"
-                            default:
-                                return "Etc.Smell"
+                        Spacer()
+                        
+                        //취기 명
+                        Text("취기 선택")
+                            .font(.callout)
+                            .fontWeight(.bold)
+                            .foregroundColor(Color("Color_BEBEBE"))
+                            .multilineTextAlignment(.center)
+                            .padding(.vertical, 5)
+                    }
+                    else {
+                        ForEach(receptionViewModel.smellTyepCode, id: \.self) { code in
+                            let smellTypeCode: String = code["code"] ?? ""  //코드
+                            let smellTypeName: String = code["codeName"] ?? ""  //코드
+                            
+                            //취기 선택 버튼 아이콘 이미지명
+                            let smellTypeIcon: String = {
+                                switch smellTypeCode {
+                                case "001":
+                                    return "Chicken.Smell"
+                                case "002":
+                                    return "Etc.Smell"
+                                case "003":
+                                    return "Pig.Smell"
+                                case "004":
+                                    return "Fertilizer.Smell"
+                                case "005":
+                                    return "Cow.Smell"
+                                case "006":
+                                    return "Waste.Smell"
+                                case "007":
+                                    return "Boiled.Smell"
+                                case "008":
+                                    return "No.Smell"
+                                case "009":
+                                    return "Compost.Smell"
+                                default:
+                                    return "Etc.Smell"
+                                }
+                            }()
+                            
+                            //선택한 취기 버튼
+                            if smellTypeCode == receptionViewModel.selectSmellType {
+                                //취기 이미지
+                                Image(smellTypeIcon)
+                                    .resizable()
+                                    .renderingMode(.template)
+                                    .foregroundColor(Color.white)
+                                    .aspectRatio(1, contentMode: .fit)
+                                
+                                Spacer()
+                                
+                                
+                                //취기 명
+                                Text(smellTypeName)
+                                    .font(.callout)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(Color.white)
+                                    .multilineTextAlignment(.center)
+                                    .padding(.vertical, 5)
                             }
-                        }()
-                        
-                        //선택한 취기 버튼
-                        if smellTypeCode == receptionViewModel.selectSmellType {
-                            Spacer()
-                            
-                            //취기 이미지
-                            Image(smellTypeIcon)
-                                .resizable()
-                                .renderingMode(.template)
-                                .foregroundColor(Color.white)
-                                .aspectRatio(1, contentMode: .fit)
-                            
-                            Spacer()
-                            
-                            //취기 명
-                            Text(smellTypeName)
-                                .font(.callout)
-                                .fontWeight(.bold)
-                                .foregroundColor(Color.white)
-                                .multilineTextAlignment(.center)
-                                .padding(.vertical, 5)
                         }
                     }
                 }
                 .frame(width: 120, height: 120)
-                .background(Color("Color_E4513D"))
+                .background(receptionViewModel.selectSmellType == "000" ? Color("Color_DFDFDF") : Color("Color_E4513D"))
                 .cornerRadius(10)
             }
         )

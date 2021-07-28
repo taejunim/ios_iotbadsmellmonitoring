@@ -100,16 +100,16 @@ class MyPageViewModel: ObservableObject {
                 //API codeComment 가져오기
                 self.codeViewModel.getCode(codeGroup: "REN") { (code) in
                     
-                    UIApplication.shared.applicationIconBadgeNumber = 0
+                    //UIApplication.shared.applicationIconBadgeNumber = 0
                     
                     // 푸시 알림 내용
                     let content = UNMutableNotificationContent()
-                    let badgeCount = 1 + UIApplication.shared.applicationIconBadgeNumber as NSNumber
+                    //let badgeCount = 1 + UIApplication.shared.applicationIconBadgeNumber as NSNumber
 
                     content.title = "악취 접수 알림"                  //제목	
                     content.body = "근처에서 악취가 난다면 접수 해주세요!"     //내용
                     content.sound = .default
-                    content.badge = badgeCount  //Badge 표시 - 알림 올 경우, 앱 아이콘 숫자 표시
+                    //`content.badge = 0  //Badge 표시 - 알림 올 경우, 앱 아이콘 숫자 표시
                     
                     //푸시 알림 시간
                     var dateComponents = DateComponents()
@@ -262,7 +262,7 @@ class MyPageViewModel: ObservableObject {
     
     //MARK: - 새 비밀번호 유효성 검사
     func isPasswordValid() -> Bool {
-        let regExp = "^[a-zA-Z0-9]{5,15}$"
+        let regExp = "^[a-zA-Z0-9]{4,15}$"
         let passwordPredicate = NSPredicate(format: "SELF MATCHES %@", regExp)
         
         return passwordPredicate.evaluate(with: newPassword)

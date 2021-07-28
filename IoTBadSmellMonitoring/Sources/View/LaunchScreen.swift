@@ -106,20 +106,23 @@ struct Title: View {
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
-                Text("우리동네")
+                Text("우리동네 악취 모니터링")
                     .font(.largeTitle)
                     .fontWeight(.bold)
+                
+                Spacer()
             }
+            .padding(.vertical, 10)
             
-            HStack {
-                Spacer()
-                Text("악취감시")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                Spacer()
-                Spacer()
-                Spacer()
-            }
+//            HStack {
+//                Spacer()
+//                Text("악취 모니터링")
+//                    .font(.largeTitle)
+//                    .fontWeight(.bold)
+//                Spacer()
+//                Spacer()
+//                Spacer()
+//            }
         }
         .padding()
         .foregroundColor(.white)    //타이틀 색상
