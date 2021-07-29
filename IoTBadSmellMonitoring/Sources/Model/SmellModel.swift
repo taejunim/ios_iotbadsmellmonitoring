@@ -9,10 +9,10 @@ import Foundation
 
 //MARK: - 금일 접수 현황 정보
 struct TodayReception: Codable {
-    let timeZoneCode: String
-    let timeZone: String
-    let status: String
-    let receptionDate: String
+    let timeZoneCode: String    //접수 시간대 코드
+    let timeZone: String    //접수 시간대 00:00 ~ 00:00
+    let status: String  //접수 상태
+    let receptionDate: String   //접수 일자
     
     //Response JSON Key와 변수명 매칭
     enum CodingKeys: String, CodingKey {

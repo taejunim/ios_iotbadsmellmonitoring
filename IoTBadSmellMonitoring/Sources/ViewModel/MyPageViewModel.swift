@@ -87,7 +87,6 @@ class MyPageViewModel: ObservableObject {
     
     //MARK: - 푸시 알림 설정 및 실행
     func scheduleNotification() {
-        
         self.removeNotification()   //기존 푸시 알림 설정 삭제
         
         //사용자 확인 완료 시 시간 알림 수행
@@ -109,7 +108,7 @@ class MyPageViewModel: ObservableObject {
                     content.title = "악취 접수 알림"                  //제목	
                     content.body = "근처에서 악취가 난다면 접수 해주세요!"     //내용
                     content.sound = .default
-                    //`content.badge = 0  //Badge 표시 - 알림 올 경우, 앱 아이콘 숫자 표시
+                    content.badge = 0  //Badge 표시 - 알림 올 경우, 앱 아이콘 숫자 표시
                     
                     //푸시 알림 시간
                     var dateComponents = DateComponents()
