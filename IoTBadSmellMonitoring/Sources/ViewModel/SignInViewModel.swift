@@ -92,7 +92,7 @@ class SignInViewModel: ObservableObject {
     
     //MARK: - ID 유효성 검사
     func isIdValid() -> Bool {
-        let regExp = "^[a-zA-Z0-9]{4,20}$"
+        let regExp = "^[a-zA-Z0-9가-힣ㄱ-ㅎㅏ-ㅣ]{4,20}$" //영문, 숫자, 한글
         let idPredicate = NSPredicate(format: "SELF MATCHES %@", regExp)
         
         return idPredicate.evaluate(with: id)
@@ -100,7 +100,7 @@ class SignInViewModel: ObservableObject {
     
     //MARK: - 비밀번호 유효성 검사
     func isPasswordValid() -> Bool {
-        let regExp = "^[a-zA-Z0-9]{4,15}$"
+        let regExp = "^[a-zA-Z0-9~!@#\\$%\\^&\\*]{4,15}$"   //영문, 숫자, 특수문자
         let passwordPredicate = NSPredicate(format: "SELF MATCHES %@", regExp)
         
         return passwordPredicate.evaluate(with: password)

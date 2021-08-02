@@ -74,7 +74,8 @@ struct AccountEntryField: View {
                 HStack {
                     TextField("5자리 이상 20자리 이하 입력", text: $signUpViewModel.id)
                         .autocapitalization(/*@START_MENU_TOKEN@*/.none/*@END_MENU_TOKEN@*/)    //첫 문자 항상 소문자
-                        .keyboardType(.alphabet)    //키보드 타입 - 영문만 표시
+                        //.keyboardType(.alphabet)    //키보드 타입 - 영문만 표시
+                        .keyboardType(.default) //키보드 타입 - Default로 변경
                     DuplicateCheckButton(viewUtil: viewUtil, signUpViewModel: signUpViewModel)  //중복확인 버튼
                 }
                 TextFiledUnderLine()    //Text Field 밑줄

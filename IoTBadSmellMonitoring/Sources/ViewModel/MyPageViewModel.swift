@@ -261,7 +261,7 @@ class MyPageViewModel: ObservableObject {
     
     //MARK: - 새 비밀번호 유효성 검사
     func isPasswordValid() -> Bool {
-        let regExp = "^[a-zA-Z0-9]{4,15}$"
+        let regExp = "^[a-zA-Z0-9~!@#\\$%\\^&\\*]{4,15}$"   //영문, 숫자, 특수문자
         let passwordPredicate = NSPredicate(format: "SELF MATCHES %@", regExp)
         
         return passwordPredicate.evaluate(with: newPassword)

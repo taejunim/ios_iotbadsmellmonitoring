@@ -219,7 +219,7 @@ class SignUpViewModel: ObservableObject {
     
     //MARK: - ID 유효성 검사
     func isIdValid() -> Bool {
-        let regExp = "^[a-zA-Z0-9]{4,20}$"
+        let regExp = "^[a-zA-Z0-9가-힣ㄱ-ㅎㅏ-ㅣ]{4,20}$" //영문, 한글, 숫자
         let idPredicate = NSPredicate(format: "SELF MATCHES %@", regExp)
         
         return idPredicate.evaluate(with: id)
@@ -227,7 +227,7 @@ class SignUpViewModel: ObservableObject {
     
     //MARK: - 비밀번호 유효성 검사
     func isPasswordValid() -> Bool {
-        let regExp = "^[a-zA-Z0-9]{4,15}$"
+        let regExp = "^[a-zA-Z0-9~!@#\\$%\\^&\\*]{4,15}$"   //영문, 숫자, 특수문자
         let passwordPredicate = NSPredicate(format: "SELF MATCHES %@", regExp)
         
         return passwordPredicate.evaluate(with: password)
@@ -235,7 +235,7 @@ class SignUpViewModel: ObservableObject {
     
     //MARK: - 비밀번호 확인 유효성 검사
     func isConfirmPasswordValid() -> Bool {
-        let regExp = "^[a-zA-Z0-9]{4,15}$"
+        let regExp = "^[a-zA-Z0-9~!@#\\$%\\^&\\*]{4,15}$"   //영문, 숫자, 특수문자
         let passwordPredicate = NSPredicate(format: "SELF MATCHES %@", regExp)
         
         return passwordPredicate.evaluate(with: confirmPassword)
@@ -243,7 +243,7 @@ class SignUpViewModel: ObservableObject {
     
     //MARK: - 이름 유효성 검사
     func isNameValid() -> Bool {
-        let regExp = "^[가-힣ㄱ-ㅎㅏ-ㅣ]{2,10}$"
+        let regExp = "^[가-힣ㄱ-ㅎㅏ-ㅣ]{2,10}$"  //한글
         let passwordPredicate = NSPredicate(format: "SELF MATCHES %@", regExp)
         
         return passwordPredicate.evaluate(with: name)
