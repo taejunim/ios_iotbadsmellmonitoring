@@ -106,6 +106,8 @@ struct Title: View {
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
+                Spacer()
+                
                 Text("우리동네 악취 모니터링")
                     .font(.largeTitle)
                     .fontWeight(.bold)

@@ -172,10 +172,10 @@ struct PasswordChange: View {
                     Text("현재 비밀번호")
                     RequiredInputLabel()    //필수입력(*) Label
                 }) {
-                SecureField("", text: $myPageViewModel.currentPassword)
+                SecureField("4자리 이상 15자리 이하 입력", text: $myPageViewModel.currentPassword)
                     .autocapitalization(.none)    //첫 문자 항상 소문자
                     .keyboardType(.alphabet)    //키보드 타입 - 영문만 표시
-                TextFiledUnderLine()    //Text Field 밑줄
+                TextFieldUnderLine()    //Text Field 밑줄
             }
             
             //새 비밀번호
@@ -184,10 +184,10 @@ struct PasswordChange: View {
                     Text("새 비밀번호")
                     RequiredInputLabel()    //필수입력(*) Label
                 }) {
-                SecureField("5자리 이상 15자리 이하 입력", text: $myPageViewModel.newPassword)
+                SecureField("4자리 이상 15자리 이하 입력", text: $myPageViewModel.newPassword)
                     .autocapitalization(.none)    //첫 문자 항상 소문자
                     .keyboardType(.alphabet)    //키보드 타입 - 영문만 표시
-                TextFiledUnderLine()    //Text Field 밑줄
+                TextFieldUnderLine()    //Text Field 밑줄
             }
             
             //새 비밀번호 확인
@@ -196,10 +196,10 @@ struct PasswordChange: View {
                     Text("새 비밀번호 확인")
                     RequiredInputLabel()    //필수입력(*) Label
                 }) {
-                SecureField("5자리 이상 15자리 이하 입력", text: $myPageViewModel.confirmPassword)
+                SecureField("4자리 이상 15자리 이하 입력", text: $myPageViewModel.confirmPassword)
                     .autocapitalization(.none)    //첫 문자 항상 소문자
                     .keyboardType(.alphabet)    //키보드 타입 - 영문만 표시
-                TextFiledUnderLine()    //Text Field 밑줄
+                TextFieldUnderLine()    //Text Field 밑줄
             }
         }
     }

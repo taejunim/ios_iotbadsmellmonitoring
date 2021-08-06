@@ -7,6 +7,7 @@
 
 import Foundation
 import Alamofire
+import Combine
 
 class SignInViewModel: ObservableObject {
     private let userAPI = UserAPIService()  //사용자 API Service

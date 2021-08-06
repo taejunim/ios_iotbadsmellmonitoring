@@ -24,8 +24,8 @@ class SignUpViewModel: ObservableObject {
     @Published var password: String = ""    //비밀번호
     @Published var confirmPassword: String = "" //비밀번호 확인
     @Published var name: String = ""    //이름
-    @Published var age: String = "0" //나이
-    @Published var selectSex: String = "001"    //성별 선택
+    @Published var age: String = "" //나이
+    @Published var selectSex: String = "000"    //성별 선택
     @Published var selectRegion: String = "001" //지역 선택
     
     @Published var isCheckId: Bool = false  //ID 중복확인 여부
@@ -101,13 +101,23 @@ class SignUpViewModel: ObservableObject {
     /// 회원가입 API를 통한 회원가입 실행
     /// - Parameter completion: 회원가입 결과
     func signUp(completion: @escaping (String) -> Void) {
+        
+        var userAge: String {
+            if age.isEmpty {
+                return "-"
+            }
+            else {
+                return String(age)
+            }
+        }
+        
         //API 호출 - Request Body
         let parameters = [
             "userType": userType,   //사용자 타입
             "userId": confirmId,    //중복 확인된 ID
             "userPassword": password,   //비밀번호
             "userName": name,   //사용자 명
-            "userAge": String(age), //나이
+            "userAge": userAge, //나이
             "userSex": selectSex,   //성별
             "userRegion": selectRegion  //지역
         ]
@@ -209,10 +219,16 @@ class SignUpViewModel: ObservableObject {
         age = filterAge //필터된 숫자
         
         //나이 입력 여부 확인
-        if age.isEmpty || Int(age)! <= 0 {
-            self.validMessage = "나이를 입력하지 않았거나 0보다 큰 숫자를 입력하세요."
-            return false
+        if !age.isEmpty {
+            if Int(age)! <= 0 {
+                self.validMessage = "0보다 큰 숫자를 입력하세요."
+                return false
+            }
         }
+//        if age.isEmpty || Int(age)! <= 0 {
+//            self.validMessage = "나이를 입력하지 않았거나 0보다 큰 숫자를 입력하세요."
+//            return false
+//        }
         
         return true
     }
@@ -251,7 +267,7 @@ class SignUpViewModel: ObservableObject {
     
     //MARK: - 입력 완료 여부
     var isInputComplete: Bool {
-        if id.isEmpty || password.isEmpty || confirmPassword.isEmpty || name.isEmpty || age.isEmpty {
+        if id.isEmpty || password.isEmpty || confirmPassword.isEmpty || name.isEmpty {
             return false
         }
         else {

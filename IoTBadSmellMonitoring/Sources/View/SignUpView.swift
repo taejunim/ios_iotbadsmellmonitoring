@@ -72,13 +72,13 @@ struct AccountEntryField: View {
                     RequiredInputLabel()    //필수입력(*) Label
                 }) {
                 HStack {
-                    TextField("5자리 이상 20자리 이하 입력", text: $signUpViewModel.id)
+                    TextField("4자리 이상 20자리 이하 입력", text: $signUpViewModel.id)
                         .autocapitalization(/*@START_MENU_TOKEN@*/.none/*@END_MENU_TOKEN@*/)    //첫 문자 항상 소문자
                         //.keyboardType(.alphabet)    //키보드 타입 - 영문만 표시
                         .keyboardType(.default) //키보드 타입 - Default로 변경
                     DuplicateCheckButton(viewUtil: viewUtil, signUpViewModel: signUpViewModel)  //중복확인 버튼
                 }
-                TextFiledUnderLine()    //Text Field 밑줄
+                TextFieldUnderLine()    //Text Field 밑줄
             }
             
             Section(
@@ -86,10 +86,10 @@ struct AccountEntryField: View {
                     Text("비밀번호")
                     RequiredInputLabel()
                 }) {
-                SecureField("5자리 이상 15자리 이하 입력", text: $signUpViewModel.password)
+                SecureField("4자리 이상 15자리 이하 입력", text: $signUpViewModel.password)
                     .autocapitalization(/*@START_MENU_TOKEN@*/.none/*@END_MENU_TOKEN@*/)    //첫 문자 항상 소문자
                     .keyboardType(.alphabet)    //키보드 타입 - 영문만 표시
-                TextFiledUnderLine()
+                TextFieldUnderLine()
             }
             
             Section(
@@ -97,10 +97,10 @@ struct AccountEntryField: View {
                     Text("비밀번호 확인")
                     RequiredInputLabel()
                 }) {
-                SecureField("5자리 이상 15자리 이하 입력", text: $signUpViewModel.confirmPassword)
+                SecureField("4자리 이상 15자리 이하 입력", text: $signUpViewModel.confirmPassword)
                     .autocapitalization(/*@START_MENU_TOKEN@*/.none/*@END_MENU_TOKEN@*/)    //첫 문자 항상 소문자
                     .keyboardType(.alphabet)    //키보드 타입 - 영문만 표시
-                TextFiledUnderLine()
+                TextFieldUnderLine()
             }
             
             Section(
@@ -111,23 +111,21 @@ struct AccountEntryField: View {
                 TextField("실명 입력", text: $signUpViewModel.name)
                     .autocapitalization(.none)    //첫 문자 항상 소문자
                     .keyboardType(.namePhonePad)
-                TextFiledUnderLine()
+                TextFieldUnderLine()
             }
             
             Section(
                 header: HStack {
                     Text("나이")
-                    RequiredInputLabel()
                 }) {
-                TextField("나이", text: $signUpViewModel.age)
+                TextField("숫자 입력", text: $signUpViewModel.age)
                     .keyboardType(.numberPad)
-                TextFiledUnderLine()
+                TextFieldUnderLine()
             }
             
             Section(
                 header: HStack {
                     Text("성별")
-                    RequiredInputLabel()
                 }) {
                 VStack {
                     Picker(selection: $signUpViewModel.selectSex, label: Text("성별")) {

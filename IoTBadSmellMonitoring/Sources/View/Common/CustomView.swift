@@ -17,7 +17,7 @@ struct DividerLine: View {
     }
 }
 
-//MARK: - 구분선 - Vertical
+//MARK: - 구분선 - Vertical Padding
 struct VerticalDividerLine: View {
     var body: some View {
         Divider()
@@ -28,7 +28,7 @@ struct VerticalDividerLine: View {
 }
 
 //MARK: - Text Field 밑줄
-struct TextFiledUnderLine: View {
+struct TextFieldUnderLine: View {
     var body: some View {
         Divider()
             .frame(height: 1)

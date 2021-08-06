@@ -80,13 +80,13 @@ struct SignInEntryField: View {
         TextField("아이디", text: $signInViewModel.id)
             .autocapitalization(/*@START_MENU_TOKEN@*/.none/*@END_MENU_TOKEN@*/)    //첫 문자 항상 소문자
             .keyboardType(.alphabet)    //키보드 타입 - 영문만 표시
-        TextFiledUnderLine()    //Text Field 밑줄
+        TextFieldUnderLine()    //Text Field 밑줄
         
         //비밀번호 입력 창
         SecureField("비밀번호", text: $signInViewModel.password)
             .autocapitalization(/*@START_MENU_TOKEN@*/.none/*@END_MENU_TOKEN@*/)    //첫 문자 항상 소문자
             .keyboardType(/*@START_MENU_TOKEN@*/.alphabet/*@END_MENU_TOKEN@*/)    //키보드 타입 - 영문만 표시
-        TextFiledUnderLine()
+        TextFieldUnderLine()
     }
 }
 
