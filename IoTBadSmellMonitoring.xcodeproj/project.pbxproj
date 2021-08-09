@@ -12,6 +12,7 @@
 		2B8A5D4D26A7B6C400057AF3 /* KeyboardUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B8A5D4C26A7B6C400057AF3 /* KeyboardUtil.swift */; };
 		2B8ACB6D269BDF810019C647 /* SideMenuViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B8ACB6C269BDF810019C647 /* SideMenuViewModel.swift */; };
 		2B8ACB6F269C3D570019C647 /* ReceptionHistoryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B8ACB6E269C3D570019C647 /* ReceptionHistoryViewModel.swift */; };
+		2B96762F26C0D1F300400FF9 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 2B96763126C0D1F300400FF9 /* InfoPlist.strings */; };
 		2BAF67E82697F02100769321 /* SideMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BAF67E72697F02100769321 /* SideMenuView.swift */; };
 		2BB2A25D2692A17D0071E796 /* Location.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BB2A25C2692A17D0071E796 /* Location.swift */; };
 		BF031BC0265F53CA008AB3F5 /* IoTBadSmellMonitoringApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF031BBF265F53CA008AB3F5 /* IoTBadSmellMonitoringApp.swift */; };
@@ -54,6 +55,7 @@
 		2B8A5D4C26A7B6C400057AF3 /* KeyboardUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardUtil.swift; sourceTree = "<group>"; };
 		2B8ACB6C269BDF810019C647 /* SideMenuViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SideMenuViewModel.swift; sourceTree = "<group>"; };
 		2B8ACB6E269C3D570019C647 /* ReceptionHistoryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceptionHistoryViewModel.swift; sourceTree = "<group>"; };
+		2B96763026C0D1F300400FF9 /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		2BAF67E72697F02100769321 /* SideMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SideMenuView.swift; sourceTree = "<group>"; };
 		2BB2A25C2692A17D0071E796 /* Location.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Location.swift; sourceTree = "<group>"; };
 		BCA40AAB0AA423D57BB3F697 /* Pods-IoTBadSmellMonitoring.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-IoTBadSmellMonitoring.debug.xcconfig"; path = "Target Support Files/Pods-IoTBadSmellMonitoring/Pods-IoTBadSmellMonitoring.debug.xcconfig"; sourceTree = "<group>"; };
@@ -158,6 +160,7 @@
 			children = (
 				BF031BC3265F53CB008AB3F5 /* Assets.xcassets */,
 				BF65E4612679965C00C7C6B1 /* MessageProperties.swift */,
+				2B96763126C0D1F300400FF9 /* InfoPlist.strings */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -302,6 +305,7 @@
 			knownRegions = (
 				en,
 				Base,
+				ko,
 			);
 			mainGroup = BF031BB3265F53CA008AB3F5;
 			productRefGroup = BF031BBD265F53CA008AB3F5 /* Products */;
@@ -319,6 +323,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BF031BC7265F53CB008AB3F5 /* Preview Assets.xcassets in Resources */,
+				2B96762F26C0D1F300400FF9 /* InfoPlist.strings in Resources */,
 				BF031BC4265F53CB008AB3F5 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -412,6 +417,17 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		2B96763126C0D1F300400FF9 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				2B96763026C0D1F300400FF9 /* ko */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		BF031BC9265F53CB008AB3F5 /* Debug */ = {
@@ -538,7 +554,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1.5;
+				CURRENT_PROJECT_VERSION = 1.0.1;
 				DEVELOPMENT_ASSET_PATHS = "\"IoTBadSmellMonitoring/Preview Content\"";
 				DEVELOPMENT_TEAM = TT32KTUMGR;
 				ENABLE_PREVIEWS = YES;
@@ -548,6 +564,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 1.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = kr.co.entcorp.IotBadSmellMonitoring;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -564,7 +581,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1.5;
+				CURRENT_PROJECT_VERSION = 1.0.1;
 				DEVELOPMENT_ASSET_PATHS = "\"IoTBadSmellMonitoring/Preview Content\"";
 				DEVELOPMENT_TEAM = TT32KTUMGR;
 				ENABLE_PREVIEWS = YES;
@@ -574,6 +591,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 1.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = kr.co.entcorp.IotBadSmellMonitoring;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

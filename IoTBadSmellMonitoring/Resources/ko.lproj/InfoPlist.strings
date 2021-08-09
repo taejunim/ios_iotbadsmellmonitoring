@@ -1,0 +1,9 @@
+/* 
+  InfoPlist.strings
+  IoTBadSmellMonitoring
+
+  Created by KJ on 2021/08/09.
+  
+*/
+
+"CFBundleDisplayName" = "우리동네 악취 모니터링";

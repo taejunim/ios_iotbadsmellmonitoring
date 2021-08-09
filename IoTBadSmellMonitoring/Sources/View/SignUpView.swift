@@ -237,10 +237,10 @@ struct AccountRegistButton: View {
             },
             label: {
                 Text("등록")
-                    .font(/*@START_MENU_TOKEN@*/.title2/*@END_MENU_TOKEN@*/)
+                    .font(.title2)
                     .fontWeight(.bold)
                     .foregroundColor(Color.white)
-                    .padding(/*@START_MENU_TOKEN@*/.horizontal/*@END_MENU_TOKEN@*/)
+                    .padding(.horizontal)
                     .frame(maxWidth: .infinity, maxHeight: 40)
                     .background(signUpViewModel.isInputComplete ? Color("Color_3498DB") : Color("Color_BEBEBE"))   //회원가입 정보 입력에 따른 배경색상 변경
             }
