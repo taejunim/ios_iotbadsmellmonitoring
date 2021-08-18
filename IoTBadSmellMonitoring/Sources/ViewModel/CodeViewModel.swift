@@ -63,4 +63,23 @@ class CodeViewModel: ObservableObject {
             }
         )
     }
+    
+    //MARK: - 현재 시간(서버 시간 기준) API 호출
+    /// 서버 시간 기준의 현재 시간 API 호출
+    /// - Parameter completion: Current Date
+    func getCurrentDate(completion: @escaping (String) -> Void) {
+        
+        let request = codeAPI.requestCurrentDate()
+        request.execute(
+            //API 호출 성공
+            onSuccess: { (date) in
+                completion(date.data!)
+            },
+            //API 호출 실패
+            onFailure: { (error) in
+                completion("")
+                print(error.localizedDescription)
+            }
+        )
+    }
 }

@@ -15,3 +15,9 @@ struct Code: Codable {
     let codeIdName: String  //코드 ID 명
     let codeComment: String //코드 설명
 }
+
+//MARK: - 현재 시간 정보
+struct CurrentDate: Codable {
+    let result: String
+    let data: String?
+}

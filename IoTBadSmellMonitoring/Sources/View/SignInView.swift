@@ -99,7 +99,7 @@ struct SignInButton: View {
         Button(
             action: {
                 viewUtil.dismissKeyboard() //키보드 닫기
-                
+
                 //입력한 로그인 정보 유효성 검사
                 if !signInViewModel.validate() {
                     viewUtil.showToast = true
@@ -107,11 +107,11 @@ struct SignInButton: View {
                 }
                 else {
                     viewUtil.isLoading = true   //로딩 시작
-                    
+
                     //로그인 실행
                     signInViewModel.signIn() { (result) in
                         viewUtil.isLoading = false  //로딩 종료
-                        
+
                         //로그인 성공이 아닌 경우 Toast 팝업 메시지 호출
                         if result != "success" {
                             viewUtil.showToast = true

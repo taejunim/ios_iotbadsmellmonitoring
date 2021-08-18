@@ -21,3 +21,9 @@ struct Responses<T: Codable>: Codable {
     let message: String?    //결과 메시지
     let data: T? //결과 데이터
 }
+
+
+struct ResponseData: Codable {
+    let result: String  //결과 상태
+    let data: String?    //결과 메시지
+}

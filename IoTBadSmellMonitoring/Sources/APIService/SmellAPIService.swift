@@ -12,7 +12,7 @@ import PromisedFuture
 class SmellAPISerivce {
     
     let apiClient = APIClient() //API Client - 공통 API 호출
-    
+
     //MARK: - 금일 냄새 접수 현황 API 호출
     /// 금일 냄새 접수 현황 API 호출
     /// - Parameter parameters: User ID
