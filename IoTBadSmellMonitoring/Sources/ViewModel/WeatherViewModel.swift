@@ -13,7 +13,8 @@ class WeatherViewModel: ObservableObject {
     private let codeViewModel = CodeViewModel() //Code View Model
     
     private let weatherAPI = WeatherAPIService()  //기상청 날씨 API Service
-    private let serviceKey = "dFNlgyX4FFci5kW2VH/nG6IIFGt8NR2vvkjUw3C5RfN8IOUY1xE9D0HzzraWWPJpPfMUgjc55LHj4NCsQVRxwQ=="   //기상청 날씨 API Service Key (Decoding)
+    //private let serviceKey = "dFNlgyX4FFci5kW2VH/nG6IIFGt8NR2vvkjUw3C5RfN8IOUY1xE9D0HzzraWWPJpPfMUgjc55LHj4NCsQVRxwQ=="   //기상청 날씨 API Service Key (Decoding)
+    private let serviceKey = "aDVsltIrJTOtDLpTA6qnVPhVhaT/aciIUGI30aiipGikIAAZOI4KxfVFBqW9q3s+3xgVzKx6c3gJdUVGaNJ9Bg==" //기상청 날씨 API Service Key (Decoding)
     private let dataType = "JSON"   //데이터 타입
     
     @Published var windDirectionCode: [[String: String]] = [[:]]  //풍향 코드

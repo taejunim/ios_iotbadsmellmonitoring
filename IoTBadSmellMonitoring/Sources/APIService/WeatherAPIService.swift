@@ -26,6 +26,6 @@ class WeatherAPIService {
     /// - Returns: Weather Model
     public func requestWeather(parameters: [String: String]) -> Future<Weather, AFError> {
         
-        return apiClient.request(route: APIRouter.get(useApi: "weather", path: "/VilageFcstInfoService/getUltraSrtFcst", parameters: parameters))
+        return apiClient.request(route: APIRouter.get(useApi: "weather", path: "/VilageFcstInfoService_2.0/getUltraSrtFcst", parameters: parameters))
     }
 }
