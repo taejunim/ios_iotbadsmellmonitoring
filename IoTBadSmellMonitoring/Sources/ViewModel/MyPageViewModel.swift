@@ -114,9 +114,10 @@ class MyPageViewModel: ObservableObject {
                     var dateComponents = DateComponents()
                     for i in 0...code.count-1 {     //0부터 3까지 4번 수행
                         
-                        let time = code[i]["codeComment"]!  //codeComment 받아오기
-                        let pushHour = time.prefix(2)           //시 변수 선언 (codeComment 앞 두자리)
-                        let pushMinute = time.suffix(2)         //분 변수 선언 (codeComment 뒤 두자리)
+                        let times = code[i]["codeComment"]!  //codeComment 받아오기
+                        let startTime = times.prefix(4) //접수 시작 시간
+                        let pushHour = startTime.prefix(2)  //시 변수 선언 (codeComment 앞 두자리)
+                        let pushMinute = startTime.suffix(2)    //분 변수 선언 (codeComment 뒤 두자리)
                         
                         dateComponents.hour = Int(pushHour)!        //알림 시 INT형으로
                         dateComponents.minute = Int(pushMinute)!    //알림 분 INT형으로
