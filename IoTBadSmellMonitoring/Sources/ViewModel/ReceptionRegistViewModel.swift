@@ -16,7 +16,10 @@ class ReceptionRegistViewModel: ObservableObject {
     private let weatherViewModel = WeatherViewModel() //Weather View Model
     private let smellAPI = SmellAPISerivce()    //Smell API Service
     
-    @Published var smellTyepCode: [[String: String]] = [[:]]  //악취 취기 코드
+    @Published var smellTyepCode: [[String:String]] = [[:]]  //악취 취기 코드
+    
+    @Published var receptionTime: [String:Any] = [:]    //접수 시간대 정보
+    @Published var receptionTimes: [[String:Any]] = []  //접수 시간대 정보 목록
     
     @Published var weatherInfo: [String: String] = [:]   //날씨 정보
     @Published var selectSmellCode: String = "" //선택한 악취 강도 코드
@@ -25,7 +28,7 @@ class ReceptionRegistViewModel: ObservableObject {
     @Published var addMessage: String = ""  //추가 전달사항
     
     @Published var pickedImage: Image?  //선택한 이미지
-    @Published var pickedImageArray: [Int: Image] = [:] //선택한 이미지 Array
+    @Published var pickedImageArray: [Int:Image] = [:] //선택한 이미지 Array
     @Published var pickedImageCount: Int = 0  //선택한 이미지 개수
     @Published var imageArray: [UIImage] = []
     
@@ -37,6 +40,27 @@ class ReceptionRegistViewModel: ObservableObject {
     func getSmellTypeCode() {
         codeViewModel.getCode(codeGroup: "STY") { (code) in
             self.smellTyepCode = code
+        }
+    }
+    
+    //MARK: - 접수 시간대 코드 API 호출 후 접수 시간대 정보 목록 생성
+    func getReceptionTimeCode() {
+        //접수 시간대 코드 API 호출
+        codeViewModel.getCode(codeGroup: "REN") { (code) in
+            
+            //접수 시간대 정보 목록 생성
+            for timeCode in code {
+                let code = timeCode["code"]!    //접수 시간대 코드
+                let times = timeCode["codeComment"]!    //접수 시간대
+                let startTime = Int(times.prefix(4))!   //접수 시작 시간
+                let endTime = Int(times.suffix(4))! //접수 종료 시간
+                
+                self.receptionTime.updateValue(code, forKey: "code")
+                self.receptionTime.updateValue(startTime, forKey: "startTime")
+                self.receptionTime.updateValue(endTime, forKey: "endTime")
+                
+                self.receptionTimes.append(self.receptionTime)  //접수 시간대 정보 목록 추가
+            }
         }
     }
     
@@ -66,24 +90,24 @@ class ReceptionRegistViewModel: ObservableObject {
             let endIndex = currentDate.firstIndex(of: ":") ?? currentDate.endIndex
             let substrDate = currentDate[..<endIndex]
             let substrHour = substrDate.suffix(2)   //시간 추출
-            let currentTime = Int(substrHour + "00")    //현재 시간
-
-            //현재 시간에 따른 접수 등록 시간대 코드
-            if currentTime! >= 0700 && currentTime! < 0900 {
-                completion("001")
+            let currentTime = Int(substrHour + "00")!    //현재 시간
+            var timeCode: String = ""   //접수 시간대 코드
+            
+            //접수 시간대 정보 목록
+            for receptionTime in self.receptionTimes {
+                let code = receptionTime["code"] as! String //접수 시간대 코드
+                let startTime = receptionTime["startTime"] as! Int  //접수 시작 시간
+                let endTime = receptionTime["endTime"] as! Int  //접수 종료 시간
+                
+                //현재 시간에 따른 접수 등록 시간대 코드
+                if currentTime >= startTime && currentTime < endTime {
+                    timeCode = code
+                    
+                    break
+                }
             }
-            else if currentTime! >= 1200 && currentTime! < 1400 {
-                completion("002")
-            }
-            else if currentTime! >= 1800 && currentTime! < 2000 {
-                completion("003")
-            }
-            else if currentTime! >= 2200 && currentTime! < 0000 {
-                completion("004")
-            }
-            else {
-                completion("")
-            }
+            
+            completion(timeCode)    //접수 등록 시간대 코드 반환
         }
     }
     
@@ -154,6 +178,7 @@ class ReceptionRegistViewModel: ObservableObject {
     /// - Returns: 접수 시간대 여부
     func isTimeZoneValid(completion: @escaping (Bool) -> Void) {
         
+        //현재 시간에 따른 접수 시간대 코드 호출
         timeZoneCode() { (timeZoneCode) in
             let registTimeZone = timeZoneCode
             
@@ -164,8 +189,9 @@ class ReceptionRegistViewModel: ObservableObject {
     
                 completion(false)
             }
-            
-            completion(true)
+            else {
+                completion(true)
+            }
         }
     }
     

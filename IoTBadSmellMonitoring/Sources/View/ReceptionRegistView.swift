@@ -54,6 +54,7 @@ struct ReceptionRegistView: View {
         .onAppear {
             receptionViewModel.selectSmellCode = selectSmell["code"] ?? ""  //선택한 악취 코드
             receptionViewModel.getSmellTypeCode()   //악취 취기 코드
+            receptionViewModel.getReceptionTimeCode()   //접수 등록 시간대 코드
             
             receptionViewModel.selectSmellType = "000"  //선택한 취기 초기화
             receptionViewModel.selectTempSmellType = "000"  //선택한 임시 취기 초기화
