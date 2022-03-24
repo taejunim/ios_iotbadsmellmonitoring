@@ -15,12 +15,16 @@ struct MyPageView: View {
     
     @EnvironmentObject var viewUtil: ViewUtil   //View Util
     @ObservedObject var viewOptionSet = ViewOptionSet()     //화면 Option Set
-    @ObservedObject var myPageViewModel = MyPageViewModel() //My Page View Model
+    //@ObservedObject var myPageViewModel = MyPageViewModel() //My Page View Model
+    @EnvironmentObject var myPageViewModel: MyPageViewModel
     
     @StateObject private var stateViewUtil = ViewUtil()
     @StateObject private var stateWeatherViewModel = WeatherViewModel()
     @StateObject private var stateSmellViewModel = SmellReceptionViewModel()
     @StateObject private var stateSideMenuViewModel = SideMenuViewModel()
+    @StateObject private var stateNoticeViewModel = NoticeViewModel()
+    @StateObject private var stateMyPageViewModel = MyPageViewModel()
+    @StateObject private var stateReceptionHistoryViewModel = ReceptionHistoryViewModel()
     
     var body: some View {
         //뒤로가기 버튼 클릭 시, 악취 접수 등록 화면 이동
@@ -31,6 +35,9 @@ struct MyPageView: View {
                 .environmentObject(stateWeatherViewModel)
                 .environmentObject(stateSmellViewModel)
                 .environmentObject(stateSideMenuViewModel)
+                .environmentObject(stateNoticeViewModel)
+                .environmentObject(stateMyPageViewModel)
+                .environmentObject(stateReceptionHistoryViewModel)
         }
         else {
             //My Page 화면
@@ -57,6 +64,8 @@ struct MyPageView: View {
                         .padding()
                         
                         PasswordChangeButton(viewUtil: viewUtil, myPageViewModel: myPageViewModel)               //비밀번호 수정 버튼
+                        
+                        Spacer().frame(height: 1)
                     }
                 }
                 .navigationBarTitle(Text("My Page"), displayMode: .inline)  //Navigation Bar 타이틀

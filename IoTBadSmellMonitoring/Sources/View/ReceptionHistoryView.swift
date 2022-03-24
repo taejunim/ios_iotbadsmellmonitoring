@@ -13,12 +13,16 @@ struct ReceptionHistoryView: View {
     @EnvironmentObject var viewUtil: ViewUtil   //화면 Util
     @ObservedObject var viewOptionSet = ViewOptionSet() //화면 Option Set
     @ObservedObject var codeViewModel = CodeViewModel() //Code View Model
-    @ObservedObject var historyViewModel = ReceptionHistoryViewModel()   //Reception History View Model
+    //@ObservedObject var historyViewModel = ReceptionHistoryViewModel()   //Reception History View Model
+    @EnvironmentObject var historyViewModel: ReceptionHistoryViewModel
     
     @StateObject private var stateViewUtil = ViewUtil()
     @StateObject private var stateWeatherViewModel = WeatherViewModel()
     @StateObject private var stateSmellViewModel = SmellReceptionViewModel()
     @StateObject private var stateSideMenuViewModel = SideMenuViewModel()
+    @StateObject private var stateNoticeViewModel = NoticeViewModel()
+    @StateObject private var stateMyPageViewModel = MyPageViewModel()
+    @StateObject private var stateReceptionHistoryViewModel = ReceptionHistoryViewModel()
     
     var body: some View {
         //뒤로가기 버튼 클릭 시, 악취 접수 화면으로 이동
@@ -29,6 +33,9 @@ struct ReceptionHistoryView: View {
                 .environmentObject(stateWeatherViewModel)
                 .environmentObject(stateSmellViewModel)
                 .environmentObject(stateSideMenuViewModel)
+                .environmentObject(stateNoticeViewModel)
+                .environmentObject(stateMyPageViewModel)
+                .environmentObject(stateReceptionHistoryViewModel)
         }
         else {
             ZStack {
@@ -65,11 +72,10 @@ struct ReceptionHistoryView: View {
                     .navigationBarBackButtonHidden(true)    //기본 Back 버튼 숨김
                     .navigationBarItems(leading: viewUtil.backMenuButton())  //커스텀 Back 버튼 추가
                 }
-                .onAppear {
-                    historyViewModel.getSmellCode()  //악취 강도 코드 호출
-                }
             }
-            
+            .onAppear {
+                historyViewModel.getSmellCode()  //악취 강도 코드 호출
+            }
         }
     }
 }
@@ -147,7 +153,7 @@ struct SearchSmellLevelView: View {
         VStack {
             HStack {
                 Text("악취 강도")
-                    .fontWeight(/*@START_MENU_TOKEN@*/.bold/*@END_MENU_TOKEN@*/)
+                    .fontWeight(.bold)
                 
                 Spacer()
                 
@@ -191,9 +197,10 @@ struct SearchSmellLevelView: View {
                     }
                     .foregroundColor(.black)
                     .padding(.horizontal)
-                    .frame(maxWidth: .infinity, minHeight: 30)
-                    .multilineTextAlignment(.trailing)
+                    .frame(maxWidth: .infinity, maxHeight: 30)
                 }
+                .padding(0)
+                .frame(maxWidth: .infinity, maxHeight: 30)
                 .onTapGesture {
                     isExpanded.toggle()
                 }
@@ -249,7 +256,7 @@ struct HistoryListView: View {
                 ScrollView {
                     LazyVStack {
                         let historyList = historyViewModel.historyList  //접수 이력 목록
-                        
+
                         //접수 이력 목록 출력
                         ForEach(historyList, id: \.self) { history in
                             //조회된 접수 이력 개별 영역(이력 간략 정보, 이력 상세 정보) - 이력 Row
@@ -257,7 +264,7 @@ struct HistoryListView: View {
                                 .onAppear {
                                     //조회 종료 여부에 따라 추가 조회
                                     if !historyViewModel.isSearchEnd {
-                                        
+
                                         //스크롤 하단 이동 시, 마지막 이력 정보일 때 추가 조회 실행
                                         if historyList.last == history {
                                             historyViewModel.pageIndex += 10    //다음 페이지
@@ -320,7 +327,7 @@ struct HistoryHeader: View {
             HStack {
                 //접수 등록일자
                 Text("\(history["registDate"]!)")
-                    .font(/*@START_MENU_TOKEN@*/.footnote/*@END_MENU_TOKEN@*/)
+                    .font(.footnote)
                 
                 Spacer()
             }

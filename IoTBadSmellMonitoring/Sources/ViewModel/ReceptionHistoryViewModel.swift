@@ -11,9 +11,9 @@ class ReceptionHistoryViewModel: ObservableObject {
     private let codeViewModel = CodeViewModel() //Code View Model
     private let smellAPI = SmellAPISerivce()    //Smell API Service
     
-    @Published var smellCode: [[String:String]] = []  //악취 강도 코드
-    @Published var historyList: [[String:String]] = []  //접수 이력 정보 목록
-    @Published var detailHistoryList: [[String:String]] = []    //접수 이력 상세 정보 목록
+    @Published var smellCode: [[String:String]] = [[:]]  //악취 강도 코드
+    @Published var historyList: [[String:String]] = [[:]]  //접수 이력 정보 목록
+    @Published var detailHistoryList: [[String:String]] = [[:]]    //접수 이력 상세 정보 목록
     
     @Published var isSearch: Bool = false   //조회 여부
     @Published var isSearchEnd: Bool = false    //조회 종료 여부
@@ -37,7 +37,6 @@ class ReceptionHistoryViewModel: ObservableObject {
     func getSmellCode() {
         codeViewModel.getCode(codeGroup: "SMT") { (code) in
             self.smellCode = code
-            self.selectSmellName = code[0]["codeName"]! //첫번째 악취 강도 코드
         }
     }
     
@@ -72,7 +71,6 @@ class ReceptionHistoryViewModel: ObservableObject {
         
         //악취 접수 이력 API 호출
         let request = smellAPI.requestHistory(parameters: parameters)
-        
         request.execute(
             //API 호출 성공
             onSuccess: { (history) in

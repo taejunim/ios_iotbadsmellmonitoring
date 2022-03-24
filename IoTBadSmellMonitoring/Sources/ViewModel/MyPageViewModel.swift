@@ -93,7 +93,7 @@ class MyPageViewModel: ObservableObject {
         let options: UNAuthorizationOptions = [.alert, .sound, .badge]
         UNUserNotificationCenter.current().requestAuthorization(options: options) { (success, error) in
             if let error = error {           //에러
-                print("ERROR: \(error)")
+                print(error.localizedDescription)
             }
             else {                          //성공 시 수행
                 //API codeComment 가져오기

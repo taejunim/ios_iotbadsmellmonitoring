@@ -12,12 +12,14 @@ import CoreLocation
 struct SignInView: View {
     @ObservedObject var location = Location()   //Location
     @ObservedObject var signInViewModel = SignInViewModel() //Sign In View Model
-    @ObservedObject var myPageViewModel = MyPageViewModel()
     
     @StateObject private var viewUtil = ViewUtil()  //View Util
     @StateObject private var weatherViewModel = WeatherViewModel()  //Weater View Model
     @StateObject private var smellViewModel = SmellReceptionViewModel() //Smell Reception View Model
     @StateObject private var sideMenuViewModel = SideMenuViewModel()    //Side Menu View Model
+    @StateObject private var noticeViewModel = NoticeViewModel()    //Notice View Model
+    @StateObject private var myPageViewModel = MyPageViewModel()
+    @StateObject private var receptionHistoryViewModel = ReceptionHistoryViewModel()
     
     var body: some View {
         //로그인 성공 시, 냄새 접수 화면 이동
@@ -27,6 +29,9 @@ struct SignInView: View {
                 .environmentObject(weatherViewModel)
                 .environmentObject(smellViewModel)
                 .environmentObject(sideMenuViewModel)
+                .environmentObject(noticeViewModel)
+                .environmentObject(myPageViewModel)
+                .environmentObject(receptionHistoryViewModel)
         }
         else {
             ZStack {
@@ -42,7 +47,9 @@ struct SignInView: View {
                         
                         HStack {
                             SignInButton(viewUtil: viewUtil, signInViewModel: signInViewModel)  //로그인 버튼
+                            
                             Spacer().frame(width: 1)    //버튼 사이 간격
+                            
                             SignUpButton()  //회원가입 화면 이동 버튼
                         }
                         
@@ -78,14 +85,14 @@ struct SignInEntryField: View {
     var body: some View {
         //아이디 입력 창
         TextField("아이디", text: $signInViewModel.id)
-            .autocapitalization(/*@START_MENU_TOKEN@*/.none/*@END_MENU_TOKEN@*/)    //첫 문자 항상 소문자
+            .autocapitalization(.none)    //첫 문자 항상 소문자
             .keyboardType(.alphabet)    //키보드 타입 - 영문만 표시
         TextFieldUnderLine()    //Text Field 밑줄
         
         //비밀번호 입력 창
         SecureField("비밀번호", text: $signInViewModel.password)
-            .autocapitalization(/*@START_MENU_TOKEN@*/.none/*@END_MENU_TOKEN@*/)    //첫 문자 항상 소문자
-            .keyboardType(/*@START_MENU_TOKEN@*/.alphabet/*@END_MENU_TOKEN@*/)    //키보드 타입 - 영문만 표시
+            .autocapitalization(.none)    //첫 문자 항상 소문자
+            .keyboardType(.alphabet)    //키보드 타입 - 영문만 표시
         TextFieldUnderLine()
     }
 }
@@ -124,7 +131,7 @@ struct SignInButton: View {
                 Text("로그인")
                     .fontWeight(.bold)
                     .foregroundColor(Color.white)
-                    .padding(/*@START_MENU_TOKEN@*/.horizontal/*@END_MENU_TOKEN@*/)
+                    .padding(.horizontal)
                     .frame(maxWidth: .infinity, maxHeight: 35)
                     .background(Color("Color_3498DB"))
             }
