@@ -17,6 +17,16 @@ struct DividerLine: View {
     }
 }
 
+//MARK: - 구분선 - Horizontal Padding
+struct HorizontalDividerLine: View {
+    var body: some View {
+        Divider()
+            .frame(height: 1)
+            .background(Color("Color_EFEFEF"))
+            .padding(.horizontal, 10)
+    }
+}
+
 //MARK: - 구분선 - Vertical Padding
 struct VerticalDividerLine: View {
     var body: some View {
