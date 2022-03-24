@@ -9,19 +9,47 @@ import Foundation
 import Alamofire
 
 class WeatherViewModel: ObservableObject {
-
     private let codeViewModel = CodeViewModel() //Code View Model
     
+    private let commonAPI = CommonAPIService()  //공통 API Service
     private let weatherAPI = WeatherAPIService()  //기상청 날씨 API Service
-    //private let serviceKey = "dFNlgyX4FFci5kW2VH/nG6IIFGt8NR2vvkjUw3C5RfN8IOUY1xE9D0HzzraWWPJpPfMUgjc55LHj4NCsQVRxwQ=="   //기상청 날씨 API Service Key (Decoding)
+    
     private let serviceKey = "aDVsltIrJTOtDLpTA6qnVPhVhaT/aciIUGI30aiipGikIAAZOI4KxfVFBqW9q3s+3xgVzKx6c3gJdUVGaNJ9Bg==" //기상청 날씨 API Service Key (Decoding)
     private let dataType = "JSON"   //데이터 타입
+    
+    @Published var gridX: String = ""   //격자 X 좌표
+    @Published var gridY: String = ""   //격자 Y 좌표
     
     @Published var windDirectionCode: [[String: String]] = [[:]]  //풍향 코드
     @Published var currentWeather: [String: String] = [:]  //기상청 날씨 API 호출 데이터
     
     @Published var result: String = ""   //결과 상태
     @Published var message: String = "" //결과 메시지
+    
+    //MARK: - 사용자 지역의 격자 정보 API 호출
+    func getGrid(completion: @escaping (_ gridX: String, _ gridY: String) -> Void) {
+        
+        let parameters = [
+            "userRegion": UserDefaults.standard.string(forKey: "topRegionName")!    //사용자 상위 지역
+        ]
+        
+        //지역 격자 정보 API 호출
+        let request = commonAPI.requestGrid(parameters: parameters)
+        request.execute(
+            //API 호출 성공
+            onSuccess: { (grid) in
+                let gridX = grid.data!.gridX    //격자 X
+                let gridY = grid.data!.gridY    //격자 Y
+                
+                completion(gridX, gridY)
+            },
+            //API 호출 실패
+            onFailure: { (error) in
+                completion("", "")
+                print(error.localizedDescription)
+            }
+        )
+    }
     
     //MARK: - 풍향 코드 API 호출
     /// - Parameter completion: 풍향 코드 정보
@@ -36,70 +64,88 @@ class WeatherViewModel: ObservableObject {
     /// - Parameter completion: 가공된 현재 날씨 정보 - createCurrentWeather() 함수 참고
     func getCurrentWeather(completion: @escaping ([String: String]) -> Void) {
         
-        let baseDate: String = "yyyyMMdd".dateFormatter(formatDate: Date()) //발표일자 - yyyyMMdd
-        
-        let calcBaseTime: Date = Calendar.current.date(byAdding: .minute, value: -30, to: Date())!    //발표시각 = 현재 시간 - 30분
-        let baseTime: String = "HH30".dateFormatter(formatDate: calcBaseTime)   //발표시각 - HH30
-        
-        let calcNearestTime: Date = Calendar.current.date(byAdding: .minute, value: 30, to: Date())!  //발표시각과 가까운 시간대 = 현재 시간 + 30분
-        let nearestTime: String = "HH00".dateFormatter(formatDate: calcNearestTime) //발표시각과 가까운 시간 - HH00
-        
-        //API 호출 - Request Body
-        let parameters = [
-            "serviceKey": serviceKey,   //서비스 인증키
-            "dataType": dataType,   //데이터 타입
-            "numOfRows": "1000",    //한 페이지 결과 수
-            "base_date": baseDate,  //발표일자
-            "base_time": baseTime,  //발표시각
-            "nx": "48", //예보지점 X 좌표
-            "ny": "36"  //예보지점 Y 좌표
-        ]
-        
-        //날씨 API 호출
-        let request = weatherAPI.requestWeather(parameters: parameters)
-        request.execute(
-            //API 호출 성공
-            onSuccess: { (weather) in
-                var weatherDictionary: [String: String] = [:]   //날씨 정보 Dictionary
-                let resultCode: String = weather.response.header.resultCode //날씨 API 조회 결과 코드
-                
-                //결과 코드 - 정상(00)
-                if resultCode == "00" {
-                    self.result = "success"
-                    let items = weather.response.body?.items.item   //Response Items 데이터 추출
+        getGrid() { (gridX, gridY) in
+            let baseDate: String = "yyyyMMdd".dateFormatter(formatDate: Date()) //발표일자 - yyyyMMdd
+            
+            let calcBaseTime: Date = Calendar.current.date(byAdding: .minute, value: -30, to: Date())!    //발표시각 = 현재 시간 - 30분
+            let baseTime: String = "HH30".dateFormatter(formatDate: calcBaseTime)   //발표시각 - HH30
+            
+            let calcNearestTime: Date = Calendar.current.date(byAdding: .minute, value: 30, to: Date())!  //발표시각과 가까운 시간대 = 현재 시간 + 30분
+            let nearestTime: String = "HH00".dateFormatter(formatDate: calcNearestTime) //발표시각과 가까운 시간 - HH00
+            
+            //API 호출 - Request Body
+            let parameters = [
+                "serviceKey": self.serviceKey,   //서비스 인증키
+                "dataType": self.dataType,   //데이터 타입
+                "numOfRows": "1000",    //한 페이지 결과 수
+                "base_date": baseDate,  //발표일자
+                "base_time": baseTime,  //발표시각
+                "nx": gridX, //예보지점 X 좌표
+                "ny": gridY  //예보지점 Y 좌표
+            ]
+            
+            //날씨 API 호출
+            let request = self.weatherAPI.requestWeather(parameters: parameters)
+            request.execute(
+                //API 호출 성공
+                onSuccess: { (weather) in
+                    var weatherDictionary: [String: String] = [:]   //날씨 정보 Dictionary
+                    let resultCode: String = weather.response.header.resultCode //날씨 API 조회 결과 코드
                     
-                    for index in 0..<items!.count {
-                        let item = items![index]
+                    //결과 코드 - 정상(00)
+                    if resultCode == "00" {
+                        self.result = "success"
+                        let items = weather.response.body?.items.item   //Response Items 데이터 추출
                         
-                        //현재 시간과 가장 가까운 날씨 예보 데이터 추출
-                        if item.fcstTime == nearestTime {
-                            let category = item.category    //자료구분 코드
+                        for index in 0..<items!.count {
+                            let item = items![index]
                             
-                            /*
-                             * - 자료구분 코드 정보
-                             *    T1H - 기온 (단위: ℃)
-                             *    SKY - 하늘상태 (맑음, 구름많음, 흐림)
-                             *    REH - 습도 (단위: %)
-                             *    PTY - 강수형태 (없음, 비, 비/눈, 눈, 소나기, 빗방울, 빗방울/눈날림, 눈날림)
-                             *    VEC - 풍향 (단위: deg)
-                             *    WSD - 풍속 (단위: m/s)
-                             */
-                            //필요없는 코드정보 제외 - RN1(1시간 강수량), UUU(동서바람성분), VVV(남북바람성분), LGT(낙뢰)
-                            if category != "RN1" && category != "UUU" && category != "VVV" && category != "LGT" {
-                                weatherDictionary.updateValue(item.fcstValue, forKey: item.category)
+                            //현재 시간과 가장 가까운 날씨 예보 데이터 추출
+                            if item.fcstTime == nearestTime {
+                                let category = item.category    //자료구분 코드
+                                
+                                /*
+                                 * - 자료구분 코드 정보
+                                 *    T1H - 기온 (단위: ℃)
+                                 *    SKY - 하늘상태 (맑음, 구름많음, 흐림)
+                                 *    REH - 습도 (단위: %)
+                                 *    PTY - 강수형태 (없음, 비, 비/눈, 눈, 소나기, 빗방울, 빗방울/눈날림, 눈날림)
+                                 *    VEC - 풍향 (단위: deg)
+                                 *    WSD - 풍속 (단위: m/s)
+                                 */
+                                //필요없는 코드정보 제외 - RN1(1시간 강수량), UUU(동서바람성분), VVV(남북바람성분), LGT(낙뢰)
+                                if category != "RN1" && category != "UUU" && category != "VVV" && category != "LGT" {
+                                    weatherDictionary.updateValue(item.fcstValue, forKey: item.category)
+                                }
                             }
                         }
+                        
+                        //풍향 코드 호출 및 날씨 데이터 가공
+                        self.getWindDirectionCode() { code in
+                            self.windDirectionCode = code
+                            completion(self.createCurrentWeather(weatherDictionary))    //가공된 현재 날씨 데이터
+                        }
                     }
-                    
-                    //풍향 코드 호출 및 날씨 데이터 가공
-                    self.getWindDirectionCode() { code in
-                        self.windDirectionCode = code
-                        completion(self.createCurrentWeather(weatherDictionary))    //가공된 현재 날씨 데이터
+                    else {
+                        self.result = "fail"
+                        self.message = "날씨 정보를 불러오지 못하였습니다."
+                        
+                        //현재 날씨 정보 - 날씨 API 오류인 경우 기본 값 설정
+                        let currentWeather = [
+                            "weatherState": "011",   //기상상태 코드 (011: 기타)
+                            "temp": "-",   //기온
+                            "humidity": "-",   //습도
+                            "windDirectionCode": "-", //풍향 코드
+                            "windSpeed": "-"  //풍속
+                        ]
+                        
+                        completion(currentWeather)
                     }
-                }
-                else {
-                    self.result = "fail"
-                    self.message = "날씨 정보를 불러오지 못하였습니다."
+                },
+                //API 호출 실패
+                onFailure: { (error) in
+                    self.result = "server error"
+                    self.message = "서버와의 통신이 원활하지 않습니다."
                     
                     //현재 날씨 정보 - 날씨 API 오류인 경우 기본 값 설정
                     let currentWeather = [
@@ -111,26 +157,10 @@ class WeatherViewModel: ObservableObject {
                     ]
                     
                     completion(currentWeather)
+                    print(error.localizedDescription)
                 }
-            },
-            //API 호출 실패
-            onFailure: { (error) in
-                self.result = "server error"
-                self.message = "서버와의 통신이 원활하지 않습니다."
-                
-                //현재 날씨 정보 - 날씨 API 오류인 경우 기본 값 설정
-                let currentWeather = [
-                    "weatherState": "011",   //기상상태 코드 (011: 기타)
-                    "temp": "-",   //기온
-                    "humidity": "-",   //습도
-                    "windDirectionCode": "-", //풍향 코드
-                    "windSpeed": "-"  //풍속
-                ]
-                
-                completion(currentWeather)
-                print(error.localizedDescription)
-            }
-        )
+            )
+        }
     }
     
     //MARK: - 현재 날씨 정보 생성
