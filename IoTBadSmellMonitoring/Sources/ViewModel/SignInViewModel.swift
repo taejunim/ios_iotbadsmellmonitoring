@@ -19,6 +19,54 @@ class SignInViewModel: ObservableObject {
     @Published var id: String = ""   //ID
     @Published var password: String = ""    //비밀번호
     
+    //MARK: - 자동 로그인
+    func authSignIn(completion: @escaping (String) -> Void) {
+        //API 호출 - Request Body
+        let parameters = [
+            "userId": UserDefaults.standard.string(forKey: "userId")!,
+            "userPassword": UserDefaults.standard.string(forKey: "password")!
+        ]
+        
+        //로그인 API 호출
+        let request = userAPI.requestSignIn(parameters: parameters)
+        request.execute(
+            //API 호출 성공
+            onSuccess: { (signIn) in
+                //로그인 성공
+                if signIn.result == "success" {
+                    self.result = signIn.result
+                    
+                    UserDefaults.standard.set(signIn.data?.userName, forKey: "userName")    //사용자 명 저장
+                    
+                    UserDefaults.standard.set(signIn.data?.topRegionCode, forKey: "topRegionCode")  //상위 지역 코드
+                    UserDefaults.standard.set(signIn.data?.topRegionName, forKey: "topRegionName")  //상위 지역 명
+                    UserDefaults.standard.set(signIn.data?.subRegionCode, forKey: "subRegionCode")  //하위 지역 코드
+                    UserDefaults.standard.set(signIn.data?.subRegionName, forKey: "subRegionName")  //하위 지역 명
+                }
+                //로그인 실패
+                else {
+                    //사용자 정보 전체 삭제
+                    for key in UserDefaults.standard.dictionaryRepresentation().keys {
+                        UserDefaults.standard.removeObject(forKey: key.description)
+                    }
+                    
+                    self.result = signIn.result
+                    self.message = "아이디 또는 비밀번호가 일치하지 않습니다."
+                }
+                
+                completion(self.result)
+            },
+            //API 호출 실패
+            onFailure: { (error) in
+                self.result = "server error"
+                self.message = "서버와의 통신이 원활하지 않습니다."
+                
+                completion(self.result)
+                print(error.localizedDescription)
+            }
+        )
+    }
+    
     //MARK: - 로그인 실행(로그인 API 호출)
     /// 로그인 API 호출을 통한 로그인 실행
     /// - Parameter completion: 로그인 결과
@@ -42,6 +90,11 @@ class SignInViewModel: ObservableObject {
                     UserDefaults.standard.set(signIn.data?.id, forKey: "userId")    //사용자 ID 저장
                     UserDefaults.standard.set(self.password, forKey: "password")    //패스워드 저장
                     UserDefaults.standard.set(signIn.data?.userName, forKey: "userName")    //사용자 명 저장
+                    
+                    UserDefaults.standard.set(signIn.data?.topRegionCode, forKey: "topRegionCode")  //상위 지역 코드
+                    UserDefaults.standard.set(signIn.data?.topRegionName, forKey: "topRegionName")  //상위 지역 명
+                    UserDefaults.standard.set(signIn.data?.subRegionCode, forKey: "subRegionCode")  //하위 지역 코드
+                    UserDefaults.standard.set(signIn.data?.subRegionName, forKey: "subRegionName")  //하위 지역 명
                 }
                 //로그인 실패
                 else {

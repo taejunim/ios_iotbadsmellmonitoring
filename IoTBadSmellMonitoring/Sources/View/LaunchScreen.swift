@@ -9,6 +9,8 @@ import SwiftUI
 
 //MARK: - Launch Screen
 struct LaunchScreen: View {
+    @ObservedObject var signInViewModel = SignInViewModel() //Sign In View Model
+    
     @State private var showLaunchScreen = true  //App 실행화면 노출 여부
     
     @State private var half = false //스케일 효과
@@ -19,6 +21,9 @@ struct LaunchScreen: View {
     @StateObject private var weatherViewModel = WeatherViewModel()
     @StateObject private var smellViewModel = SmellReceptionViewModel()
     @StateObject private var sideMenuViewModel = SideMenuViewModel()
+    @StateObject private var noticeViewModel = NoticeViewModel()
+    @StateObject private var myPageViewModel = MyPageViewModel()
+    @StateObject private var receptionHistoryViewModel = ReceptionHistoryViewModel()
     
     //전체 화면 - 그라데이션 효과 설정
     var gradient: LinearGradient {
@@ -52,20 +57,27 @@ struct LaunchScreen: View {
                         .blur(radius: degree ? 0 : 90)  //타이틀 흐림 효과 처리
                 }
                 .edgesIgnoringSafeArea(.all)    //Safe Area 전체 적용
-            }
-            else {
+            } else {
                 //로그인 정보가 없는 경우, 로그인 화면 이동
                 if UserDefaults.standard.string(forKey: "userId") == nil {
                     SignInView()    //로그인 화면 이동
                         .environmentObject(viewUtil)
-                }
-                //로그인 정보가 있는 경우, 악취 접수 화면 이동
-                else {
-                    SmellReceptionView()    //악취 접수 화면
-                        .environmentObject(viewUtil)
-                        .environmentObject(weatherViewModel)
-                        .environmentObject(smellViewModel)
-                        .environmentObject(sideMenuViewModel)
+                } else {
+                    //자동 로그인 결과 확인 후 화면 이동
+                    if signInViewModel.result == "success" {
+                        SmellReceptionView()    //악취 접수 화면
+                            .environmentObject(viewUtil)
+                            .environmentObject(weatherViewModel)
+                            .environmentObject(smellViewModel)
+                            .environmentObject(sideMenuViewModel)
+                            .environmentObject(noticeViewModel)
+                            .environmentObject(myPageViewModel)
+                            .environmentObject(receptionHistoryViewModel)
+
+                    } else {
+                        SignInView()    //로그인 화면 이동
+                            .environmentObject(viewUtil)
+                    }
                 }
             }
         }
@@ -80,6 +92,22 @@ struct LaunchScreen: View {
             //시작 화면 노출 시간 지연 설정
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
                 showLaunchScreen = false    //시작 화면 노출 여부 변경
+                
+                viewUtil.isLoading = true   //로딩 시작
+                
+                //저장된 로그인 ID 확인
+                if UserDefaults.standard.string(forKey: "userId") != nil {
+                    //자동 로그인 실행
+                    signInViewModel.authSignIn() { (result) in
+                        viewUtil.isLoading = false  //로딩 종료
+                        
+                        //로그인 성공이 아닌 경우 Toast 팝업 메시지 호출
+                        if result != "success" {
+                            viewUtil.showToast = true
+                            viewUtil.toastMessage = signInViewModel.message
+                        }
+                    }
+                }
             }
         }
     }
