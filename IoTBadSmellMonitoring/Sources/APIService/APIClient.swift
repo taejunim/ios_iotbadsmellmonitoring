@@ -70,7 +70,6 @@ class APIClient {
             )
             
             upload.responseDecodable(decoder: decoder, completionHandler: { (response: DataResponse<T, AFError>) in
-                print(response)
                 switch response.result{
                 //API 연동 성공
                 case .success(let value):
