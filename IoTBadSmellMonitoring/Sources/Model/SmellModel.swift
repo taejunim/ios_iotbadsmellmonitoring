@@ -7,6 +7,45 @@
 
 import Foundation
 
+//MARK: - 지역 접수 통계 정보
+struct RegionalStatistics: Codable {
+    let topRegionCode: String   //상위 지역 코드
+    let topRegionName: String   //상위 지역 명
+    let subRegionCode: String   //하위 지역 코드
+    let subRegionName: String   //하위 지역 명
+    
+    let mainSmellTypeCode: String   //주요 악취 코드
+    let mainSmellTypeName: String   //주요 악취 명
+    let mainSmellLevelCode: String  //주요 악취 강도 코드
+    let mainSmellLevelName: String  //주요 악취 강도 명
+    
+    let receptionTotalCount: Int    //총 접수 횟수
+    let detectionCount: Int //감지 횟수
+    let detectionRate: Double   //감지 비율(%)
+    
+    let smellRegisterTime: String
+    let smellRegisterTimeName: String
+    
+    enum CodingKeys: String, CodingKey {
+        case topRegionCode = "userRegionMaster"
+        case topRegionName = "userRegionMasterName"
+        case subRegionCode = "userRegionDetail"
+        case subRegionName = "userRegionDetailName"
+        
+        case mainSmellTypeCode = "mainSmellType"
+        case mainSmellTypeName = "mainSmellTypeName"
+        case mainSmellLevelCode = "mainSmellValue"
+        case mainSmellLevelName = "mainSmellValueName"
+        
+        case receptionTotalCount = "userTotalCount"
+        case detectionCount = "userRegisterCount"
+        case detectionRate = "userRegisterPercentage"
+        
+        case smellRegisterTime
+        case smellRegisterTimeName
+    }
+}
+
 //MARK: - 금일 접수 현황 정보
 struct TodayReception: Codable {
     let timeZoneCode: String    //접수 시간대 코드

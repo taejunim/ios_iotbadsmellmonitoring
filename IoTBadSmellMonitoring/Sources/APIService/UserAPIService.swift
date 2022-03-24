@@ -16,8 +16,8 @@ class UserAPIService {
     //MARK: - 로그인 API 호출
     /// 로그인 API 호출
     /// - Parameter parameters:
-    ///   - User ID
-    ///   - Password
+    ///   - userId: 사용자 ID
+    ///   - userPassword: 비밀번호
     /// - Returns: User Model
     public func requestSignIn(parameters: [String: Any]) -> Future<Responses<User>, AFError> {
         
@@ -27,24 +27,37 @@ class UserAPIService {
     //MARK: - 회원가입 API 호출
     /// 회원가입 API 호출
     /// - Parameter parameters:
-    ///   - User Type
-    ///   - User ID
-    ///   - Password
-    ///   - User Name
-    ///   - Age
-    ///   - Sex Code
-    ///   - Region Code
+    ///   - userType: 사용자 유형
+    ///   - userId: 사용자 ID
+    ///   - userPassword: 비밀번호
+    ///   - userName: 이름
+    ///   - userPhone: 휴대전화번호
+    ///   - userAge: 연령
+    ///   - userSex: 성별
+    ///   - userRegionMaster: 상위 지역 코드
+    ///   - userRegionDetail: 하위 지역 코드
     /// - Returns: API Response - Result, Message
-    public func requestSignUp(parameters: [String: Any]) -> Future<Response, AFError> {
+    public func requestSignUp(parameters: [String : Any]) -> Future<Response, AFError> {
         
         return apiClient.request(route: APIRouter.post(useApi: "base", path: "/api/userJoinInsert", parameters: parameters, isUpload: false))
+    }
+    
+    //MARK: - 사용자 정보 API 호출
+    /// 사용자 정보 API 호출
+    /// - Parameter parameters:
+    ///   - userId: 사용자 ID
+    /// - Returns: User Model
+    public func requestUserInfo(parameters: [String : String]) -> Future<Responses<User>, AFError> {
+        
+        return apiClient.request(route: APIRouter.get(useApi: "base", path: "/api/userInfo", parameters: parameters))
     }
      
     //MARK: - ID 찾기 API 호출
     /// ID 찾기 API 호출
-    /// - Parameter parameters: User ID
+    /// - Parameter parameters:
+    ///   - userId: 사용자 ID
     /// - Returns: API Response - Result, Message
-    public func requestFindId(parameters: [String: String]) -> Future<Response, AFError> {
+    public func requestFindId(parameters: [String : String]) -> Future<Response, AFError> {
         
         return apiClient.request(route: APIRouter.get(useApi: "base", path: "/api/userFindId", parameters: parameters))
     }
@@ -52,12 +65,20 @@ class UserAPIService {
     //MARK: - 비밀번호 변경 API 호출
     /// 비밀번호 변경 API 호출
     /// - Parameter parameters:
-    ///   - User ID
-    ///   - Password
+    ///   - userId: 사용자 ID
+    ///   - userPassword: 비밀번호
     /// - Returns: API Response - Result, Message
-    public func requestPasswordChange(parameters: [String: Any]) -> Future<Response, AFError> {
+    public func requestPasswordChange(parameters: [String : Any]) -> Future<Response, AFError> {
 
         return apiClient.request(route: APIRouter.post(useApi: "base", path: "/api/userPasswordChange", parameters: parameters, isUpload: false))
+    }
+    
+    //MARK: - 인증 번호 API 호출
+    /// 인증 번호 API 호출
+    /// - Returns: API Response - Result, Message
+    public func requestAuthNumber(parameters: [String : String]) -> Future<Responses<AuthNumber>, AFError> {
+        
+        return apiClient.request(route: APIRouter.get(useApi: "base", path: "/api/getNumberGen", parameters: parameters))
     }
 }
 

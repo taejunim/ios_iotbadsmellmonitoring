@@ -12,14 +12,26 @@ import PromisedFuture
 class SmellAPISerivce {
     
     let apiClient = APIClient() //API Client - 공통 API 호출
-
-    //MARK: - 금일 냄새 접수 현황 API 호출
-    /// 금일 냄새 접수 현황 API 호출
-    /// - Parameter parameters: User ID
+    
+    //MARK: - 금일 악취 접수 현황 API 호출
+    /// 금일 악취 접수 현황 API 호출
+    /// - Parameter parameters:
+    ///   - userId: 사용자 ID
     /// - Returns: Today Reception Model
     public func requestTodayReception(parameters: [String: String]) -> Future<Responses<[TodayReception]>, AFError> {
         
         return apiClient.request(route: APIRouter.get(useApi: "base", path: "/api/userTodayRegisterInfo", parameters: parameters))
+    }
+    
+    //MARK: - 지역 악취 접수 통계 API 호출
+    /// 사용자가 속하는 지역의 악취 접수 통계 API 호출
+    /// - Parameter parameters:
+    ///   - regionMaster: 상위 지역 코드
+    ///   - regionDetail: 하위 지역 코드
+    /// - Returns: Regional Statistics Model
+    public func requestRegionalStatistics(parameters: [String : String]) -> Future<Responses<RegionalStatistics>, AFError> {
+        
+        return apiClient.request(route: APIRouter.get(useApi: "base", path: "/api/myTownSmellInfo", parameters: parameters))
     }
     
     //MARK: - 악취 접수 등록 및 이미지 업로드 API 호출

@@ -30,9 +30,6 @@ class Location: ObservableObject {
         self.locationManager.desiredAccuracy = kCLLocationAccuracyBest  //배터리에 권장되는 최적의 정확도
         self.locationManager.startUpdatingLocation()    //위치정보 업데이트
 
-        let authStatus = getAuthStatus()    //위치 서비스 권한 상태
-        print("Autorization Status : \(authStatus)")
-        
         getLocation()   //위치 정보 호출
     }
     
@@ -68,8 +65,6 @@ class Location: ObservableObject {
         
         latitude = coordinate?.latitude //위도
         longitude = coordinate?.longitude   //경도
-        
-        print("Latitude: \(String(describing: latitude)) / Longitude: \(String(describing: longitude))")
     }
     
     //MARK: - 위치 서비스 권한 확인

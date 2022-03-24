@@ -18,6 +18,44 @@ struct Code: Codable {
 
 //MARK: - 현재 시간 정보
 struct CurrentDate: Codable {
-    let result: String
-    let data: String?
+    let result: String  //결과
+    let data: String?   //데이터
+}
+
+//MARK: - 지역 정보 목록
+struct Regions: Codable {
+    let region: Region  //지역 정보
+}
+
+//MARK: - 지역 정보
+struct Region: Codable {
+    let topRegion: [TopRegion]  //상위 지역 정보 목록
+    
+    enum CodingKeys: String, CodingKey {
+        case topRegion = "master"
+    }
+}
+
+//MARK: - 상위 지역 정보
+struct TopRegion: Codable {
+    let code: String    //상위 지역 코드
+    let codeName: String    //상위 지역 코드명
+    let subRegion: [SubRegion]  //하위 지역 정보 목록
+    
+    enum CodingKeys: String, CodingKey {
+        case code = "mCodeId"
+        case codeName = "mCodeIdName"
+        case subRegion = "detail"
+    }
+}
+
+//MARK: - 하위 지역 정보
+struct SubRegion: Codable {
+    let code: String    //하위 지역 코드
+    let codeName: String    //하위 지역 코드명
+    
+    enum CodingKeys: String, CodingKey {
+        case code = "dCodeId"
+        case codeName = "dCodeIdName"
+    }
 }

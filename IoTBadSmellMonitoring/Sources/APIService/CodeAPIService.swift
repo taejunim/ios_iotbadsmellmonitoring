@@ -15,7 +15,8 @@ class CodeAPIService {
     
     //MARK: - 코드 API 호출
     /// 코드 정보 API 호출
-    /// - Parameter parameters: Code Group ID
+    /// - Parameter parameters:
+    ///   - codeGroup: 그룹 코드
     /// - Returns: Code Model
     public func requestCode(parameters: [String: String]) -> Future<Responses<[Code]>, AFError> {
         
@@ -28,5 +29,13 @@ class CodeAPIService {
     public func requestCurrentDate() -> Future<CurrentDate, AFError> {
         
         return apiClient.request(route: APIRouter.get(useApi: "base", path: "/api/currentDate", parameters: [:]))
+    }
+    
+    //MARK: - 지역 코드 정보 목록 API 호출
+    /// 상위 지역, 하위 지역의 코드 정보 목록 API 호출
+    /// - Returns: Regions Model
+    public func requestRegionCode() -> Future<Responses<Regions>, AFError> {
+        
+        return apiClient.request(route: APIRouter.get(useApi: "base", path: "/api/getRegionList", parameters: [:]))
     }
 }
