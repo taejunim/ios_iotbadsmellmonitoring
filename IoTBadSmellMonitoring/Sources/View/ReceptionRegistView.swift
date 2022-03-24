@@ -46,6 +46,8 @@ struct ReceptionRegistView: View {
                 }
                 
                 ReceptionRegistButton(viewUtil: viewUtil, location: location, receptionViewModel: receptionViewModel)   //접수 등록 버튼
+                
+                Spacer().frame(height: 1)
             }
             .navigationBarTitle(Text("악취 접수 등록"), displayMode: .inline) //Navigation Bar 타이틀
             .navigationBarBackButtonHidden(true)    //기본 Back 버튼 숨김
@@ -88,7 +90,7 @@ struct SelectSmellView: View {
     var body: some View {
         VStack {
             Text("취기 및 악취 강도 선택")
-                .fontWeight(/*@START_MENU_TOKEN@*/.bold/*@END_MENU_TOKEN@*/)
+                .fontWeight(.bold)
             
             VStack {
                 SmellTypeButton(viewUtil: viewUtil, receptionViewModel: receptionViewModel) //취기 선택 버튼
@@ -309,7 +311,6 @@ struct SmellTypeListView: View {
                                         Image(smellTypeIcon)
                                             .resizable()
                                             .renderingMode(.template)
-                                            //.foregroundColor(Color.black)
                                             .foregroundColor(smellTypeCode == receptionViewModel.selectTempSmellType ? Color.white : Color.black)
                                             .aspectRatio(1, contentMode: .fit)
                                         
@@ -319,7 +320,6 @@ struct SmellTypeListView: View {
                                         Text(smellTypeName)
                                             .font(.callout)
                                             .fontWeight(.bold)
-                                            //.foregroundColor(Color.black)
                                             .foregroundColor(smellTypeCode == receptionViewModel.selectTempSmellType ? Color.white : Color.black)
                                             .multilineTextAlignment(.center)
                                             .padding(.vertical, 5)
@@ -545,6 +545,7 @@ struct AddMessageView: View {
             
             //전달사항 입력 창
             TextEditor(text: $receptionViewModel.addMessage)
+                .autocapitalization(.none)
                 .padding()
                 .border(Color("Color_7F7F7F"), width: 1)
                 .frame(height: 100)
@@ -638,7 +639,7 @@ struct ReceptionRegistButton: View {
             },
             label: {
                 Text("등록")
-                    .font(/*@START_MENU_TOKEN@*/.title2/*@END_MENU_TOKEN@*/)
+                    .font(.title2)
                     .fontWeight(.bold)
                     .foregroundColor(Color.white)
                     .padding(.horizontal)

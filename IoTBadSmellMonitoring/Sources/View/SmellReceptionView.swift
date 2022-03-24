@@ -18,6 +18,9 @@ struct SmellReceptionView: View {
     @EnvironmentObject var weatherViewModel: WeatherViewModel //Weather View Model
     @EnvironmentObject var smellViewModel: SmellReceptionViewModel  //Smell Reception View Model
     @EnvironmentObject var sideMenuViewModel: SideMenuViewModel //Side Menu View Model
+    @EnvironmentObject var noticeViewModel: NoticeViewModel //Notice View Model
+    @EnvironmentObject var myPageViewModel: MyPageViewModel //My Page View Model
+    @EnvironmentObject var receptionHistory: ReceptionHistoryViewModel  //Reception History View Model
 
     var body: some View {
         //로그아웃 여부에 따라 로그인 화면 이동
@@ -40,6 +43,15 @@ struct SmellReceptionView: View {
             //악취 접수 메인 화면
             else {
                 ZStack {
+                    //공지사항 오늘 하루 보지 않기 처리 여부에 따른 공지사항 팝업 표출
+                    if !noticeViewModel.isCloseToday {
+                        if !noticeViewModel.isClose {
+                            //공지사항 팝업
+                            NoticePopupView(noticeViewModel: noticeViewModel)
+                                .zIndex(1)
+                        }
+                    }
+                    
                     //로딩 표시 여부에 따라 표출
                     if viewUtil.isLoading {
                         viewUtil.loadingView()  //로딩 화면
@@ -60,11 +72,7 @@ struct SmellReceptionView: View {
                             ScrollView {
                                 CurrentWeatherView(viewUtil: viewUtil, weatherViewModel: weatherViewModel, smellViewModel: smellViewModel)  //현재 날씨 화면
                                 
-                                DividerLine()   //구분선
-                                
-                                ReceptionStatusView(smellViewModel: smellViewModel) //금일 접수 현황 화면
-                                
-                                DividerLine()   //구분선
+                                SmellReceptionBanner(smellViewModel: smellViewModel) //악취 접수 배너 - 접수 현황 및 통계
 
                                 SmellLevelView(weatherViewModel: weatherViewModel, smellViewModel: smellViewModel)  //악취 강도 선택 화면
                                 
@@ -80,15 +88,20 @@ struct SmellReceptionView: View {
                 .onAppear {
                     viewUtil.isLoading = true   //로딩 시작
                     
+                    smellViewModel.setRegionInfo()  //사용자의 지역 정보 세팅
+                    
                     smellViewModel.weatherBackground = smellViewModel.setWeatherBackground()    //시간에 따른 날씨 배경 설정
                     smellViewModel.getSmellCode()   //악취 강도 코드
                     smellViewModel.getReceptionStatus() //금일 냄새 접수 현황
+                    smellViewModel.getRegionalStatistics()  //사용자 지역의 악취 접수 통계
                     
                     //현재 날씨 호출
                     weatherViewModel.getCurrentWeather() { (weather) in
                         weatherViewModel.currentWeather = weather   //현재 날씨 정보
                         viewUtil.isLoading = false  //로딩 종료
                     }
+                    
+                    noticeViewModel.checkCloseToday()   //공지사항 오늘 하루 보지 않기 처리 확인
                 }
                 .onChange(of: viewUtil.isViewDismiss, perform: { _ in
                     //isViewDismiss가 true인 경우만 실행 - 냄새 접수 등록 완료 후 재호출
@@ -98,11 +111,17 @@ struct SmellReceptionView: View {
                         smellViewModel.weatherBackground = smellViewModel.setWeatherBackground()    //시간에 따른 날씨 배경 설정
                         smellViewModel.getSmellCode()   //악취 강도 코드
                         smellViewModel.getReceptionStatus() //금일 냄새 접수 현황
+                        smellViewModel.getRegionalStatistics()  //사용자 지역의 악취 접수 통계
                         
                         //현재 날씨 호출
                         weatherViewModel.getCurrentWeather() { (weather) in
                             weatherViewModel.currentWeather = weather   //현재 날씨 정보
                             viewUtil.isLoading = false  //로딩 종료
+                        }
+                        
+                        //공지사항 - 하루 동안 보지 않기 설정이 아닌 경우
+                        if !noticeViewModel.isCloseToday {
+                            noticeViewModel.isClose = false
                         }
                     }
                     
@@ -151,9 +170,9 @@ struct CurrentWeatherView: View {
         VStack {
             //현재 날씨 타이틀 및 새로고침 버튼
             ZStack {
-                Text("현재 날씨")
+                Text("\(smellViewModel.topRegionName) 현재 날씨")
                     .font(.title3)
-                    .fontWeight(/*@START_MENU_TOKEN@*/.bold/*@END_MENU_TOKEN@*/)
+                    .fontWeight(.bold)
                     .foregroundColor(.white)
                     .padding(.bottom, 5)
 
@@ -220,10 +239,10 @@ struct CurrentWeatherView: View {
                     VStack(alignment: .leading, spacing: 20) {
                         //기온
                         Text("기온 : \(weatherViewModel.currentWeather["temp"] ?? "0")℃")
-                            .fontWeight(/*@START_MENU_TOKEN@*/.bold/*@END_MENU_TOKEN@*/)
+                            .fontWeight(.bold)
                         //풍향
                         Text("풍향 : \(weatherViewModel.currentWeather["windDirection"] ?? "0")")
-                            .fontWeight(/*@START_MENU_TOKEN@*/.bold/*@END_MENU_TOKEN@*/)
+                            .fontWeight(.bold)
                     }
 
                     Spacer()
@@ -231,17 +250,17 @@ struct CurrentWeatherView: View {
                     VStack(alignment: .leading, spacing: 20) {
                         //습도
                         Text("습도 : \(weatherViewModel.currentWeather["humidity"] ?? "0")%")
-                            .fontWeight(/*@START_MENU_TOKEN@*/.bold/*@END_MENU_TOKEN@*/)
+                            .fontWeight(.bold)
                         //풍속
                         Text("풍속 : \(weatherViewModel.currentWeather["windSpeed"] ?? "0")m/s")
-                            .fontWeight(/*@START_MENU_TOKEN@*/.bold/*@END_MENU_TOKEN@*/)
+                            .fontWeight(.bold)
                     }
                 }
                 //날씨 API 호출 실패 시, 메세지 출력
                 else {
                     VStack(alignment: .center) {
                         Text(weatherViewModel.message)
-                            .fontWeight(/*@START_MENU_TOKEN@*/.bold/*@END_MENU_TOKEN@*/)
+                            .fontWeight(.bold)
                     }
                     .padding(.vertical, 30)
                 }
@@ -255,15 +274,58 @@ struct CurrentWeatherView: View {
     }
 }
 
+//MARK: - 악취 접수 배너
+struct SmellReceptionBanner: View {
+    @ObservedObject var smellViewModel: SmellReceptionViewModel
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            DividerLine()
+            
+            TabView {
+                VStack {
+                    ReceptionStatusView(smellViewModel: smellViewModel) //금일 접수 현황 화면
+
+                    Spacer()
+                }
+                
+                VStack {
+                    RegionalStatisticsView(smellViewModel: smellViewModel)  //사용자 지역의 통계 화면
+                    
+                    Spacer()
+                }
+            }
+            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .always))
+            .frame(height: 160)
+            .padding(.top, 10)
+            .onAppear {
+                UIPageControl.appearance().currentPageIndicatorTintColor = .black   //현재 페이지 Indicator 색상
+                UIPageControl.appearance().pageIndicatorTintColor = UIColor.black.withAlphaComponent(0.2)   //페이지 Indicator 색상
+            }
+            
+            Divider()
+                .frame(height: 1)
+                .background(Color("Color_EFEFEF"))
+                .padding([.leading, .bottom, .trailing], 10)
+        }
+    }
+}
+
 //MARK: - 금일 접수 현황 화면
 struct ReceptionStatusView: View {
     @ObservedObject var smellViewModel: SmellReceptionViewModel
     
     var body: some View {
         VStack {
-            HStack {
-                Text("금일 냄새 접수 현황(\(smellViewModel.completeCount)/\(smellViewModel.receptionStatus.count))")
-                    .font(/*@START_MENU_TOKEN@*/.subheadline/*@END_MENU_TOKEN@*/)
+            HStack(spacing: 3) {
+                Text("금일 악취 접수 현황")
+                    .font(.subheadline)
+                    .fontWeight(.bold)
+                
+                //금일 접수 횟수
+                Text("(\(smellViewModel.completeCount)/\(smellViewModel.receptionStatus.count))")
+                    .font(.footnote)
+                    .fontWeight(.bold)
                 
                 Spacer()
             }
@@ -311,6 +373,91 @@ struct ReceptionStatusView: View {
     }
 }
 
+//MARK: - 사용자 지역의 접수 통계 화면
+struct RegionalStatisticsView: View {
+    @ObservedObject var smellViewModel: SmellReceptionViewModel
+    
+    var body: some View {
+        VStack {
+            HStack(spacing: 3) {
+                Text("우리동네 악취 현황")
+                    .font(.subheadline)
+                    .fontWeight(.bold)
+                
+                HStack(spacing: 0) {
+                    Text("(총 악취 접수 : ")
+                        .font(.footnote)
+                        .fontWeight(.bold)
+                    
+                    Text("\(smellViewModel.receptionTotalCount)")
+                        .font(.footnote)
+                        .fontWeight(.bold)
+                        .foregroundColor(Color("Color_E74C3C"))
+                    
+                    Text(" 건)")
+                        .font(.footnote)
+                        .fontWeight(.bold)
+                }
+                
+                Spacer()
+            }
+            
+            HStack(spacing: 0) {
+                VStack {
+                    Text("감지 횟수")
+                        .fontWeight(.bold)
+                        .foregroundColor(Color("Color_006AC5"))
+                        .frame(height: 50)
+                    
+                    Text("\(smellViewModel.detectionCount) 건")
+                        .fontWeight(.bold)
+                }
+                
+                Spacer()
+                
+                VStack {
+                    Text("감지 비율")
+                        .fontWeight(.bold)
+                        .foregroundColor(Color("Color_006AC5"))
+                        .frame(height: 50)
+                    
+                    Text("\(String(smellViewModel.detectionRate)) %")
+                    //Text("\(String(format: "%.2f", smellViewModel.detectionRate)) %") //소수점 2자리
+                        .fontWeight(.bold)
+                }
+                
+                Spacer()
+                
+                VStack {
+                    Text("주요 감지 악취 강도")
+                        .fontWeight(.bold)
+                        .foregroundColor(Color("Color_006AC5"))
+                        .frame(height: 50)
+                    
+                    Text("\(smellViewModel.mainSmellLevelName)")
+                        .fontWeight(.bold)
+                }
+                
+                Spacer()
+                
+                VStack {
+                    Text("주요 악취")
+                        .fontWeight(.bold)
+                        .foregroundColor(Color("Color_006AC5"))
+                        .frame(height: 50)
+                    
+                    Text("\(smellViewModel.mainSmellTypeName)")
+                        .fontWeight(.bold)
+                }
+            }
+            .font(.subheadline)
+            
+            Spacer()
+        }
+        .padding(.horizontal)
+    }
+}
+
 //MARK: - 악취 강도 선택 화면
 struct SmellLevelView: View {
     @ObservedObject var weatherViewModel: WeatherViewModel
@@ -320,7 +467,7 @@ struct SmellLevelView: View {
         VStack {
             HStack {
                 Text("악취 강도를 선택하세요.")
-                    .fontWeight(/*@START_MENU_TOKEN@*/.bold/*@END_MENU_TOKEN@*/)
+                    .fontWeight(.bold)
             }
 
             //악취 강도 선택 버튼 생성
@@ -377,5 +524,6 @@ struct SmellReceptionView_Previews: PreviewProvider {
             .environmentObject(WeatherViewModel())
             .environmentObject(SmellReceptionViewModel())
             .environmentObject(SideMenuViewModel())
+            .environmentObject(NoticeViewModel())
     }
 }

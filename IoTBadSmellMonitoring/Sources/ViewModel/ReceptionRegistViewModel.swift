@@ -140,6 +140,8 @@ class ReceptionRegistViewModel: ObservableObject {
                     "windSpeedValue": windSpeed,    //풍속
                     "gpsX": coordinate.longitude!,  //x 좌표 - 경도
                     "gpsY": coordinate.latitude!,   //y 좌표 - 위도
+//                    "gpsX": "126.312690",  //x 좌표 - 경도
+//                    "gpsY": "33.345134",   //y 좌표 - 위도
                     "smellComment": self.addMessage,    //추가 전달사항
                     "smellRegisterTime": registTimeZone,    //접수 등록 시간대
                     "regId": UserDefaults.standard.string(forKey: "userId")!    //등록자 ID
@@ -158,6 +160,10 @@ class ReceptionRegistViewModel: ObservableObject {
                         else {
                             self.result = regist.result
                             self.message = "악취 접수 등록이 실패하였습니다."
+                            
+                            if regist.message == "NO REGIST REGION." {
+                                self.message = "현재 위치는 악취 접수가 불가능한 지역입니다."
+                            }
                         }
 
                         completion(self.result)
