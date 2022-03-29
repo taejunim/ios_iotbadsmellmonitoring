@@ -316,47 +316,59 @@ struct AccountEntryField: View {
                 }) {
                     HStack {
                         //상위 지역 Picker
-                        Picker(
-                            selection: $signUpViewModel.selectTopRegion,
-                            label: Text("상위 지역"),
-                            content: {
-                                Text("선택").tag("000")
-                                
-                                ForEach(0..<signUpViewModel.topRegionCode.count, id: \.self) { index in
-                                    Text(signUpViewModel.topRegionCode[index]["codeName"] ?? "")
-                                        .tag(signUpViewModel.topRegionCode[index]["code"] ?? "")
+                        Menu {
+                            Picker(
+                                selection: $signUpViewModel.selectTopRegionIndex,
+                                label: Text("상위 지역"),
+                                content: {
+                                    Text("선택").tag(-1)
+                                    
+                                    ForEach(0..<signUpViewModel.topRegionCode.count, id: \.self) { (index) in
+                                        Text(signUpViewModel.topRegionCode[index]["codeName"] ?? "")
+                                            .tag(index)
+                                    }
                                 }
+                            )
+                            .onChange(of: signUpViewModel.selectTopRegion) { (value) in
+                                signUpViewModel.changeSubRegionPicker(selectTopRegion: value)   //상위 지역 선택 시, 하위 지역 Picker 변경
                             }
-                        )
-                        .onChange(of: signUpViewModel.selectTopRegion) { (value) in
-                            signUpViewModel.changeSubRegionPicker(selectTopRegion: value)   //상위 지역 선택 시, 하위 지역 Picker 변경
+                            .labelsHidden()
+                            .pickerStyle(InlinePickerStyle())    //Picker Style 변경
+                        } label: {
+                            Text(signUpViewModel.selectTopRegionName)
+                                .frame(maxWidth: .infinity, maxHeight: 25)
+                                .background(Color("Color_3498DB"))
+                                .cornerRadius(5)
+                                .accentColor(Color.white)
+                                .shadow(color: .gray, radius: 1, x: 1.5, y: 1.5)
                         }
-                        .frame(maxWidth: .infinity, maxHeight: 25)
-                        .background(Color("Color_3498DB"))
-                        .cornerRadius(5)
-                        .pickerStyle(MenuPickerStyle())    //Picker Style 변경
-                        .accentColor(Color.white)
-                        .shadow(color: .gray, radius: 1, x: 1.5, y: 1.5)
+                        .frame(height: 25)
                         
                         //하위 지역 Picker
-                        Picker(
-                            selection: $signUpViewModel.selectSubRegion,
-                            label: Text("하위 지역"),
-                            content: {
-                                Text("선택").tag("000")
-                                
-                                ForEach(0..<signUpViewModel.subRegionCode.count, id: \.self) { index in
-                                    Text(signUpViewModel.subRegionCode[index]["codeName"] ?? "")
-                                        .tag(signUpViewModel.subRegionCode[index]["code"] ?? "")
+                        Menu {
+                            Picker(
+                                selection: $signUpViewModel.selectSubRegionIndex,
+                                label: Text("하위 지역"),
+                                content: {
+                                    Text("선택").tag(-1)
+                                    
+                                    ForEach(0..<signUpViewModel.subRegionCode.count, id: \.self) { (index) in
+                                        Text(signUpViewModel.subRegionCode[index]["codeName"] ?? "")
+                                            .tag(index)
+                                    }
                                 }
-                            }
-                        )
-                        .frame(maxWidth: .infinity, maxHeight: 25)
-                        .background(Color("Color_3498DB"))
-                        .cornerRadius(5)
-                        .pickerStyle(MenuPickerStyle())    //Picker Style 변경
-                        .accentColor(Color.white)
-                        .shadow(color: .gray, radius: 1, x: 1.5, y: 1.5)
+                            )
+                            .labelsHidden()
+                            .pickerStyle(InlinePickerStyle())    //Picker Style 변경
+                        } label: {
+                            Text(signUpViewModel.selectSubRegionName)
+                                .frame(maxWidth: .infinity, maxHeight: 25)
+                                .background(Color("Color_3498DB"))
+                                .cornerRadius(5)
+                                .accentColor(Color.white)
+                                .shadow(color: .gray, radius: 1, x: 1.5, y: 1.5)
+                        }
+                        .frame(height: 25)
                     }
                 }
         }

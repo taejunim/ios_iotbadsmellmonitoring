@@ -31,11 +31,11 @@ class SignUpViewModel: ObservableObject {
     //휴대전화번호 - 통신망 식별 번호
     @Published var networkIDNumber: String = "" {
         didSet {
+            //텍스트 길이 3이상 입력 방지
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 while self.networkIDNumber.count > 3 {
                     self.networkIDNumber.removeLast()
-                    //self.focusPhoneNumberField = .stationNumber
                 }
             }
         }
@@ -43,6 +43,7 @@ class SignUpViewModel: ObservableObject {
     //휴대전화번호 - 국 번호
     @Published var stationNumber: String = "" {
         didSet {
+            //텍스트 길이 4이상 입력 방지
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 while self.stationNumber.count > 4 {
@@ -54,6 +55,7 @@ class SignUpViewModel: ObservableObject {
     //휴대전화번호 - 가입자 개별 번호
     @Published var individualNumber: String = "" {
         didSet {
+            //텍스트 길이 4이상 입력 방지
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 while self.individualNumber.count > 4 {
@@ -68,15 +70,41 @@ class SignUpViewModel: ObservableObject {
         didSet {
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
-                while self.individualNumber.count > 3 {
-                    self.individualNumber.removeLast()
+                while self.age.count > 3 {
+                    self.age.removeLast()
                 }
             }
         }
     }
     @Published var selectSex: String = "000"    //성별 선택
     @Published var selectTopRegion: String = "000" //상위 지역 선택
+    @Published var selectTopRegionName: String = "선택"
     @Published var selectSubRegion: String = "000"  //하위 지역 선택
+    @Published var selectSubRegionName: String = "선택"
+    //선택한 상위 지역 Index
+    @Published var selectTopRegionIndex: Int = -1 {
+        didSet {
+            if selectTopRegionIndex == -1 {
+                selectTopRegion = "000"
+                selectTopRegionName = "선택"
+            } else {
+                selectTopRegion = topRegionCode[selectTopRegionIndex]["code"]!
+                selectTopRegionName = topRegionCode[selectTopRegionIndex]["codeName"]!
+            }
+        }
+    }
+    //선택한 하위 지역 Index
+    @Published var selectSubRegionIndex: Int = -1 {
+        didSet {
+            if selectSubRegionIndex == -1 {
+                selectSubRegion = "000"
+                selectSubRegionName = "선택"
+            } else {
+                selectSubRegion = subRegionCode[selectSubRegionIndex]["code"]!
+                selectSubRegionName = subRegionCode[selectSubRegionIndex]["codeName"]!
+            }
+        }
+    }
     
     @Published var isCheckId: Bool = false  //ID 중복확인 여부
     @Published var confirmId: String = ""   //중복확인 완료 ID
@@ -133,6 +161,7 @@ class SignUpViewModel: ObservableObject {
     //MARK: - 상위 지역 선택 시, 하위 지역 Picker 변경
     /// - Parameter selectTopRegion: 선택한 상위 지역 코드
     func changeSubRegionPicker(selectTopRegion: String) {
+        selectSubRegionIndex = -1
         selectSubRegion = "000" //하위 지역 선택 초기화
         subRegionCode.removeAll()   //기존 하위 지역 코드 목록 초기화
         
@@ -200,50 +229,56 @@ class SignUpViewModel: ObservableObject {
         isAuthComplete = false
         authNumber = ""
         
+        phoneNumber = networkIDNumber + stationNumber + individualNumber    //휴대전화번호
+        
         //휴대전화번호 입력 여부 확인
-        if networkIDNumber.isEmpty || stationNumber.isEmpty || individualNumber.isEmpty {
-            self.result = "success"
-            self.message = "휴대전화번호를 입력하지 않았습니다."
+        if phoneNumber.isEmpty || phoneNumber.count < 11 {
+            self.result = "error"
+            self.message = "유효하지 않은 전화번호이거나, 입력하지 않았습니다."
             
             completion(self.result)
         } else {
-            phoneNumber = networkIDNumber + stationNumber + individualNumber    //휴대전화번호
-            
-            let parameters = [
-                "userPhone": phoneNumber
-            ]
-            
-            //인증 번호 API 호출
-            let request = userAPI.requestAuthNumber(parameters: parameters)
-            request.execute(
-                onSuccess: { (auth) in
-                    
-                    if auth.result == "success" {
-                        self.isAuthRequest = true   //인증 요청 여부
-                        self.receivedAuthNumber = auth.data!.authNumber //요청하여 받은 인증번호
-                        
-                        self.result = "success"
-                        self.message = "인증 요청이 완료되었습니다."
-                    }
-                    else if auth.result == "fail" {
-                        self.result = "registered"
-                        self.message = "이미 가입된 전화번호입니다."
-                    }
-                    else {
-                        self.result = "error"
-                        self.message = "유효하지 않은 전화번호이거나, 인증 요청이 불가능 상태입니다."
-                    }
-                    
-                    completion(self.result)
-                },
-                onFailure: { (error) in
-                    self.result = "server error"
-                    self.message = "서버와의 통신이 원활하지 않습니다."
+            if phoneNumber.count == 11 {
+                let parameters = [
+                    "userPhone": phoneNumber
+                ]
 
-                    completion(self.result)
-                    print(error.localizedDescription)
-                }
-            )
+                //인증 번호 API 호출
+                let request = userAPI.requestAuthNumber(parameters: parameters)
+                request.execute(
+                    onSuccess: { (auth) in
+                        if auth.result == "success" {
+                            self.isAuthRequest = true   //인증 요청 여부
+                            self.receivedAuthNumber = auth.data!.authNumber //요청하여 받은 인증번호
+
+                            self.result = "success"
+                            self.message = "인증 요청이 완료되었습니다."
+                        }
+                        else if auth.result == "fail" {
+                            self.result = "registered"
+                            self.message = "이미 가입된 전화번호입니다."
+                        }
+                        else {
+                            self.result = "error"
+                            self.message = "유효하지 않은 전화번호이거나, 인증 요청이 불가능 상태입니다."
+                        }
+
+                        completion(self.result)
+                    },
+                    onFailure: { (error) in
+                        self.result = "server error"
+                        self.message = "서버와의 통신이 원활하지 않습니다."
+
+                        completion(self.result)
+                        print(error.localizedDescription)
+                    }
+                )
+            } else {
+                self.result = "error"
+                self.message = "유효하지 않은 전화번호입니다."
+                
+                completion(self.result)
+            }
         }
     }
     
@@ -377,7 +412,7 @@ class SignUpViewModel: ObservableObject {
             return false
         } else {
             guard isNameValid() else {
-                self.validMessage = "이름은 한글만 입력 가능합니다."
+                self.validMessage = "이름은 공백 없이 한글만 입력 가능합니다."
                 return false
             }
         }
