@@ -96,7 +96,14 @@ struct SmellReceptionView: View {
                     smellViewModel.getRegionalStatistics()  //사용자 지역의 악취 접수 통계
                     
                     //현재 날씨 호출
-                    weatherViewModel.getCurrentWeather() { (weather) in
+                    weatherViewModel.getCurrentWeather() { (gridResult, weather) in
+                        //지역 격자 정보 호출 결과가 실패하거나 오류인 경우 처리
+                        if gridResult == "fail" {
+                            smellViewModel.topRegionName = "제주도"
+                        } else if gridResult == "error" {
+                            smellViewModel.topRegionName = "-"
+                        }
+                        
                         weatherViewModel.currentWeather = weather   //현재 날씨 정보
                         viewUtil.isLoading = false  //로딩 종료
                     }
@@ -114,7 +121,14 @@ struct SmellReceptionView: View {
                         smellViewModel.getRegionalStatistics()  //사용자 지역의 악취 접수 통계
                         
                         //현재 날씨 호출
-                        weatherViewModel.getCurrentWeather() { (weather) in
+                        weatherViewModel.getCurrentWeather() { (gridResult, weather) in
+                            //지역 격자 정보 호출 결과가 실패하거나 오류인 경우 처리
+                            if gridResult == "fail" {
+                                smellViewModel.topRegionName = "제주도"
+                            } else if gridResult == "error" {
+                                smellViewModel.topRegionName = "-"
+                            }
+                            
                             weatherViewModel.currentWeather = weather   //현재 날씨 정보
                             viewUtil.isLoading = false  //로딩 종료
                         }
@@ -185,7 +199,14 @@ struct CurrentWeatherView: View {
                             isRefresh = true    //새로고침 활성
                             
                             //현재 날씨 호출
-                            weatherViewModel.getCurrentWeather() { (weather) in
+                            weatherViewModel.getCurrentWeather() { (gridResult, weather) in
+                                //지역 격자 정보 호출 결과가 실패하거나 오류인 경우 처리
+                                if gridResult == "fail" {
+                                    smellViewModel.topRegionName = "제주도"
+                                } else if gridResult == "error" {
+                                    smellViewModel.topRegionName = "-"
+                                }
+                                
                                 weatherViewModel.currentWeather = weather   //현재 날씨 정보
                                 
                                 isRefresh = false   //새로고침 비활성

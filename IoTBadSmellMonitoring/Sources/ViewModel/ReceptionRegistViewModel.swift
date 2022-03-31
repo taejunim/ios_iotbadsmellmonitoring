@@ -120,9 +120,22 @@ class ReceptionRegistViewModel: ObservableObject {
             let registTimeZone = timeZoneCode  //접수 등록 시간대 코드
             
             //현재 날씨 API 호출
-            self.weatherViewModel.getCurrentWeather() { (weather) in
-                self.weatherInfo = weather
-
+            self.weatherViewModel.getCurrentWeather() { (gridResult, weather) in
+                
+                if gridResult == "success" {
+                    self.weatherInfo = weather
+                } else {
+                    let errorWeather = [
+                        "weatherState": "011",   //기상상태 코드 (011: 기타)
+                        "temp": "-",   //기온
+                        "humidity": "-",   //습도
+                        "windDirectionCode": "-", //풍향 코드
+                        "windSpeed": "-"  //풍속
+                    ]
+                    
+                    self.weatherInfo = errorWeather
+                }
+                
                 let weatherState: String = self.weatherInfo["weatherState"]!    //기상상태 코드
                 let temp: String = self.weatherInfo["temp"]!    //기온
                 let humidity: String = self.weatherInfo["humidity"]!    //습도
@@ -160,7 +173,7 @@ class ReceptionRegistViewModel: ObservableObject {
                         else {
                             self.result = regist.result
                             self.message = "악취 접수 등록이 실패하였습니다."
-                            
+
                             if regist.message == "NO REGIST REGION." {
                                 self.message = "현재 위치는 악취 접수가 불가능한 지역입니다."
                             }

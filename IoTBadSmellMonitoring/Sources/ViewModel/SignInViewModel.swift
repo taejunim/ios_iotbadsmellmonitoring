@@ -21,6 +21,7 @@ class SignInViewModel: ObservableObject {
     
     //MARK: - 자동 로그인
     func authSignIn(completion: @escaping (String) -> Void) {
+        
         //API 호출 - Request Body
         let parameters = [
             "userId": UserDefaults.standard.string(forKey: "userId")!,

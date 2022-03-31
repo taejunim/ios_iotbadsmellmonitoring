@@ -451,7 +451,8 @@ class SignUpViewModel: ObservableObject {
     
     //MARK: - ID 유효성 검사
     func isIdValid() -> Bool {
-        let regExp = "^[a-zA-Z0-9]{4,20}$" //영문, 숫자
+        //let regExp = "^[a-zA-Z0-9]{4,20}$" //영문, 숫자
+        let regExp = "^(?=.*[a-zA-Z])[a-zA-Z\\d0-9]{4,20}$" //영문 포함, 숫자
         let idPredicate = NSPredicate(format: "SELF MATCHES %@", regExp)
         
         return idPredicate.evaluate(with: id)

@@ -23,7 +23,7 @@ struct SignInView: View {
     
     var body: some View {
         //로그인 성공 시, 냄새 접수 화면 이동
-        if signInViewModel.result == "success" || UserDefaults.standard.string(forKey: "userId") != nil{
+        if signInViewModel.result == "success" {
             SmellReceptionView()    //냄새 접수 화면
                 .environmentObject(viewUtil)
                 .environmentObject(weatherViewModel)

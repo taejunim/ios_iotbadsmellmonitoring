@@ -17,8 +17,8 @@ class WeatherViewModel: ObservableObject {
     private let serviceKey = "aDVsltIrJTOtDLpTA6qnVPhVhaT/aciIUGI30aiipGikIAAZOI4KxfVFBqW9q3s+3xgVzKx6c3gJdUVGaNJ9Bg==" //기상청 날씨 API Service Key (Decoding)
     private let dataType = "JSON"   //데이터 타입
     
-    @Published var gridX: String = ""   //격자 X 좌표
-    @Published var gridY: String = ""   //격자 Y 좌표
+    @Published var gridX: String = "53"   //격자 X 좌표
+    @Published var gridY: String = "38"   //격자 Y 좌표
     
     @Published var windDirectionCode: [[String: String]] = [[:]]  //풍향 코드
     @Published var currentWeather: [String: String] = [:]  //기상청 날씨 API 호출 데이터
@@ -27,8 +27,8 @@ class WeatherViewModel: ObservableObject {
     @Published var message: String = "" //결과 메시지
     
     //MARK: - 사용자 지역의 격자 정보 API 호출
-    func getGrid(completion: @escaping (_ gridX: String, _ gridY: String) -> Void) {
-        
+    func getGrid(completion: @escaping (_ result: String, _ gridX: String, _ gridY: String) -> Void) {
+
         let parameters = [
             "userRegion": UserDefaults.standard.string(forKey: "topRegionName")!    //사용자 상위 지역
         ]
@@ -38,14 +38,16 @@ class WeatherViewModel: ObservableObject {
         request.execute(
             //API 호출 성공
             onSuccess: { (grid) in
-                let gridX = grid.data!.gridX    //격자 X
-                let gridY = grid.data!.gridY    //격자 Y
+                if grid.result == "success" {
+                    self.gridX = grid.data!.gridX    //격자 X
+                    self.gridY = grid.data!.gridY    //격자 Y
+                }
                 
-                completion(gridX, gridY)
+                completion(grid.result, self.gridX, self.gridY)
             },
             //API 호출 실패
             onFailure: { (error) in
-                completion("", "")
+                completion("error", self.gridX, self.gridY)
                 print(error.localizedDescription)
             }
         )
@@ -62,9 +64,9 @@ class WeatherViewModel: ObservableObject {
     //MARK: - 현재 날씨 API 호출c
     /// 기상청 날씨 API 호출
     /// - Parameter completion: 가공된 현재 날씨 정보 - createCurrentWeather() 함수 참고
-    func getCurrentWeather(completion: @escaping ([String: String]) -> Void) {
+    func getCurrentWeather(completion: @escaping (_ gridResult: String, _ weatherInfo: [String : String]) -> Void) {
         
-        getGrid() { (gridX, gridY) in
+        getGrid() { (gridResult, gridX, gridY) in
             let baseDate: String = "yyyyMMdd".dateFormatter(formatDate: Date()) //발표일자 - yyyyMMdd
             
             let calcBaseTime: Date = Calendar.current.date(byAdding: .minute, value: -30, to: Date())!    //발표시각 = 현재 시간 - 30분
@@ -123,7 +125,7 @@ class WeatherViewModel: ObservableObject {
                         //풍향 코드 호출 및 날씨 데이터 가공
                         self.getWindDirectionCode() { code in
                             self.windDirectionCode = code
-                            completion(self.createCurrentWeather(weatherDictionary))    //가공된 현재 날씨 데이터
+                            completion(gridResult, self.createCurrentWeather(weatherDictionary))    //가공된 현재 날씨 데이터
                         }
                     }
                     else {
@@ -139,7 +141,7 @@ class WeatherViewModel: ObservableObject {
                             "windSpeed": "-"  //풍속
                         ]
                         
-                        completion(currentWeather)
+                        completion(gridResult, currentWeather)
                     }
                 },
                 //API 호출 실패
@@ -156,7 +158,7 @@ class WeatherViewModel: ObservableObject {
                         "windSpeed": "-"  //풍속
                     ]
                     
-                    completion(currentWeather)
+                    completion(gridResult, currentWeather)
                     print(error.localizedDescription)
                 }
             )
