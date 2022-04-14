@@ -147,7 +147,7 @@ class SignInViewModel: ObservableObject {
     
     //MARK: - ID 유효성 검사
     func isIdValid() -> Bool {
-        let regExp = "^[a-zA-Z0-9가-힣ㄱ-ㅎㅏ-ㅣ]{4,20}$" //영문, 숫자, 한글
+        let regExp = "^[a-zA-Z0-9]{4,20}$" //영문, 숫자
         let idPredicate = NSPredicate(format: "SELF MATCHES %@", regExp)
         
         return idPredicate.evaluate(with: id)

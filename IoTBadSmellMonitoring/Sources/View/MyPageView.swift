@@ -88,7 +88,7 @@ struct MyPageView: View {
                 })
                 .onAppear {
                     //사용자 정보에 저장된 푸시 알림 여부 상태에 따른 토글 버튼의 상태 변경
-                    if UserDefaults.standard.objectIsForced(forKey: "notificationStatus") {
+                    if UserDefaults.standard.object(forKey: "notificationStatus") != nil {
                         myPageViewModel.showToggle = UserDefaults.standard.bool(forKey: "notificationStatus")
                     }
                     else {
@@ -140,7 +140,6 @@ struct PushToggle: View {
                 .onChange(of: myPageViewModel.showToggle, perform: { toggleIsOn in
                     
                     UserDefaults.standard.set(toggleIsOn, forKey: "notificationStatus") //푸시 알림 상태 저장
-                    
                     //토글 상태 ON
                     if toggleIsOn {
                         myPageViewModel.showToggle = true
@@ -169,6 +168,7 @@ struct PushToggle: View {
         }
     }
 }
+
 //MARK: - 비밀번호 변경 field
 struct PasswordChange: View {
     @ObservedObject var myPageViewModel: MyPageViewModel
