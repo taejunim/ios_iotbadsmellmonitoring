@@ -47,7 +47,6 @@ class ReceptionRegistViewModel: ObservableObject {
     func getReceptionTimeCode() {
         //접수 시간대 코드 API 호출
         codeViewModel.getCode(codeGroup: "REN") { (code) in
-            
             //접수 시간대 정보 목록 생성
             for timeCode in code {
                 let code = timeCode["code"]!    //접수 시간대 코드
@@ -86,6 +85,7 @@ class ReceptionRegistViewModel: ObservableObject {
 
         //현재시간 API 호출 - 서버 시간 기준
         codeViewModel.getCurrentDate() { (currentDate) in
+            
 
             let endIndex = currentDate.firstIndex(of: ":") ?? currentDate.endIndex
             let substrDate = currentDate[..<endIndex]
@@ -100,7 +100,9 @@ class ReceptionRegistViewModel: ObservableObject {
                 let endTime = receptionTime["endTime"] as! Int  //접수 종료 시간
                 
                 //현재 시간에 따른 접수 등록 시간대 코드
+
                 if currentTime >= startTime && currentTime < endTime {
+                    let _ = print("code in code")
                     timeCode = code
                     
                     break
@@ -199,6 +201,7 @@ class ReceptionRegistViewModel: ObservableObject {
         
         //현재 시간에 따른 접수 시간대 코드 호출
         timeZoneCode() { (timeZoneCode) in
+            let _ = print("timeZoneCode : " + timeZoneCode)
             let registTimeZone = timeZoneCode
             
             //접수 등록 시간대 확인
@@ -217,8 +220,13 @@ class ReceptionRegistViewModel: ObservableObject {
     //MARK: - 취기 선택 유효성 검사
     func isSmellTypeValid() -> Bool {
         let selectSmellType = selectSmellType
+        let selectSmellCode = selectSmellCode
         
-        if selectSmellType == "000" {
+        if selectSmellCode == "001" { // (0)무취 선택시 취기 강도 선택안해도 등록 가능하게 true를 리턴한다
+            self.selectSmellType = "008"
+            return true
+        }
+        if selectSmellType == "000" || selectSmellType == ""{
             
             self.result = "not selected"
             self.validMessage = "취기를 선택하지 않았습니다."

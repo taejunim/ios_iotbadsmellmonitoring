@@ -109,9 +109,8 @@ struct PrivacyConentView: View {
                     }
                 }
             )
-            
             //개인정보 처리방침 내용 - Web View
-            WebView(loadURL: "http://101.101.216.193:8007/agreement")
+            WebView(loadURL: "http://49.50.172.217:8080/agreement")
                 .frame(height: 200)
                 .border(Color("Color_BEBEBE"))
         }

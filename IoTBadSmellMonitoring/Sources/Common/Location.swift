@@ -100,4 +100,6 @@ class Location: ObservableObject {
             )
         )
     }
+    
+    
 }

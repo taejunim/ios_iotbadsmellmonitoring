@@ -9,8 +9,14 @@ import SwiftUI
 import UIKit
 
 //MARK: - 악취 접수 화면
+
 struct SmellReceptionView: View {
     @Environment(\.presentationMode) var presentationMode
+    @Environment(\.scenePhase) var scenePhase
+    @ObservedObject var signInViewModel = SignInViewModel() //Sign In View Model
+    
+    @State var isSignIn: Bool = true  //App 실행화면 노출 여부
+    @State var showLaunchScreen: Bool = true  //App 실행화면 노출 여부
     
     @EnvironmentObject var viewUtil: ViewUtil   //화면 Util
     @ObservedObject var viewOptionSet = ViewOptionSet() //화면 Option Set
@@ -23,97 +29,80 @@ struct SmellReceptionView: View {
     @EnvironmentObject var receptionHistory: ReceptionHistoryViewModel  //Reception History View Model
 
     var body: some View {
-        //로그아웃 여부에 따라 로그인 화면 이동
-        if sideMenuViewModel.isSignOut {
-            //로그인 화면
-            SignInView()
-                .environmentObject(viewUtil)
-        }
-        else {
-            //사이드 메뉴 선택 시, 해당 메뉴로 이동 - My Page
-            if sideMenuViewModel.moveMenu == "MyPage" {
-                MyPageView()
-                    .environmentObject(viewUtil)
-            }
-            //사이드 메뉴 선택 시, 해당 메뉴로 이동 - 접수 이력
-            else if sideMenuViewModel.moveMenu == "ReceptionHistory" {
-                ReceptionHistoryView()
-                    .environmentObject(viewUtil)
-            }
-            //악취 접수 메인 화면
-            else {
-                ZStack {
-                    //공지사항 오늘 하루 보지 않기 처리 여부에 따른 공지사항 팝업 표출
-                    if !noticeViewModel.isCloseToday {
-                        if !noticeViewModel.isClose {
-                            //공지사항 팝업
-                            NoticePopupView(noticeViewModel: noticeViewModel)
-                                .zIndex(1)
-                        }
-                    }
-                    
-                    //로딩 표시 여부에 따라 표출
-                    if viewUtil.isLoading {
-                        viewUtil.loadingView()  //로딩 화면
-                            .zIndex(1)  //Z Stack 순서 맨 앞으로
-                    }
-                    
-                    //사이드 메뉴
-                    if viewUtil.showMenu {
-                        SideMenuView()
-                            .environmentObject(viewUtil)
-                            .environmentObject(sideMenuViewModel)
-                            .zIndex(1)
-                    }
-                    
-                    //악취 접수 메인 화면
-                    NavigationView {
-                        VStack {
-                            ScrollView {
-                                CurrentWeatherView(viewUtil: viewUtil, weatherViewModel: weatherViewModel, smellViewModel: smellViewModel)  //현재 날씨 화면
-                                
-                                SmellReceptionBanner(smellViewModel: smellViewModel) //악취 접수 배너 - 접수 현황 및 통계
-
-                                SmellLevelView(weatherViewModel: weatherViewModel, smellViewModel: smellViewModel)  //악취 강도 선택 화면
-                                
-                                DividerLine()   //구분선
+        
+        
+    //로그아웃 여부에 따라 로그인 화면 이동
+    if sideMenuViewModel.isSignOut {
+        let _ = print("로그아웃하고 여기로 이동?")
+        //로그인 화면
+        SignInView()
+            .environmentObject(viewUtil)
+    }
+    else {
+        if !UserDefaults.standard.bool(forKey: "isSignIn") {
+//        SignInView().environmentObject(viewUtil)
+            SignInFailurePopupInPage()
+        } else {
+                //사이드 메뉴 선택 시, 해당 메뉴로 이동 - My Page
+                if sideMenuViewModel.moveMenu == "MyPage" {
+                    MyPageView()
+                        .environmentObject(viewUtil)
+                }
+                //사이드 메뉴 선택 시, 해당 메뉴로 이동 - 접수 이력
+                else if sideMenuViewModel.moveMenu == "ReceptionHistory" {
+                    ReceptionHistoryView()
+                        .environmentObject(viewUtil)
+                }
+                //악취 접수 메인 화면
+                else {
+                    ZStack {
+                        //공지사항 오늘 하루 보지 않기 처리 여부에 따른 공지사항 팝업 표출
+                        if !noticeViewModel.isCloseToday {
+                            if !noticeViewModel.isClose {
+                                //공지사항 팝업
+                                NoticePopupView(noticeViewModel: noticeViewModel)
+                                    .zIndex(1)
                             }
                         }
-                        .disabled(viewUtil.isLoading)   //로딩 중 화면 클릭 방지
-                        .navigationBarTitle(Text("악취 접수"), displayMode: .inline) //Navigation Bar 타이틀
-                        .navigationBarBackButtonHidden(true)    //기본 Back 버튼 숨김
-                        .navigationBarItems(leading: MenuButton(viewUtil: viewUtil))  //커스텀 Back 버튼 추가
-                    }
-                }
-                .onAppear {
-                    viewUtil.isLoading = true   //로딩 시작
-                    
-                    smellViewModel.setRegionInfo()  //사용자의 지역 정보 세팅
-                    
-                    smellViewModel.weatherBackground = smellViewModel.setWeatherBackground()    //시간에 따른 날씨 배경 설정
-                    smellViewModel.getSmellCode()   //악취 강도 코드
-                    smellViewModel.getReceptionStatus() //금일 냄새 접수 현황
-                    smellViewModel.getRegionalStatistics()  //사용자 지역의 악취 접수 통계
-                    
-                    //현재 날씨 호출
-                    weatherViewModel.getCurrentWeather() { (gridResult, weather) in
-                        //지역 격자 정보 호출 결과가 실패하거나 오류인 경우 처리
-                        if gridResult == "fail" {
-                            smellViewModel.topRegionName = "제주도"
-                        } else if gridResult == "error" {
-                            smellViewModel.topRegionName = "-"
+                        
+                        //로딩 표시 여부에 따라 표출
+                        if viewUtil.isLoading {
+                            viewUtil.loadingView()  //로딩 화면
+                                .zIndex(1)  //Z Stack 순서 맨 앞으로
                         }
                         
-                        weatherViewModel.currentWeather = weather   //현재 날씨 정보
-                        viewUtil.isLoading = false  //로딩 종료
+                        //사이드 메뉴
+                        if viewUtil.showMenu {
+                            SideMenuView()
+                                .environmentObject(viewUtil)
+                                .environmentObject(sideMenuViewModel)
+                                .zIndex(1)
+                        }
+                        
+                        //악취 접수 메인 화면
+                        NavigationView {
+                            VStack {
+                                ScrollView {
+                                    CurrentWeatherView(viewUtil: viewUtil, weatherViewModel: weatherViewModel, smellViewModel: smellViewModel)  //현재 날씨 화면
+                                    
+                                    SmellReceptionBanner(smellViewModel: smellViewModel) //악취 접수 배너 - 접수 현황 및 통계
+
+                                    SmellLevelView(weatherViewModel: weatherViewModel, smellViewModel: smellViewModel)  //악취 강도 선택 화면
+                                    
+                                    DividerLine()   //구분선
+                                }
+                            }
+                            .disabled(viewUtil.isLoading)   //로딩 중 화면 클릭 방지
+                            .navigationBarTitle(Text("악취 접수"), displayMode: .inline) //Navigation Bar 타이틀
+                            .navigationBarBackButtonHidden(true)    //기본 Back 버튼 숨김
+                            .navigationBarItems(leading: MenuButton(viewUtil: viewUtil))  //커스텀 Back 버튼 추가
+                        }
+                        .navigationBarBackButtonHidden(true)
                     }
-                    
-                    noticeViewModel.checkCloseToday()   //공지사항 오늘 하루 보지 않기 처리 확인
-                }
-                .onChange(of: viewUtil.isViewDismiss, perform: { _ in
-                    //isViewDismiss가 true인 경우만 실행 - 냄새 접수 등록 완료 후 재호출
-                    if viewUtil.isViewDismiss {
+                    .onAppear {
                         viewUtil.isLoading = true   //로딩 시작
+                        
+                        smellViewModel.setRegionInfo()  //사용자의 지역 정보 세팅
                         
                         smellViewModel.weatherBackground = smellViewModel.setWeatherBackground()    //시간에 따른 날씨 배경 설정
                         smellViewModel.getSmellCode()   //악취 강도 코드
@@ -133,18 +122,54 @@ struct SmellReceptionView: View {
                             viewUtil.isLoading = false  //로딩 종료
                         }
                         
-                        //공지사항 - 하루 동안 보지 않기 설정이 아닌 경우
-                        if !noticeViewModel.isCloseToday {
-                            noticeViewModel.isClose = false
+                        noticeViewModel.checkCloseToday()   //공지사항 오늘 하루 보지 않기 처리 확인
+                    }
+                    .onChange(of: viewUtil.isViewDismiss, perform: { _ in
+                        //isViewDismiss가 true인 경우만 실행 - 냄새 접수 등록 완료 후 재호출
+                        if viewUtil.isViewDismiss {
+                            viewUtil.isLoading = true   //로딩 시작
+                            
+                            smellViewModel.weatherBackground = smellViewModel.setWeatherBackground()    //시간에 따른 날씨 배경 설정
+                            smellViewModel.getSmellCode()   //악취 강도 코드
+                            smellViewModel.getReceptionStatus() //금일 냄새 접수 현황
+                            smellViewModel.getRegionalStatistics()  //사용자 지역의 악취 접수 통계
+                            
+                            //현재 날씨 호출
+                            weatherViewModel.getCurrentWeather() { (gridResult, weather) in
+                                //지역 격자 정보 호출 결과가 실패하거나 오류인 경우 처리
+                                if gridResult == "fail" {
+                                    smellViewModel.topRegionName = "제주도"
+                                } else if gridResult == "error" {
+                                    smellViewModel.topRegionName = "-"
+                                }
+                                
+                                weatherViewModel.currentWeather = weather   //현재 날씨 정보
+                                viewUtil.isLoading = false  //로딩 종료
+                            }
+                            
+                            //공지사항 - 하루 동안 보지 않기 설정이 아닌 경우
+                            if !noticeViewModel.isCloseToday {
+                                noticeViewModel.isClose = false
+                            }
+                        }
+                        
+                        viewUtil.isViewDismiss = false
+                })
+                    .onChange(of: scenePhase) { newPahase in
+                        if newPahase == .active {
+                            signInViewModel.authSignIn() {result in
+                                if result != "success" {
+                                    UserDefaults.standard.set(false, forKey: "isSignIn")
+                                }
+                            }
                         }
                     }
-                    
-                    viewUtil.isViewDismiss = false
-                })
+                }
             }
         }
     }
 }
+
 
 //MARK: - Menu 버튼
 struct MenuButton: View {
@@ -480,6 +505,7 @@ struct RegionalStatisticsView: View {
 }
 
 //MARK: - 악취 강도 선택 화면
+
 struct SmellLevelView: View {
     @ObservedObject var weatherViewModel: WeatherViewModel
     @ObservedObject var smellViewModel: SmellReceptionViewModel
@@ -537,6 +563,7 @@ struct SmellLevelView: View {
         }
     }
 }
+
 
 struct SmellReceptionView_Previews: PreviewProvider {
     static var previews: some View {

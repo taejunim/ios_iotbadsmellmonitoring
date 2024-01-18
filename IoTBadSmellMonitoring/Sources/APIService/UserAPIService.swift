@@ -80,6 +80,17 @@ class UserAPIService {
         
         return apiClient.request(route: APIRouter.get(useApi: "base", path: "/api/getNumberGen", parameters: parameters))
     }
+    
+    //MARK: - 회원탈퇴 API 호출
+    /// 비밀번호 변경 API 호출
+    /// - Parameter parameters:
+    ///   - userId: 사용자 ID
+    ///   - userPassword: 비밀번호
+    /// - Returns: API Response - Result, Message
+    public func deleteUser(parameters: [String : Any]) -> Future<Response, AFError> {
+
+        return apiClient.request(route: APIRouter.post(useApi: "base", path: "/api/userDelete", parameters: parameters, isUpload: false))
+    }
 }
 
 

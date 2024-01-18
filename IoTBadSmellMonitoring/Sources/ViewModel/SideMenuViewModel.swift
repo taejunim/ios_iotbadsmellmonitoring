@@ -36,6 +36,7 @@ class SideMenuViewModel: ObservableObject {
     
     //MARK: - 로그아웃 실행
     func signOut() {
+        print("들어온다")
         //UserDefaults 값 초기화
         for key in UserDefaults.standard.dictionaryRepresentation().keys {
             UserDefaults.standard.removeObject(forKey: key.description)

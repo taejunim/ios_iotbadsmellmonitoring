@@ -33,7 +33,7 @@ struct NoticeContentView: View {
                 
                 Spacer()
             }
-            .padding(.horizontal, 15)
+            .padding(.horizontal, 10)
             
             HorizontalDividerLine()
             
@@ -74,7 +74,10 @@ struct NoticePopupView: View {
                 .padding(.top)
                 .background(Color.white)
                 .cornerRadius(5.0)
-                .frame(maxWidth: .infinity, maxHeight: geometryReader.size.height/3.8)
+                .frame(maxWidth: .infinity, maxHeight:
+                        UIDevice.isiPhoneSE()
+                       ? geometryReader.size.height/2.8
+                       : geometryReader.size.height/3.8)
             }
             .padding()
             .frame(width: geometryReader.size.width, height: geometryReader.size.height)
@@ -142,6 +145,7 @@ struct NoticePopupButton: View {
         }
     }
 }
+
 
 struct NoticeView_Previews: PreviewProvider {
     static var previews: some View {

@@ -13,6 +13,9 @@ import UserNotifications
 class MyPageViewModel: ObservableObject {
     private let codeViewModel = CodeViewModel() //Code View Model
     private let userAPI = UserAPIService()  //사용자 API Service
+    @Published var sideMenuViewModel = SideMenuViewModel()
+    @Published var showAlert: Bool = false  //알림창 노출 여부
+    @Published var alert: Alert?    //알림창
     
     @Published var result: String = ""   //결과 상태
     @Published var message: String = "" //결과 메시지
@@ -277,4 +280,71 @@ class MyPageViewModel: ObservableObject {
             return true
         }
     }
+    
+    
+    //MARK: - 회원탈퇴
+    func deleteUser(completion: @escaping (String) -> Void ) {
+        //API 호출 - Request Body
+        let parameters = [
+            "userId": UserDefaults.standard.string(forKey: "userId")!
+        ]
+        
+        //비밀번호 수정 API 호출
+        let request = userAPI.deleteUser(parameters: parameters)
+        request.execute(
+            //API 호출 성공
+            onSuccess: { (passwordChange) in
+                //회원탈퇴 성공
+                if passwordChange.result == "success" {
+                    self.result = passwordChange.result
+                    self.message = "회원탈퇴에 성공하였습니다."
+                    self.sideMenuViewModel.signOut()
+                }
+                //회원탈퇴 실패
+                else {
+                    self.result = passwordChange.result
+                    self.message = "회원탈퇴에 실패하였습니다."
+                }
+                
+                completion(self.result)
+            },
+            //API 호출 실패
+            onFailure: { (error) in
+                self.result = "server error"
+                self.message = "서버와의 통신이 원활하지 않습니다."
+                
+                completion(self.result)
+                
+                print(error.localizedDescription)
+            }
+        )
+        completion(self.result)
+    }
+    
+    //MARK: - 회원탈퇴 확인 알림창
+    func deleteUserAlert() -> Alert {
+        return Alert(
+            title: Text("회원탈퇴"),
+            message: Text("회원탈퇴를 하시겠습니까?"),
+            primaryButton: .destructive(
+                Text("확인"),
+                action: {
+                    self.deleteUser() { result in
+                        if result == "success" {
+                            self.sideMenuViewModel.isSignOut = true
+                            print(self.sideMenuViewModel.isSignOut)
+                        }
+                    }
+                    print("확인")
+                }
+            ),
+            secondaryButton: .cancel(
+                Text("닫기"),
+                action: {
+                    print("닫기")
+                }
+            )
+        )
+    }
+    
 }

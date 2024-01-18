@@ -10,13 +10,19 @@ import UserNotifications
 import Combine
 
 //MARK: - 마이페이지 화면
+
 struct MyPageView: View {
     @Environment(\.presentationMode) var presentationMode   //Back 버튼 기능 추가에 필요
+    @Environment(\.scenePhase) var scenePhase
+    @ObservedObject var signInViewModel = SignInViewModel() //Sign In View Model
+    @StateObject var sideMenuViewModel = SideMenuViewModel() //Sign In View Model
+    
+    @AppStorage("isSignIn") var isSignIn : Bool = true
     
     @EnvironmentObject var viewUtil: ViewUtil   //View Util
     @ObservedObject var viewOptionSet = ViewOptionSet()     //화면 Option Set
-    //@ObservedObject var myPageViewModel = MyPageViewModel() //My Page View Model
-    @EnvironmentObject var myPageViewModel: MyPageViewModel
+    @ObservedObject var myPageViewModel = MyPageViewModel() //My Page View Model
+//    @EnvironmentObject var myPageViewModel: MyPageViewModel
     
     @StateObject private var stateViewUtil = ViewUtil()
     @StateObject private var stateWeatherViewModel = WeatherViewModel()
@@ -27,6 +33,7 @@ struct MyPageView: View {
     @StateObject private var stateReceptionHistoryViewModel = ReceptionHistoryViewModel()
     
     var body: some View {
+        let _ = print("mypage : " + String(sideMenuViewModel.isSignOut))
         //뒤로가기 버튼 클릭 시, 악취 접수 등록 화면 이동
         if viewUtil.isBack {
             //악취 접수 등록 화면
@@ -40,59 +47,78 @@ struct MyPageView: View {
                 .environmentObject(stateReceptionHistoryViewModel)
         }
         else {
-            //My Page 화면
-            NavigationView {
-                ZStack {
-                    //로딩 표시 여부에 따라 표출
-                    if viewUtil.isLoading {
-                        viewUtil.loadingView()  //로딩 화면
+            if !UserDefaults.standard.bool(forKey: "isSignIn") {
+                SignInFailurePopupInPage()
+            } else {
+                //My Page 화면
+                NavigationView {
+                    ZStack {
+                        //로딩 표시 여부에 따라 표출
+                        if viewUtil.isLoading {
+                            viewUtil.loadingView()  //로딩 화면
+                        }
+                        
+                        VStack {
+                            ScrollView {
+                                VStack {
+                                    Profile()   //프로필
+                                    
+                                    VerticalDividerLine()
+                                    
+                                    PushToggle(myPageViewModel: myPageViewModel)    //푸쉬(토글버튼)
+                                    VerticalDividerLine()
+                                    
+                                    PasswordChange(myPageViewModel: myPageViewModel)    //비밀번호 변경 field
+                                    
+                                    //                                        deleteUser(myPageViewModel : myPageViewModel)
+                                }
+                            }
+                            .padding(
+                                UIDevice.isiPhoneSE()
+                                ? EdgeInsets(top: 10, leading: 20, bottom: 0, trailing: 0)
+                                : EdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
+                            )
+                            
+                            PasswordChangeButton(viewUtil: viewUtil, myPageViewModel: myPageViewModel)               //비밀번호 수정 버튼
+                            
+                            Spacer().frame(height: 1)
+                        }
                     }
-                    
-                    VStack {
-                        ScrollView {
-                            VStack {
-                                Profile()   //프로필
-                                
-                                VerticalDividerLine()
-                                
-                                PushToggle(myPageViewModel: myPageViewModel)    //푸쉬(토글버튼)
-                                VerticalDividerLine()
-                                
-                                PasswordChange(myPageViewModel: myPageViewModel)    //비밀번호 변경 field
+                    .navigationBarTitle(Text("My Page"), displayMode: .inline)  //Navigation Bar 타이틀
+                    .navigationBarBackButtonHidden(true)    //기본 Back 버튼 숨김
+                    .navigationBarItems(leading: viewUtil.backMenuButton()) //커스텀 Back 버튼 추가
+                    .popup(
+                        isPresented: $viewUtil.showToast,   //팝업 노출 여부
+                        type: .floater(verticalPadding: 40),
+                        position: .bottom,
+                        animation: .easeInOut(duration: 0.0),   //애니메이션 효과
+                        autohideIn: 2,  //팝업 노출 시간
+                        closeOnTap: false,
+                        closeOnTapOutside: false,
+                        view: {
+                            viewUtil.toast()    //팝업 화면
+                        }
+                    )
+                    .gesture(DragGesture(minimumDistance: 0.00001).onChanged {_ in
+                        viewUtil.dismissKeyboard() //키보드 닫기
+                    })
+                    .onAppear {
+                        //사용자 정보에 저장된 푸시 알림 여부 상태에 따른 토글 버튼의 상태 변경
+                        if UserDefaults.standard.object(forKey: "notificationStatus") != nil {
+                            myPageViewModel.showToggle = UserDefaults.standard.bool(forKey: "notificationStatus")
+                        }
+                        else {
+                            myPageViewModel.showToggle = UserDefaults.standard.bool(forKey: "notificationAuth")
+                        }
+                    }
+                }.onChange(of: scenePhase) { newPahase in
+                    if newPahase == .active {
+                        signInViewModel.authSignIn() {result in
+                            if result != "success" {
+                                sideMenuViewModel.signOut()
+                                UserDefaults.standard.set(false, forKey: "isSignIn")
                             }
                         }
-                        .padding()
-                        
-                        PasswordChangeButton(viewUtil: viewUtil, myPageViewModel: myPageViewModel)               //비밀번호 수정 버튼
-                        
-                        Spacer().frame(height: 1)
-                    }
-                }
-                .navigationBarTitle(Text("My Page"), displayMode: .inline)  //Navigation Bar 타이틀
-                .navigationBarBackButtonHidden(true)    //기본 Back 버튼 숨김
-                .navigationBarItems(leading: viewUtil.backMenuButton()) //커스텀 Back 버튼 추가
-                .popup(
-                    isPresented: $viewUtil.showToast,   //팝업 노출 여부
-                    type: .floater(verticalPadding: 40),
-                    position: .bottom,
-                    animation: .easeInOut(duration: 0.0),   //애니메이션 효과
-                    autohideIn: 2,  //팝업 노출 시간
-                    closeOnTap: false,
-                    closeOnTapOutside: false,
-                    view: {
-                        viewUtil.toast()    //팝업 화면
-                    }
-                )
-                .gesture(DragGesture(minimumDistance: 0.00001).onChanged {_ in
-                    viewUtil.dismissKeyboard() //키보드 닫기
-                })
-                .onAppear {
-                    //사용자 정보에 저장된 푸시 알림 여부 상태에 따른 토글 버튼의 상태 변경
-                    if UserDefaults.standard.object(forKey: "notificationStatus") != nil {
-                        myPageViewModel.showToggle = UserDefaults.standard.bool(forKey: "notificationStatus")
-                    }
-                    else {
-                        myPageViewModel.showToggle = UserDefaults.standard.bool(forKey: "notificationAuth")
                     }
                 }
             }
@@ -210,6 +236,34 @@ struct PasswordChange: View {
                     .keyboardType(.alphabet)    //키보드 타입 - 영문만 표시
                 TextFieldUnderLine()    //Text Field 밑줄
             }
+            //새 비밀번호 확인
+            Section(
+                header:HStack {
+                    
+                }) {
+                    Button(action: {
+                        myPageViewModel.showAlert = true  //알람 노출 여부
+                        myPageViewModel.alert = myPageViewModel.deleteUserAlert()  //알람 생성
+                        print("delete")
+                    })
+                    {
+                        HStack{
+                            Image(systemName: "trash")
+                                .font(.system(size: 15))
+                            Text("회원탈퇴")
+                                .fontWeight(.semibold)
+                                .font(.system(size: 15))
+                        }
+                        .padding(EdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10))
+                        .foregroundColor(.white)
+                        .background(Color(red:240 / 255 , green : 50 / 255 , blue: 20 / 255).ignoresSafeArea())
+                        .cornerRadius(10)
+                    }
+                    .alert(isPresented: $myPageViewModel.showAlert) {
+                        myPageViewModel.alert! //알림창 호출
+                    }
+            }
+                .padding(EdgeInsets(top: 1, leading: 0, bottom: 0, trailing: 0))
         }
     }
 }
@@ -271,7 +325,78 @@ struct PasswordChangeButton: View {
     }
 }
 
+////MARK: - 회원탈퇴
+//struct deleteUser: View {
+//    @ObservedObject var myPageViewModel: MyPageViewModel
+//    var body: some View {
+//        
+//    }
+//}
+
+//MARK: - 로그인 실패 알림 팝업
+struct SignInFailurePopupInPage: View {
+    
+    var body: some View {
+        NavigationView {
+            GeometryReader { geometryReader in
+                VStack {
+                    VStack {
+                        Text("로그인 실패")
+                            .fontWeight(.bold)
+                        
+                        VStack {
+                            HorizontalDividerLine()
+                            
+                            Text("로그인 정보가 일치하지 않아 로그인에 실패하였습니다.앱을 종료합니다.")
+                                .font(.subheadline)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.horizontal)
+                            
+                            HorizontalDividerLine()
+                            
+                            // 앱 종료
+                            Button(
+                                
+                                action: {
+                                    UIApplication.shared.perform(#selector(NSXPCConnection.suspend))
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                        exit(0)
+                                    }
+                                },
+                                label: {
+                                    Text("확인")
+                                        .fontWeight(.bold)
+                                        .foregroundColor(Color.white)
+                                        .padding(.horizontal)
+                                        .frame(maxWidth: .infinity, maxHeight: 30)
+                                        .background(Color("Color_3498DB"))
+                                        .cornerRadius(5)
+                                        .shadow(color: .gray, radius: 1, x: 1.5, y: 1.5)
+                                }
+                            )
+                            .padding([.bottom, .leading, .trailing], 10)
+                        }
+                    }
+                    .padding(.top)
+                    .background(Color.white)
+                    .cornerRadius(5.0)
+                    .frame(maxWidth: .infinity, maxHeight: 
+                            UIDevice.isiPhoneSE()
+                           ? geometryReader.size.height/2.8
+                           : geometryReader.size.height/3.8)
+                }
+                .padding()
+                .frame(width: geometryReader.size.width, height: geometryReader.size.height)
+                .background(Color.black.opacity(0.5))
+            }
+            .edgesIgnoringSafeArea(.all)
+        }
+    }
+}
+
+
 //MARK: - preview
+
 struct MyPageView_Previews: PreviewProvider {
     static var previews: some View {
         MyPageView()

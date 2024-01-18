@@ -9,12 +9,20 @@ import SwiftUI
 import UIKit
 
 //MARK: - 악취 접수 이력 화면
+
 struct ReceptionHistoryView: View {
+    @Environment(\.presentationMode) var presentationMode   //Back 버튼 기능 추가에 필요
     @EnvironmentObject var viewUtil: ViewUtil   //화면 Util
     @ObservedObject var viewOptionSet = ViewOptionSet() //화면 Option Set
     @ObservedObject var codeViewModel = CodeViewModel() //Code View Model
-    //@ObservedObject var historyViewModel = ReceptionHistoryViewModel()   //Reception History View Model
+//    @ObservedObject var historyViewModel = ReceptionHistoryViewModel()   //Reception History View Model
     @EnvironmentObject var historyViewModel: ReceptionHistoryViewModel
+    
+    @Environment(\.scenePhase) var scenePhase
+    @ObservedObject var signInViewModel = SignInViewModel() //Sign In View Model
+    @StateObject var sideMenuViewModel = SideMenuViewModel() //Sign In View Model
+    
+    @AppStorage("isSignIn") var isSignIn : Bool = true
     
     @StateObject private var stateViewUtil = ViewUtil()
     @StateObject private var stateWeatherViewModel = WeatherViewModel()
@@ -38,6 +46,10 @@ struct ReceptionHistoryView: View {
                 .environmentObject(stateReceptionHistoryViewModel)
         }
         else {
+            if !UserDefaults.standard.bool(forKey: "isSignIn") {
+//            SignInView().environmentObject(viewUtil)
+                SignInFailurePopupInPage()
+            } else {
             ZStack {
                 //첨부사진 이미지 팝업 창 활성 여부에 따라 팝업 활성
                 if historyViewModel.showImageModal {
@@ -75,7 +87,18 @@ struct ReceptionHistoryView: View {
             }
             .onAppear {
                 historyViewModel.getSmellCode()  //악취 강도 코드 호출
+            }.onChange(of: scenePhase) { newPahase in
+                if newPahase == .active {
+                    signInViewModel.authSignIn() {result in
+                        if result != "success" {
+                            sideMenuViewModel.signOut()
+                            UserDefaults.standard.set(false, forKey: "isSignIn")
+                            self.presentationMode.wrappedValue.dismiss()
+                        }
+                    }
+                }
             }
+        }
         }
     }
 }
@@ -520,6 +543,7 @@ struct ImageModalView: View {
         .edgesIgnoringSafeArea(.all)
     }
 }
+
 
 struct ReceptionHistoryView_Previews: PreviewProvider {
     static var previews: some View {

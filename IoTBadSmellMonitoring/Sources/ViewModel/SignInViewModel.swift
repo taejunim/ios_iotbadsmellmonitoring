@@ -24,8 +24,8 @@ class SignInViewModel: ObservableObject {
         
         //API 호출 - Request Body
         let parameters = [
-            "userId": UserDefaults.standard.string(forKey: "userId")!,
-            "userPassword": UserDefaults.standard.string(forKey: "password")!
+            "userId": UserDefaults.standard.string(forKey: "userId") ?? "null",
+            "userPassword": UserDefaults.standard.string(forKey: "password") ?? "null"
         ]
         
         //로그인 API 호출
@@ -43,6 +43,7 @@ class SignInViewModel: ObservableObject {
                     UserDefaults.standard.set(signIn.data?.topRegionName, forKey: "topRegionName")  //상위 지역 명
                     UserDefaults.standard.set(signIn.data?.subRegionCode, forKey: "subRegionCode")  //하위 지역 코드
                     UserDefaults.standard.set(signIn.data?.subRegionName, forKey: "subRegionName")  //하위 지역 명
+                    UserDefaults.standard.set(true, forKey: "isSignIn")                             //로그인 여부
                 }
                 //로그인 실패
                 else {
@@ -50,9 +51,13 @@ class SignInViewModel: ObservableObject {
                     for key in UserDefaults.standard.dictionaryRepresentation().keys {
                         UserDefaults.standard.removeObject(forKey: key.description)
                     }
-                    
-                    self.result = signIn.result
-                    self.message = "아이디 또는 비밀번호가 일치하지 않습니다."
+                    if signIn.result == "statusNotChange" {
+                        self.result = signIn.result
+                        self.message = "관리자 승인이 필요한 회원입니다."
+                    } else {
+                        self.result = signIn.result
+                        self.message = "아이디 또는 비밀번호가 일치하지 않습니다."
+                    }
                 }
                 
                 completion(self.result)
@@ -96,11 +101,17 @@ class SignInViewModel: ObservableObject {
                     UserDefaults.standard.set(signIn.data?.topRegionName, forKey: "topRegionName")  //상위 지역 명
                     UserDefaults.standard.set(signIn.data?.subRegionCode, forKey: "subRegionCode")  //하위 지역 코드
                     UserDefaults.standard.set(signIn.data?.subRegionName, forKey: "subRegionName")  //하위 지역 명
+                    UserDefaults.standard.set(true, forKey: "isSignIn")                             //로그인 여부
                 }
                 //로그인 실패
                 else {
-                    self.result = signIn.result
-                    self.message = "아이디 또는 비밀번호가 일치하지 않습니다."
+                    if signIn.result == "statusNotChange" {
+                        self.result = signIn.result
+                        self.message = "관리자 승인이 필요한 회원입니다."
+                    } else {
+                        self.result = signIn.result
+                        self.message = "아이디 또는 비밀번호가 일치하지 않습니다."
+                    }
                 }
                 
                 completion(self.result)

@@ -8,8 +8,14 @@
 import SwiftUI
 
 //MARK: - 악취 접수 등록 화면
+
 struct ReceptionRegistView: View {
     @Environment(\.presentationMode) var presentationMode   //Back 버튼 기능 추가에 필요
+    @Environment(\.scenePhase) var scenePhase
+    @ObservedObject var signInViewModel = SignInViewModel() //Sign In View Model
+    @StateObject var sideMenuViewModel = SideMenuViewModel() //Sign In View Model
+    
+    @AppStorage("isSignIn") var isSignIn : Bool = true
     
     @EnvironmentObject var viewUtil: ViewUtil   //View Util
     @ObservedObject var viewOptionSet = ViewOptionSet() //화면 Option Set
@@ -19,68 +25,91 @@ struct ReceptionRegistView: View {
     @State var selectSmell: [String: String]    //선택한 악취 강도
     
     var body: some View {
-        ZStack {
-            //취기 선택 팝업 창
-            if viewUtil.showModal {
-                SmellTypeModalView(viewUtil: viewUtil, receptionViewModel: receptionViewModel)
-                    .zIndex(1)
-            }
+        
+        if !UserDefaults.standard.bool(forKey: "isSignIn") {
+//            SignInView().environmentObject(viewUtil)
+            SignInFailurePopupInPage()
             
-            //악취 접수 등록 화면
-            VStack {
-                ScrollView {
-                    VStack {
-                        SelectSmellView(viewUtil: viewUtil, receptionViewModel: receptionViewModel, selectSmell: $selectSmell)  //취기 및 악취 강도 선택 화면
-                        
-                        DividerLine()   //구분선
-
-                        AttachPictureView(viewUtil: viewUtil, receptionViewModel: receptionViewModel) //촬영사진 첨부 화면
-                        
-                        DividerLine()   //구분선
-                        
-                        AddMessageView(receptionViewModel: receptionViewModel)    //전달사항 추가 화면
-                        
-                        DividerLine()   //구분선
-                    }
-                    .offset(x: 0, y: -keyboardUtil.currentHeight)   //키보드 활성화 시, 키보드 높이 만큼 화면 올리기
+        } else {
+            ZStack {
+                //취기 선택 팝업 창
+                if viewUtil.showModal {
+                    SmellTypeModalView(viewUtil: viewUtil, receptionViewModel: receptionViewModel)
+                        .zIndex(1)
                 }
                 
-                ReceptionRegistButton(viewUtil: viewUtil, location: location, receptionViewModel: receptionViewModel)   //접수 등록 버튼
+                //악취 접수 등록 화면
+                VStack {
+                    ScrollView {
+                        VStack {
+                            
+                                SelectSmellView(viewUtil: viewUtil, receptionViewModel: receptionViewModel, selectSmell: $selectSmell)  //취기 및 악취 강도 선택 화면
+                            
+                            DividerLine()   //구분선
+
+                            AttachPictureView(viewUtil: viewUtil, receptionViewModel: receptionViewModel) //촬영사진 첨부 화면
+                            
+                            DividerLine()   //구분선
+                            
+                            AddMessageView(receptionViewModel: receptionViewModel)    //전달사항 추가 화면
+                            
+                            DividerLine()   //구분선
+                        }
+                        .offset(x: 0, y: -keyboardUtil.currentHeight)   //키보드 활성화 시, 키보드 높이 만큼 화면 올리기
+                    }
+                    
+                    ReceptionRegistButton(viewUtil: viewUtil, location: location, receptionViewModel: receptionViewModel)   //접수 등록 버튼
+                    
+                    Spacer().frame(height: 1)
+                }
+                .navigationBarTitle(Text("악취 접수 등록"), displayMode: .inline) //Navigation Bar 타이틀
+                .navigationBarBackButtonHidden(true)    //기본 Back 버튼 숨김
+                .navigationBarItems(leading: BackButton())  //커스텀 Back 버튼 추가
+                .onAppear{
+                    receptionViewModel.getReceptionTimeCode()
+                }
+            }
+            .onAppear {
+                receptionViewModel.selectSmellCode = selectSmell["code"] ?? ""  //선택한 악취 코드
+                receptionViewModel.getSmellTypeCode()   //악취 취기 코드
+                receptionViewModel.getReceptionTimeCode()   //접수 등록 시간대 코드
                 
-                Spacer().frame(height: 1)
+                receptionViewModel.selectSmellType = "000"  //선택한 취기 초기화
+                receptionViewModel.selectTempSmellType = "000"  //선택한 임시 취기 초기화
+                receptionViewModel.pickedImageArray = [:]   //선택한 이미지 배열 초기화
             }
-            .navigationBarTitle(Text("악취 접수 등록"), displayMode: .inline) //Navigation Bar 타이틀
-            .navigationBarBackButtonHidden(true)    //기본 Back 버튼 숨김
-            .navigationBarItems(leading: BackButton())  //커스텀 Back 버튼 추가
-        }
-        .onAppear {
-            receptionViewModel.selectSmellCode = selectSmell["code"] ?? ""  //선택한 악취 코드
-            receptionViewModel.getSmellTypeCode()   //악취 취기 코드
-            receptionViewModel.getReceptionTimeCode()   //접수 등록 시간대 코드
-            
-            receptionViewModel.selectSmellType = "000"  //선택한 취기 초기화
-            receptionViewModel.selectTempSmellType = "000"  //선택한 임시 취기 초기화
-            receptionViewModel.pickedImageArray = [:]   //선택한 이미지 배열 초기화
-        }
-        .popup(
-            isPresented: $viewUtil.showToast,   //팝업 노출 여부
-            type: .floater(verticalPadding: 40),
-            position: .bottom,
-            animation: .easeInOut(duration: 0.0),   //애니메이션 효과
-            autohideIn: 2,  //팝업 노출 시간
-            closeOnTap: false,
-            closeOnTapOutside: false,
-            view: {
-                viewUtil.toast()    //팝업 화면
+            .popup(
+                isPresented: $viewUtil.showToast,   //팝업 노출 여부
+                type: .floater(verticalPadding: 40),
+                position: .bottom,
+                animation: .easeInOut(duration: 0.0),   //애니메이션 효과
+                autohideIn: 2,  //팝업 노출 시간
+                closeOnTap: false,
+                closeOnTapOutside: false,
+                view: {
+                    viewUtil.toast()    //팝업 화면
+                }
+            )
+            .gesture(DragGesture(minimumDistance: 0.00001).onChanged { _ in
+                viewUtil.dismissKeyboard() //키보드 닫기
+            })
+            .onChange(of: scenePhase) { newPahase in
+                if newPahase == .active {
+                    signInViewModel.authSignIn() {result in
+                        if result != "success" {
+                            sideMenuViewModel.signOut()
+                            UserDefaults.standard.set(false, forKey: "isSignIn")
+                            self.presentationMode.wrappedValue.dismiss()
+                        }
+                    }
+                }
             }
-        )
-        .gesture(DragGesture(minimumDistance: 0.00001).onChanged { _ in
-            viewUtil.dismissKeyboard() //키보드 닫기
-        })
+        }
     }
 }
 
 //MARK: - 취기 및 악취 강도 선택 화면
+
 struct SelectSmellView: View {
     @ObservedObject var viewUtil: ViewUtil
     @ObservedObject var receptionViewModel: ReceptionRegistViewModel
@@ -89,12 +118,52 @@ struct SelectSmellView: View {
 
     var body: some View {
         VStack {
-            Text("취기 및 악취 강도 선택")
-                .fontWeight(.bold)
-            
-            VStack {
-                SmellTypeButton(viewUtil: viewUtil, receptionViewModel: receptionViewModel) //취기 선택 버튼
+            if selectSmell["code"] != "001" {
+                Text("취기 및 악취 강도 선택")
+                    .fontWeight(.bold)
                 
+                VStack {
+                    SmellTypeButton(viewUtil: viewUtil, receptionViewModel: receptionViewModel) //취기 선택 버튼
+                    
+                    let smellCode: String = selectSmell["code"] ?? ""   //코드
+                    let smellName: String = selectSmell["codeName"] ?? ""   //코드 명
+                    let smellComment: String = selectSmell["codeComment"] ?? "" //코드 설명
+                    
+                    
+                    
+                    
+                    //악취 강도 선택 버튼 색상
+                    let smellColor: String = {
+                        switch smellCode {
+                        case "001":
+                            return "Zero.Degree"
+                        case "002":
+                            return "One.Degree"
+                        case "003":
+                            return "Two.Degree"
+                        case "004":
+                            return "Three.Degree"
+                        case "005":
+                            return "Four.Degree"
+                        case "006":
+                            return "Five.Degree"
+                        default:
+                            return "Color_FFFFFF"
+                        }
+                    }()
+                    
+                    //악취 강도 명 - 악취 강도 설명
+                    Text("\(smellName) - \(smellComment)")
+                        .fontWeight(.bold)
+                        .foregroundColor(Color.white)
+                        .padding()
+                        .frame(maxWidth: .infinity, maxHeight: 35, alignment: .leading)
+                        .background(Color(smellColor))
+                        .cornerRadius(10.0)
+                }
+            }
+            else
+            {
                 let smellCode: String = selectSmell["code"] ?? ""   //코드
                 let smellName: String = selectSmell["codeName"] ?? ""   //코드 명
                 let smellComment: String = selectSmell["codeComment"] ?? "" //코드 설명
@@ -118,6 +187,7 @@ struct SelectSmellView: View {
                         return "Color_FFFFFF"
                     }
                 }()
+               
                 
                 //악취 강도 명 - 악취 강도 설명
                 Text("\(smellName) - \(smellComment)")
@@ -134,9 +204,11 @@ struct SelectSmellView: View {
 }
 
 //MARK: - 취기 선택 팝업 호출 버튼
+
+
 struct SmellTypeButton: View {
     @ObservedObject var viewUtil: ViewUtil
-    @ObservedObject var receptionViewModel: ReceptionRegistViewModel
+    @ObservedObject var receptionViewModel: ReceptionRegistViewModel;
     
     var body: some View {
         Button(
@@ -146,7 +218,9 @@ struct SmellTypeButton: View {
             label: {
                 VStack(alignment: .center) {
                     Spacer()
-                    if receptionViewModel.selectSmellType == "000" {
+                    
+                    if receptionViewModel.selectSmellType == "000"
+                    || receptionViewModel.selectSmellType == "" {
                         Spacer()
                         //취기 이미지
                         Image(systemName: "plus.rectangle")
@@ -168,6 +242,127 @@ struct SmellTypeButton: View {
                         ForEach(receptionViewModel.smellTyepCode, id: \.self) { code in
                             let smellTypeCode: String = code["code"] ?? ""  //코드
                             let smellTypeName: String = code["codeName"] ?? ""  //코드
+                            
+//                            if (smellTypeCode != "") {
+//                                
+//                            } else {
+//                                let smellTypeIcon : String = [[:]]
+//                            }
+                            //취기 선택 버튼 아이콘 이미지명
+                            let smellTypeIcon: String = {
+                                switch smellTypeCode {
+                                case "001":
+                                    return "Chicken.Smell"
+                                case "002":
+                                    return "Etc.Smell"
+                                case "003":
+                                    return "Pig.Smell"
+                                case "004":
+                                    return "Fertilizer.Smell"
+                                case "005":
+                                    return "Cow.Smell"
+                                case "006":
+                                    return "Waste.Smell"
+                                case "007":
+                                    return "Boiled.Smell"
+                                case "008":
+                                    return "No.Smell"
+                                case "009":
+                                    return "Compost.Smell"
+                                default:
+                                    return "Etc.Smell"
+                                }
+                            }()
+                    //선택한 취기 버튼
+                    if smellTypeCode == receptionViewModel.selectSmellType {
+                        
+                            //취기 이미지
+                            Image(smellTypeIcon)
+                                .resizable()
+                                .renderingMode(.template)
+                                .foregroundColor(Color.white)
+                                .aspectRatio(1, contentMode: .fit)
+                            
+                            Spacer()
+                            
+                            
+                            //취기 명
+                            Text(smellTypeName)
+                                .font(.callout)
+                                .fontWeight(.bold)
+                                .foregroundColor(Color.white)
+                                .multilineTextAlignment(.center)
+                                .padding(.vertical, 5)
+                            }
+                        }
+                    }
+                }
+                .frame(width: 120, height: 120)
+                .background(receptionViewModel.selectSmellType == "000" || receptionViewModel.selectSmellType == "" ? Color("Color_DFDFDF") : Color("Color_E4513D"))
+                .cornerRadius(10)
+            }
+        )
+        .padding()
+    }
+}
+
+//MARK: - 취기 선택 팝업
+struct SmellTypeModalView: View {
+    @ObservedObject var viewUtil: ViewUtil
+    @ObservedObject var receptionViewModel: ReceptionRegistViewModel
+    
+    var body: some View {
+        GeometryReader { geometryReader in
+            VStack {
+                VStack {
+                    Text("취기 선택")
+                        .fontWeight(.bold)
+                    
+                    
+                    SmellTypeListView(receptionViewModel: receptionViewModel)   //취기 목록 화면
+                    SmellTypeModalButton(viewUtil: viewUtil, receptionViewModel: receptionViewModel) //취기 선택 팝업 하단 버튼
+                }
+                .padding(.top)
+                .background(Color.white)
+                .cornerRadius(5.0)
+                .frame(height: geometryReader.size.height/1.5)
+            }
+            .padding()
+            .frame(width: geometryReader.size.width, height: geometryReader.size.height)
+            .background(Color.black.opacity(0.5))
+        }
+        .edgesIgnoringSafeArea(.all)
+        .onAppear{
+                if (receptionViewModel.smellTyepCode == [[:]]) {
+                    receptionViewModel.getSmellTypeCode()
+//                    receptionViewModel.getReceptionTimeCode()
+                }
+        }
+    }
+}
+
+//MARK: - 취기 선택 팝업: 취기 목록 화면
+struct SmellTypeListView: View {
+    @ObservedObject var receptionViewModel: ReceptionRegistViewModel
+    
+    var body: some View {
+        ScrollView{
+            let totalCount: Int = self.receptionViewModel.smellTyepCode.count   //취기 총 개수
+            
+            
+            //한 줄에 3개씩 출력 (3 x n)
+            ForEach(0..<totalCount/3, id: \.self) { row in
+                HStack {
+                    
+                    ForEach(0..<3) { index in
+                        
+                        
+                            
+                            let codeIndex = row * 3 + index //코드 Index
+                            if codeIndex != 7 {
+                            let smellTypeCode: String = receptionViewModel.smellTyepCode[codeIndex]["code"] ?? ""   //취기 코드
+                            let smellTypeName: String = receptionViewModel.smellTyepCode[codeIndex]["codeName"] ?? ""   //취기 명
+                            
                             
                             //취기 선택 버튼 아이콘 이미지명
                             let smellTypeIcon: String = {
@@ -194,166 +389,65 @@ struct SmellTypeButton: View {
                                     return "Etc.Smell"
                                 }
                             }()
-                            
-                            //선택한 취기 버튼
-                            if smellTypeCode == receptionViewModel.selectSmellType {
-                                //취기 이미지
-                                Image(smellTypeIcon)
-                                    .resizable()
-                                    .renderingMode(.template)
-                                    .foregroundColor(Color.white)
-                                    .aspectRatio(1, contentMode: .fit)
-                                
-                                Spacer()
-                                
-                                
-                                //취기 명
-                                Text(smellTypeName)
-                                    .font(.callout)
-                                    .fontWeight(.bold)
-                                    .foregroundColor(Color.white)
-                                    .multilineTextAlignment(.center)
-                                    .padding(.vertical, 5)
-                            }
-                        }
-                    }
-                }
-                .frame(width: 120, height: 120)
-                .background(receptionViewModel.selectSmellType == "000" ? Color("Color_DFDFDF") : Color("Color_E4513D"))
-                .cornerRadius(10)
-            }
-        )
-        .padding()
-    }
-}
-
-//MARK: - 취기 선택 팝업
-struct SmellTypeModalView: View {
-    @ObservedObject var viewUtil: ViewUtil
-    @ObservedObject var receptionViewModel: ReceptionRegistViewModel
-    
-    var body: some View {
-        GeometryReader { geometryReader in
-            VStack {
-                VStack {
-                    Text("취기 선택")
-                        .fontWeight(.bold)
-                    
-                    SmellTypeListView(receptionViewModel: receptionViewModel)   //취기 목록 화면
-                    SmellTypeModalButton(viewUtil: viewUtil, receptionViewModel: receptionViewModel) //취기 선택 팝업 하단 버튼
-                }
-                .padding(.top)
-                .background(Color.white)
-                .cornerRadius(5.0)
-                .frame(height: geometryReader.size.height/1.5)
-            }
-            .padding()
-            .frame(width: geometryReader.size.width, height: geometryReader.size.height)
-            .background(Color.black.opacity(0.5))
-        }
-        .edgesIgnoringSafeArea(.all)
-    }
-}
-
-//MARK: - 취기 선택 팝업: 취기 목록 화면
-struct SmellTypeListView: View {
-    @ObservedObject var receptionViewModel: ReceptionRegistViewModel
-    
-    var body: some View {
-        ScrollView{
-            let totalCount: Int = self.receptionViewModel.smellTyepCode.count   //취기 총 개수
-            
-            //한 줄에 3개씩 출력 (3 x n)
-            ForEach(0..<totalCount/3, id: \.self) { row in
-                HStack {
-                    ForEach(0..<3) { index in
-                        let codeIndex = row * 3 + index //코드 Index
-                        let smellTypeCode: String = receptionViewModel.smellTyepCode[codeIndex]["code"] ?? ""   //취기 코드
-                        let smellTypeName: String = receptionViewModel.smellTyepCode[codeIndex]["codeName"] ?? ""   //취기 명
-                        
-                        //취기 선택 버튼 아이콘 이미지명
-                        let smellTypeIcon: String = {
-                            switch smellTypeCode {
-                            case "001":
-                                return "Chicken.Smell"
-                            case "002":
-                                return "Etc.Smell"
-                            case "003":
-                                return "Pig.Smell"
-                            case "004":
-                                return "Fertilizer.Smell"
-                            case "005":
-                                return "Cow.Smell"
-                            case "006":
-                                return "Waste.Smell"
-                            case "007":
-                                return "Boiled.Smell"
-                            case "008":
-                                return "No.Smell"
-                            case "009":
-                                return "Compost.Smell"
-                            default:
-                                return "Etc.Smell"
-                            }
-                        }()
-                        
-                        //취기 선택 버튼
-                        Button(
-                            action: {
-                                self.receptionViewModel.selectTempSmellType = smellTypeCode //선택한 취기 코드
-                            },
-                            label: {
-                                VStack {
-                                    VStack(alignment: .center) {
-                                        Spacer()
+                            //취기 선택 버튼
+                            Button(
+                                action: {
+                                    self.receptionViewModel.selectTempSmellType = smellTypeCode //선택한 취기 코드
+                                    receptionViewModel.getReceptionTimeCode()
+                                },
+                                label: {
+                                    VStack {
+                                        VStack(alignment: .center) {
+                                            Spacer()
+                                            
+                                            //취기 이미지
+                                            Image(smellTypeIcon)
+                                                .resizable()
+                                                .renderingMode(.template)
+                                                .foregroundColor(smellTypeCode == receptionViewModel.selectTempSmellType ? Color.white : Color.black)
+                                                .aspectRatio(1, contentMode: .fit)
+                                            
+                                            Spacer()
+                                            
+                                            //취기 명
+                                            Text(smellTypeName)
+                                                .font(.callout)
+                                                .fontWeight(.bold)
+                                                .foregroundColor(smellTypeCode == receptionViewModel.selectTempSmellType ? Color.white : Color.black)
+                                                .multilineTextAlignment(.center)
+                                                .padding(.vertical, 5)
+                                        }
+                                        .frame(width: 100, height: 100)
+                                        .background(smellTypeCode == receptionViewModel.selectTempSmellType ? Color("Color_E4513D") : Color("Color_DFDFDF"))
+                                        .cornerRadius(10)
                                         
-                                        //취기 이미지
-                                        Image(smellTypeIcon)
-                                            .resizable()
-                                            .renderingMode(.template)
-                                            .foregroundColor(smellTypeCode == receptionViewModel.selectTempSmellType ? Color.white : Color.black)
-                                            .aspectRatio(1, contentMode: .fit)
-                                        
-                                        Spacer()
-                                        
-                                        //취기 명
-                                        Text(smellTypeName)
-                                            .font(.callout)
-                                            .fontWeight(.bold)
-                                            .foregroundColor(smellTypeCode == receptionViewModel.selectTempSmellType ? Color.white : Color.black)
-                                            .multilineTextAlignment(.center)
-                                            .padding(.vertical, 5)
-                                    }
-                                    .frame(width: 100, height: 100)
-                                    .background(smellTypeCode == receptionViewModel.selectTempSmellType ? Color("Color_E4513D") : Color("Color_DFDFDF"))
-                                    .cornerRadius(10)
-                                    
-                                    //라디오 버튼
-                                    ZStack {
-                                        Circle()
-                                            .fill(Color.white)
-                                            .frame(width: 18, height: 18)
-                                            .overlay(
-                                                Circle()
-                                                    .stroke(smellTypeCode == receptionViewModel.selectTempSmellType ? Color("Color_E4513D") : Color.gray, lineWidth: 1)
-                                            )
-                                        
-                                        //취기 선택한 경우 해당 라디오 버튼 체크 표시
-                                        if smellTypeCode == receptionViewModel.selectTempSmellType {
+                                        //라디오 버튼
+                                        ZStack {
                                             Circle()
-                                                .fill(Color("Color_E4513D"))
-                                                .frame(width: 10, height: 10)
+                                                .fill(Color.white)
+                                                .frame(width: 18, height: 18)
+                                                .overlay(
+                                                    Circle()
+                                                        .stroke(smellTypeCode == receptionViewModel.selectTempSmellType ? Color("Color_E4513D") : Color.gray, lineWidth: 1)
+                                                )
+                                                //취기 선택한 경우 해당 라디오 버튼 체크 표시
+                                                if smellTypeCode == receptionViewModel.selectTempSmellType {
+                                                    Circle()
+                                                        .fill(Color("Color_E4513D"))
+                                                        .frame(width: 10, height: 10)
+                                            }
                                         }
                                     }
                                 }
-                            }
-                        )
-                        
-                        //row의 마지막 Spacer 제외
-                        if index != 2 {
-                            Spacer()
+                                    
+                            )
+                            //row의 마지막 Spacer 제외
+//                            if index != 2 {
+//                                Spacer()
+//                            }
                         }
                     }
+                       
                 }
                 .padding()
             }
@@ -577,10 +671,10 @@ struct ReceptionRegistButton: View {
                     viewUtil.alert = location.requestAuthAlert() //위치 서비스 권한 요청 알림창
                 }
                 else {
-                    //접수 시간대에 따른 등록 가능 여부 확인 후, 등록 실행
-                    receptionViewModel.isTimeZoneValid() { (valid) in
-                        if valid {
-                            if receptionViewModel.isSmellTypeValid() {
+                    
+                    if receptionViewModel.isSmellTypeValid() {
+                        receptionViewModel.isTimeZoneValid() { (vaild) in
+                            if vaild {
                                 //등록 알림창
                                 var registAlert: Alert {
                                     return Alert(
@@ -623,18 +717,74 @@ struct ReceptionRegistButton: View {
                                 
                                 viewUtil.showAlert = true   //알림창 호출 여부
                                 viewUtil.alert = registAlert    //등록 알림창 호출
-                            }
-                            else {
+                            } else {
                                 viewUtil.showToast = true
                                 viewUtil.toastMessage = receptionViewModel.validMessage
                             }
                         }
-                        //접수 등록 불가인 경우 Toast 메시지 출력
-                        else {
-                            viewUtil.showToast = true
-                            viewUtil.toastMessage = receptionViewModel.validMessage
-                        }
+                    } else {
+                        viewUtil.showToast = true
+                        viewUtil.toastMessage = receptionViewModel.validMessage
                     }
+                    
+                    //접수 시간대에 따른 등록 가능 여부 확인 후, 등록 실행
+//                    receptionViewModel.isTimeZoneValid() { (valid) in
+//                        if valid {
+//                            if receptionViewModel.isSmellTypeValid() {
+//                                //등록 알림창
+//                                var registAlert: Alert {
+//                                    return Alert(
+//                                        title: Text("악취 접수 등록"),
+//                                        message: Text("악취 접수 등록을 진행하시겠습니까?"),
+//                                        primaryButton: .destructive(
+//                                            Text("등록"),
+//                                            action: {
+//                                                viewUtil.isLoading = true   //로딩 시작
+//                                                disabledButton = true  //버튼 비활성화
+//                                                
+//                                                //악취 접수 등록 실행
+//                                                receptionViewModel.registReception() { (result) in
+//                                                    viewUtil.isLoading = false   //로딩 종료
+//                                                    
+//                                                    viewUtil.showToast = true   //Toast 팝업
+//                                                    viewUtil.toastMessage = receptionViewModel.message
+//                                                    
+//                                                    if result == "success" {
+//                                                        //현재시간 기준으로 1.5초 후 실행
+//                                                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+//                                                            viewUtil.isViewDismiss = true   //창 닫힘 여부
+//                                                            self.presentationMode.wrappedValue.dismiss()    //Navigation View 닫기
+//                                                        }
+//                                                    }
+//                                                    else {
+//                                                        self.disabledButton = false //버튼 활성화
+//                                                    }
+//                                                }
+//                                            }
+//                                        ),
+//                                        secondaryButton: .cancel(
+//                                            Text("취소"),
+//                                            action: {
+//                                                viewUtil.showAlert = false
+//                                            }
+//                                        )
+//                                    )
+//                                }
+//                                
+//                                viewUtil.showAlert = true   //알림창 호출 여부
+//                                viewUtil.alert = registAlert    //등록 알림창 호출
+//                            }
+//                            else {
+//                                viewUtil.showToast = true
+//                                viewUtil.toastMessage = receptionViewModel.validMessage
+//                            }
+//                        }
+//                        //접수 등록 불가인 경우 Toast 메시지 출력
+//                        else {
+//                            viewUtil.showToast = true
+//                            viewUtil.toastMessage = receptionViewModel.validMessage
+//                        }
+//                    }
                 }
             },
             label: {
@@ -653,6 +803,7 @@ struct ReceptionRegistButton: View {
         .disabled(disabledButton)    //등록 진행 시에 버튼 클릭 방지를 위한 비활성화
     }
 }
+
 
 struct ReceptionRegistView_Previews: PreviewProvider {
     static var previews: some View {

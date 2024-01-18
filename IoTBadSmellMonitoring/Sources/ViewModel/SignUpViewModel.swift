@@ -333,7 +333,7 @@ class SignUpViewModel: ObservableObject {
                 //회원가입 성공
                 if signUp.result == "success" {
                     self.result = signUp.result
-                    self.message = "회원가입이 완료되었습니다."
+                    self.message = "등록이 완료되었습니다.\n관리자 승인후 서비스 이용이 가능합니다."
                 }
                 //회원가입 실패
                 else {

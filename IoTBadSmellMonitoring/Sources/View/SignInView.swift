@@ -9,6 +9,7 @@ import SwiftUI
 import CoreLocation
 
 //MARK: - 로그인 화면
+
 struct SignInView: View {
     @ObservedObject var location = Location()   //Location
     @ObservedObject var signInViewModel = SignInViewModel() //Sign In View Model
@@ -180,6 +181,7 @@ struct FindPasswordButton: View {
         .padding(.top)
     }
 }
+
 
 struct SignInView_Previews: PreviewProvider {
     static var previews: some View {

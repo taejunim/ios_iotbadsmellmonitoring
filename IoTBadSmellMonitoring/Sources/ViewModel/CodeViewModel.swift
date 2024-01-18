@@ -73,6 +73,7 @@ class CodeViewModel: ObservableObject {
         request.execute(
             //API 호출 성공
             onSuccess: { (date) in
+                let _ = print("currentDate : " + date.data!)
                 completion(date.data!)
             },
             //API 호출 실패

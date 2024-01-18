@@ -8,6 +8,7 @@
 import SwiftUI
 
 //MARK: - Launch Screen
+
 struct LaunchScreen: View {
     @ObservedObject var signInViewModel = SignInViewModel() //Sign In View Model
     
@@ -200,8 +201,9 @@ struct SignInFailurePopup: View {
                         
                         //확인 버튼 - 로그인 화면 이동
                         Button(
+                            
                             action: {
-                                showLaunchScreen = false    //시작 화면 노출 여부 변경
+                                showLaunchScreen = false //시작 화면 노출 여부 변경
                             },
                             label: {
                                 Text("확인")
@@ -229,6 +231,7 @@ struct SignInFailurePopup: View {
         .edgesIgnoringSafeArea(.all)
     }
 }
+
 
 struct LaunchScreen_Previews: PreviewProvider {
     static var previews: some View {
